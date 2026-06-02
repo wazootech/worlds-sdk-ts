@@ -3,13 +3,44 @@ import { createClient } from "@libsql/client";
 import { DataFactory } from "n3";
 import { FakeEmbeddingService } from "@/client/search-index/embedding-service/mod.ts";
 import { LibsqlSearchIndexProjector } from "@/client/adapters/libsql/search-index/libsql-search-index-projector.ts";
-import { createLibsqlPersistHooks } from "@/client/adapters/libsql/create-libsql-persist-hooks.ts";
+import {
+  LibsqlQuadStore,
+  type LibsqlQuadStoreOptions,
+} from "@/client/adapters/libsql/quad-store/mod.ts";
+import { LibsqlRdfjsStore } from "@/client/adapters/libsql/rdfjs-store/mod.ts";
+import type { Patch, TransactionContext } from "@/client/quad-store/mod.ts";
 import {
   setupLibsqlSchemaForTest,
   sharedTextSplitter,
   testLibsqlSchemaBuilder,
   testLibsqlSearchQueryBuilder,
 } from "@/client/adapters/libsql/libsql-test-fixtures.ts";
+
+/** Compat helper wrapping LibsqlQuadStore for testing. */
+function createLibsqlPersistHooks(
+  options: Omit<LibsqlQuadStoreOptions, "store">,
+) {
+  const store = new LibsqlRdfjsStore({
+    client: options.client,
+    matchPageSize: options.matchPageSize,
+  });
+  const quadStore = new LibsqlQuadStore({
+    ...options,
+    store,
+  });
+  return {
+    commit: async (patch: Patch, context?: TransactionContext) => {
+      const tx = quadStore.createTransaction();
+      if (patch.insertions) {
+        tx.addQuads(patch.insertions);
+      }
+      if (patch.deletions) {
+        tx.removeQuads(patch.deletions);
+      }
+      await tx.commit(context);
+    },
+  };
+}
 import { LibsqlSearchIndex } from "./libsql-search-index.ts";
 import { rebuildLibsqlSearchIndexFromQuads } from "./rebuild-libsql-search-index-from-quads.ts";
 import { resolveLabelPredicates } from "./search-chunk-fts.ts";

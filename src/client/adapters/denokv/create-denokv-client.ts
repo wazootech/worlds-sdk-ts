@@ -6,19 +6,22 @@ import { ComunicaSparqlEngine } from "@/client/adapters/comunica/mod.ts";
 
 import { DenokvRdfjsStore } from "./rdfjs-store/mod.ts";
 import { DenokvSearchIndex } from "./search-index/mod.ts";
-import {
-  createDenokvPersistHooks,
-  type DenokvPersistHooksOptions,
-} from "./create-denokv-persist-hooks.ts";
-import { RdfjsQuadStore } from "@/client/adapters/rdfjs/rdfjs-quad-store.ts";
-import { Transaction } from "@/client/quad-store/mod.ts";
+import { DenokvQuadStore } from "./quad-store/mod.ts";
+import type { CommitPatchToDenokvOptions } from "./commit-patch-to-denokv.ts";
+import type { SearchIndexOnImport } from "@/client/search-index/mod.ts";
 
 /**
  * DenokvClientOptions specifies configuration parameters for Deno KV client contexts.
  */
-export interface DenokvClientOptions extends DenokvPersistHooksOptions {
+export interface DenokvClientOptions extends CommitPatchToDenokvOptions {
   /** queryEngine optionally enables built-in Comunica SPARQL over DenokvRdfjsStore. */
   queryEngine?: ComunicaQueryEngine;
+
+  /** searchIndexOnImport controls when search indexing runs. */
+  searchIndexOnImport?: SearchIndexOnImport;
+
+  /** reindex optionally triggers rebuilding external search indexes. */
+  reindex?: () => Promise<void>;
 }
 
 /**
@@ -27,8 +30,6 @@ export interface DenokvClientOptions extends DenokvPersistHooksOptions {
 export function createDenokvClient(
   options: DenokvClientOptions,
 ): ClientInterface {
-  const persistHooks = createDenokvPersistHooks(options);
-
   const denokvRdfjsStore = new DenokvRdfjsStore({
     kv: options.kv,
     keyPrefix: options.keyPrefix,
@@ -40,16 +41,16 @@ export function createDenokvClient(
     keyPrefix: options.keyPrefix,
   });
 
-  const quadStore = new RdfjsQuadStore({
-    store: denokvRdfjsStore as unknown as rdfjs.Store,
-    commit: persistHooks.commit,
+  const quadStore = new DenokvQuadStore({
+    ...options,
+    store: denokvRdfjsStore,
   });
 
   const sparqlEngine = options.queryEngine
     ? new ComunicaSparqlEngine({
       queryEngine: options.queryEngine,
       store: denokvRdfjsStore as unknown as rdfjs.Store,
-      createTransaction: () => new Transaction({ commit: persistHooks.commit }),
+      createTransaction: () => quadStore.createTransaction(),
     })
     : undefined;
 

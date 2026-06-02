@@ -8,15 +8,13 @@ import {
   LibsqlSearchIndex,
   LibsqlSearchIndexProjector,
 } from "@/client/adapters/libsql/search-index/mod.ts";
-import { createLibsqlPersistHooks } from "@/client/adapters/libsql/create-libsql-persist-hooks.ts";
+import { LibsqlQuadStore } from "./quad-store/mod.ts";
 
 import type { LibsqlClientBaseOptions } from "./libsql-client-base-options.ts";
 import { LibsqlRdfjsStore } from "./rdfjs-store/mod.ts";
 import { initializeLibsqlSchema } from "./initialize-libsql-schema.ts";
 import { LibsqlSchemaBuilder } from "./schema/libsql-schema-builder.ts";
 import { LibsqlSearchQueryBuilder } from "./search-index/libsql-search-query-builder.ts";
-import { RdfjsQuadStore } from "@/client/adapters/rdfjs/rdfjs-quad-store.ts";
-import { Transaction } from "@/client/quad-store/mod.ts";
 
 /**
  * LibsqlClientOptions configures LibSQL execution through LibsqlRdfjsStore and quad indexes.
@@ -53,27 +51,23 @@ export async function createLibsqlClient(
     textSplitter,
   });
 
-  const persistHooks = createLibsqlPersistHooks({
-    ...options,
-    searchQueryBuilder,
-    searchIndexProjector,
-  });
-
   const libsqlRdfjsStore = new LibsqlRdfjsStore({
     client: options.client,
     matchPageSize: options.matchPageSize,
   });
 
-  const quadStore = new RdfjsQuadStore({
-    store: libsqlRdfjsStore as unknown as rdfjs.Store,
-    commit: persistHooks.commit,
+  const quadStore = new LibsqlQuadStore({
+    ...options,
+    store: libsqlRdfjsStore,
+    searchQueryBuilder,
+    searchIndexProjector,
   });
 
   const sparqlEngine = options.queryEngine
     ? new ComunicaSparqlEngine({
       queryEngine: options.queryEngine,
       store: libsqlRdfjsStore as unknown as rdfjs.Store,
-      createTransaction: () => new Transaction({ commit: persistHooks.commit }),
+      createTransaction: () => quadStore.createTransaction(),
     })
     : undefined;
 

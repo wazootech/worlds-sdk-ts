@@ -2,7 +2,12 @@ import { assertEquals } from "@std/assert";
 import { createClient } from "@libsql/client";
 import { DataFactory } from "n3";
 import { LibsqlSearchIndexProjector } from "@/client/adapters/libsql/search-index/libsql-search-index-projector.ts";
-import { createLibsqlPersistHooks } from "./create-libsql-persist-hooks.ts";
+import {
+  LibsqlQuadStore,
+  type LibsqlQuadStoreOptions,
+} from "./quad-store/mod.ts";
+import { LibsqlRdfjsStore } from "./rdfjs-store/mod.ts";
+import type { Patch, TransactionContext } from "@/client/quad-store/mod.ts";
 
 import { FakeEmbeddingService } from "@/client/search-index/embedding-service/mod.ts";
 import {
@@ -13,6 +18,32 @@ import {
 import { buildChunkFtsValue } from "@/client/adapters/libsql/search-index/search-chunk-fts.ts";
 
 const { quad, namedNode, literal } = DataFactory;
+
+/** Compat helper wrapping LibsqlQuadStore for testing. */
+function createLibsqlPersistHooks(
+  options: Omit<LibsqlQuadStoreOptions, "store">,
+) {
+  const store = new LibsqlRdfjsStore({
+    client: options.client,
+    matchPageSize: options.matchPageSize,
+  });
+  const quadStore = new LibsqlQuadStore({
+    ...options,
+    store,
+  });
+  return {
+    commit: async (patch: Patch, context?: TransactionContext) => {
+      const tx = quadStore.createTransaction();
+      if (patch.insertions) {
+        tx.addQuads(patch.insertions);
+      }
+      if (patch.deletions) {
+        tx.removeQuads(patch.deletions);
+      }
+      await tx.commit(context);
+    },
+  };
+}
 
 Deno.test(
   "createLibsqlPersistHooks - bulk quad INSERT persists expected quads row count",

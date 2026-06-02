@@ -1,18 +1,17 @@
 import type * as rdfjs from "@rdfjs/types";
 
-import { RdfjsQuadStore } from "@/client/adapters/rdfjs/rdfjs-quad-store.ts";
-
-import { DenokvRdfjsStore } from "./rdfjs-store/mod.ts";
 import {
-  createDenokvPersistHooks,
-  type DenokvPersistHooksOptions,
-} from "./create-denokv-persist-hooks.ts";
+  DenokvQuadStore,
+  type DenokvQuadStoreOptions,
+} from "./quad-store/mod.ts";
+import { DenokvRdfjsStore } from "./rdfjs-store/mod.ts";
+
 /**
  * DenokvStoresForTest bundles Deno KV quad and RDF/JS store facades for adapter tests.
  */
 export interface DenokvStoresForTest {
   /** denokvQuadStore serves Client import and export in tests. */
-  denokvQuadStore: RdfjsQuadStore;
+  denokvQuadStore: DenokvQuadStore;
 
   /** denokvRdfjsStore serves Comunica SPARQL match and buffered updates in tests. */
   denokvRdfjsStore: DenokvRdfjsStore;
@@ -22,19 +21,16 @@ export interface DenokvStoresForTest {
  * createDenokvStoresForTest wires shared DenokvRdfjsStore and BufferedRdfjsQuadStore instances for tests.
  */
 export function createDenokvStoresForTest(
-  options: DenokvPersistHooksOptions,
+  options: Omit<DenokvQuadStoreOptions, "store">,
 ): DenokvStoresForTest {
-  const persistHooks = createDenokvPersistHooks(options);
   const denokvRdfjsStore = new DenokvRdfjsStore({
     kv: options.kv,
     keyPrefix: options.keyPrefix,
     enabledQuadIndexes: options.enabledQuadIndexes,
   });
-  const denokvQuadStore = new RdfjsQuadStore({
-    store: denokvRdfjsStore as unknown as rdfjs.Store,
-    commit: async (patch, context) => {
-      await persistHooks.commit(patch, context);
-    },
+  const denokvQuadStore = new DenokvQuadStore({
+    ...options,
+    store: denokvRdfjsStore,
   });
 
   return { denokvQuadStore, denokvRdfjsStore };
@@ -46,10 +42,7 @@ export function createDenokvStoresForTest(
 export async function seedDenokvQuadsForTest(
   kv: Deno.Kv,
   quads: rdfjs.Quad[],
-  options?: Pick<
-    DenokvPersistHooksOptions,
-    "keyPrefix" | "enabledQuadIndexes"
-  >,
+  options?: Omit<DenokvQuadStoreOptions, "store" | "kv">,
 ): Promise<void> {
   const { denokvQuadStore } = createDenokvStoresForTest({ kv, ...options });
   await denokvQuadStore.import({

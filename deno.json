@@ -17,7 +17,7 @@
   },
   "imports": {
     "@/": "./src/",
-    "ai": "npm:ai@^6.0.194",
+    "ai": "npm:ai@^6.0.195",
     "@ai-sdk/google": "npm:@ai-sdk/google@^3.0.80",
     "@comunica/query-sparql-rdfjs-lite": "npm:@comunica/query-sparql-rdfjs-lite@^5.2.3",
     "@rdfjs/types": "npm:@rdfjs/types@^2.0.1",

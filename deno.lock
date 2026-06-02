@@ -18,7 +18,7 @@
     "npm:@tensorflow/tfjs-backend-wasm@^4.22.0": "4.22.0_@tensorflow+tfjs-core@4.22.0",
     "npm:@tensorflow/tfjs@^4.22.0": "4.22.0_seedrandom@3.0.5",
     "npm:@types/n3@1.26.1": "1.26.1",
-    "npm:ai@^6.0.194": "6.0.194_zod@4.4.3",
+    "npm:ai@^6.0.195": "6.0.195_zod@4.4.3",
     "npm:n3@^2.0.3": "2.0.3",
     "npm:rdf-canonize@5": "5.0.0",
     "npm:zod@^4.4.3": "4.4.3"
@@ -63,8 +63,8 @@
     }
   },
   "npm": {
-    "@ai-sdk/gateway@3.0.122_zod@4.4.3": {
-      "integrity": "sha512-U1k2fk7cSH/tS5CZ3ujROiUCOLFwkzb792OqR/Org8Mfm27dKSIdRZG4ZuJUifT8alUWa61IoaRu4foXKlP5TQ==",
+    "@ai-sdk/gateway@3.0.123_zod@4.4.3": {
+      "integrity": "sha512-rL+3Sp9crOlfE7MwguFPS30qVp6HFcr9na0KYMb4CcQdxAIjBJec3EEdCjc94UyRVZWLmgQ6Yr605FmPlFIi0w==",
       "dependencies": [
         "@ai-sdk/provider",
         "@ai-sdk/provider-utils",
@@ -3111,8 +3111,8 @@
         "event-target-shim"
       ]
     },
-    "ai@6.0.194_zod@4.4.3": {
-      "integrity": "sha512-0MkYqrSZZuC1zTECppcaUT0i54aocXpYaUMVue3V8z/weBHCytfO5/CcwZCU80msZpfkbBUKYSSrkZFotEO5wQ==",
+    "ai@6.0.195_zod@4.4.3": {
+      "integrity": "sha512-IYZpuVz0boWbpIQYyinfWFrvQ1N0dG+EVB63it45B2YAU/MxxCnwz4zBswjYnPtHnJBedpMPNrwVbeczbl2GKg==",
       "dependencies": [
         "@ai-sdk/gateway",
         "@ai-sdk/provider",
@@ -4036,7 +4036,7 @@
       "npm:@tensorflow/tfjs-backend-wasm@^4.22.0",
       "npm:@tensorflow/tfjs@^4.22.0",
       "npm:@types/n3@1.26.1",
-      "npm:ai@^6.0.194",
+      "npm:ai@^6.0.195",
       "npm:n3@^2.0.3",
       "npm:rdf-canonize@5",
       "npm:zod@^4.4.3"

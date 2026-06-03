@@ -16,7 +16,6 @@ if (import.meta.main) {
         `<http://example.com/subject> <http://example.com/predicate> "Hello, World!" .`,
       contentType: "text/turtle",
     },
-    mode: "merge",
   });
 
   const searchResponse = await client.search({ query: "Hello" });

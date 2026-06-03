@@ -1,6 +1,6 @@
 import { createClient } from "@libsql/client";
 import { DataFactory } from "n3";
-import { createLibsqlClient } from "@/client/adapters/libsql/mod.ts";
+import { createLibsqlClient } from "@/libsql/mod.ts";
 
 const { quad, namedNode, literal } = DataFactory;
 

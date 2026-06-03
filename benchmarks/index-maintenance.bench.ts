@@ -1,13 +1,13 @@
 import { createClient } from "@libsql/client";
-import { createLibsqlClient } from "@/client/adapters/libsql/mod.ts";
-import { rebuildLibsqlSearchIndexFromQuads } from "@/client/adapters/libsql/search-index/rebuild-libsql-search-index-from-quads.ts";
-import { refreshSearchChunksForSubjects } from "@/client/adapters/libsql/search-index/refresh-search-chunks-for-subjects.ts";
+import { createLibsqlClient } from "@/libsql/mod.ts";
+import { rebuildLibsqlSearchIndexFromQuads } from "@/libsql/search-index/rebuild-libsql-search-index-from-quads.ts";
+import { refreshSearchChunksForSubjects } from "@/libsql/search-index/refresh-search-chunks-for-subjects.ts";
 import { FakeEmbeddingService } from "@/client/search-index/embedding-service/mod.ts";
 import {
   setupLibsqlSchemaForTest,
   sharedTextSplitter,
   testLibsqlSearchQueryBuilder,
-} from "@/client/adapters/libsql/libsql-test-fixtures.ts";
+} from "@/libsql/libsql-test-fixtures.ts";
 import { generateSyntheticQuads } from "./shared/synthetic-data.ts";
 
 const databaseClient = createClient({ url: ":memory:" });

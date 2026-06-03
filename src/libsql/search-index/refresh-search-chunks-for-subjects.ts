@@ -1,10 +1,10 @@
 import type * as rdfjs from "@rdfjs/types";
 
 import { isTextualLiteral } from "@/client/quad-store/mod.ts";
-import { buildSelectTextualLiteralQuadsForSubjects } from "@/client/adapters/libsql/quad-store/libsql-quad-query-builder.ts";
-import type { ProjectSearchChunksOptions } from "@/client/adapters/libsql/search-index/project-search-chunks.ts";
-import { refreshSearchChunksForQuads } from "@/client/adapters/libsql/search-index/project-search-chunks.ts";
-import { quadFromLibsqlRow } from "@/client/adapters/libsql/libsql-quad-row.ts";
+import { buildSelectTextualLiteralQuadsForSubjects } from "@/libsql/quad-store/libsql-quad-query-builder.ts";
+import type { ProjectSearchChunksOptions } from "@/libsql/search-index/project-search-chunks.ts";
+import { refreshSearchChunksForQuads } from "@/libsql/search-index/project-search-chunks.ts";
+import { quadFromLibsqlRow } from "@/libsql/libsql-quad-row.ts";
 
 /**
  * RefreshSearchChunksForSubjectsResult reports subject-scoped search index refresh counts.

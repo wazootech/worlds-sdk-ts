@@ -9,11 +9,11 @@
     "./search-index/embedding-service": "./src/client/search-index/embedding-service/mod.ts",
     "./search-index/quad-chunker": "./src/client/search-index/quad-chunker/mod.ts",
     "./sparql-engine": "./src/client/sparql-engine/mod.ts",
-    "./adapters/libsql": "./src/client/adapters/libsql/mod.ts",
-    "./adapters/tfjs-universal-sentence-encoder": "./src/client/adapters/tfjs-universal-sentence-encoder/mod.ts",
-    "./adapters/comunica": "./src/client/adapters/comunica/mod.ts",
-    "./adapters/rdfjs": "./src/client/adapters/rdfjs/mod.ts",
-    "./adapters/denokv": "./src/client/adapters/denokv/mod.ts"
+    "./libsql": "./src/libsql/mod.ts",
+    "./tfjs-universal-sentence-encoder": "./src/tfjs-universal-sentence-encoder/mod.ts",
+    "./comunica": "./src/comunica/mod.ts",
+    "./rdfjs": "./src/rdfjs/mod.ts",
+    "./denokv": "./src/denokv/mod.ts"
   },
   "imports": {
     "@/": "./src/",
@@ -43,7 +43,7 @@
     "vendor/jsonld-context-parser/**"
   ],
   "tasks": {
-    "download:tfjs-use": "deno run -A ./src/client/adapters/tfjs-universal-sentence-encoder/download-tfjs-use.ts",
+    "download:tfjs-use": "deno run -A ./src/tfjs-universal-sentence-encoder/download-tfjs-use.ts",
     "example:hello-world": "deno -A ./examples/hello-world/main.ts",
     "example:libsql-hello-world": "deno -A ./examples/libsql-hello-world/main.ts",
     "example:denokv-hello-world": "deno -A --unstable-kv ./examples/denokv-hello-world/main.ts",

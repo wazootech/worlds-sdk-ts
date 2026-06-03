@@ -2,8 +2,8 @@ import { createClient } from "@libsql/client";
 import type { Quad } from "@rdfjs/types";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 import type { ClientInterface } from "@worlds/client";
-import { createDenokvClient } from "@worlds/client/adapters/denokv";
-import { createLibsqlClient } from "@worlds/client/adapters/libsql";
+import { createDenokvClient } from "@worlds/client/denokv";
+import { createLibsqlClient } from "@worlds/client/libsql";
 import {
   buildHexastorePerfFixtureChecksumInputs,
   computeHexastorePerfFixtureChecksum,

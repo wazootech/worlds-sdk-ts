@@ -5,16 +5,16 @@ import type { Quad } from "@/client/quad-store/mod.ts";
 import {
   buildGenerationDataPrefix,
   buildPrimaryQuadKey,
-} from "@/client/adapters/denokv/kv/denokv-keys.ts";
+} from "@/denokv/kv/denokv-keys.ts";
 import {
   DEFAULT_DENOKV_QUAD_INDEXES,
   type DenokvQuadIndex,
-} from "@/client/adapters/denokv/kv/denokv-index-set.ts";
-import { readActiveGeneration } from "@/client/adapters/denokv/kv/denokv-dataset-generation.ts";
+} from "@/denokv/kv/denokv-index-set.ts";
+import { readActiveGeneration } from "@/denokv/kv/denokv-dataset-generation.ts";
 import {
   buildBestMatchCursor,
   matchesPattern,
-} from "@/client/adapters/denokv/kv/denokv-match-selector.ts";
+} from "@/denokv/kv/denokv-match-selector.ts";
 
 /** MAX_KV_GET_MANY_SIZE is Deno KV's per-call getMany key cap. */
 export const MAX_KV_GET_MANY_SIZE = 10;

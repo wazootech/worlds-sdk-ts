@@ -35,11 +35,8 @@ deno add jsr:@worlds/client
 
 ```typescript
 import { Client } from "@worlds/client";
-import { ComunicaSparqlEngine } from "@worlds/client/adapters/comunica";
-import {
-  RdfjsQuadStore,
-  RdfjsSearchIndex,
-} from "@worlds/client/adapters/rdfjs";
+import { ComunicaSparqlEngine } from "@worlds/client/comunica";
+import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/client/rdfjs";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 import { Store } from "n3";
 
@@ -94,16 +91,16 @@ for structured traversal and reasoning.
 `createLibsqlClient` or `createDenokvClient`. Shared modules sit under
 `src/client/`:
 
-| Module                   | Export                                  | Role                                                        |
-| :----------------------- | :-------------------------------------- | :---------------------------------------------------------- |
-| `quad-store`             | `@worlds/client/quad-store`             | Import/export API, patch types, RDF formats                 |
-| `rdfjs-buffer`           | `@worlds/client/quad-store`             | Shared patch buffering and import flush (topology-agnostic) |
-| `import-lifecycle`       | `@worlds/client` (root barrel)          | Import lifecycle hooks around durable commits               |
-| `adapters/*/rdfjs-store` | `@worlds/client/adapters/libsql` (etc.) | Durable `*RdfjsStore` quad index + backend sync             |
+| Module             | Export                         | Role                                                        |
+| :----------------- | :----------------------------- | :---------------------------------------------------------- |
+| `quad-store`       | `@worlds/client/quad-store`    | Import/export API, patch types, RDF formats                 |
+| `rdfjs-buffer`     | `@worlds/client/quad-store`    | Shared patch buffering and import flush (topology-agnostic) |
+| `import-lifecycle` | `@worlds/client` (root barrel) | Import lifecycle hooks around durable commits               |
+| `*/rdfjs-store`    | `@worlds/client/libsql` (etc.) | Durable `*RdfjsStore` quad index + backend sync             |
 
-Do not confuse `@worlds/client/quad-store` with adapter `rdfjs-store/` folders —
+Do not confuse `@worlds/client/quad-store` with backend `rdfjs-store/` folders —
 they are different layers. Durable import flow: `Client.import` → `*QuadStore` →
-`importViaBufferedRdfjsStore` → `*RdfjsStore.commit` → adapter `commitPatchTo*`.
+`importViaBufferedRdfjsStore` → `*RdfjsStore.commit` → backend `commitPatchTo*`.
 
 Regenerate merged API doc JSON with `deno task doc:json` (writes gitignored
 `docs/api.json`). Agent prompts, scale guidance, and coding rules:
@@ -127,11 +124,8 @@ compare backends in [benchmarks/README.md](benchmarks/README.md) and
 
 ```typescript
 import { Client } from "@worlds/client";
-import { ComunicaSparqlEngine } from "@worlds/client/adapters/comunica";
-import {
-  RdfjsQuadStore,
-  RdfjsSearchIndex,
-} from "@worlds/client/adapters/rdfjs";
+import { ComunicaSparqlEngine } from "@worlds/client/comunica";
+import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/client/rdfjs";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 import { Store } from "n3";
 
@@ -149,7 +143,7 @@ const client = new Client({
 ### LibSQL (production default)
 
 ```typescript
-import { createLibsqlClient } from "@worlds/client/adapters/libsql";
+import { createLibsqlClient } from "@worlds/client/libsql";
 import { createClient } from "@libsql/client";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 
@@ -163,7 +157,7 @@ const client = await createLibsqlClient({
 ### Deno KV (Deno-native durable)
 
 ```typescript
-import { createDenokvClient } from "@worlds/client/adapters/denokv";
+import { createDenokvClient } from "@worlds/client/denokv";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 
 const kv = await Deno.openKv();

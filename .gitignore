@@ -8,6 +8,6 @@ benchmarks/crossover-*-run.log
 benchmarks/.cache/
 .bench-large.db
 gq-*.txt
-src/client/adapters/tfjs-universal-sentence-encoder/models/
+src/tfjs-universal-sentence-encoder/models/
 docs/api.json
 docs.json

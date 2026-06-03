@@ -5,7 +5,7 @@ import { DataFactory } from "n3";
 import type * as rdfjs from "@rdfjs/types";
 import { collectQuadsFromStream } from "@/client/quad-store/mod.ts";
 import { LibsqlRdfjsStore } from "./mod.ts";
-import { testLibsqlSchemaBuilder } from "@/client/adapters/libsql/libsql-test-fixtures.ts";
+import { testLibsqlSchemaBuilder } from "@/libsql/libsql-test-fixtures.ts";
 
 const { namedNode, literal, blankNode } = DataFactory;
 

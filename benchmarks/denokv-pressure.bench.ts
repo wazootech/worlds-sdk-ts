@@ -1,5 +1,5 @@
 import type { ClientInterface } from "@worlds/client";
-import { createDenokvClient } from "@worlds/client/adapters/denokv";
+import { createDenokvClient } from "@worlds/client/denokv";
 import { generateSyntheticQuads } from "./shared/synthetic-data.ts";
 
 // Pre-allocated payloads for strict repeatable boundaries

@@ -1,5 +1,5 @@
 import { createClient } from "@libsql/client";
-import { createLibsqlClient } from "@worlds/client/adapters/libsql";
+import { createLibsqlClient } from "@worlds/client/libsql";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 import { GRAPH_GROUNDED_AGENT_SYSTEM_PROMPT } from "./agent-prompts.ts";
 import { createTools } from "./tools.ts";

@@ -3,15 +3,15 @@ import { createClient } from "@libsql/client";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import type { Quad } from "n3";
 import { DataFactory, Parser, Store } from "n3";
-import { commitPatchToLibsql } from "@/client/adapters/libsql/commit-patch-to-libsql.ts";
+import { commitPatchToLibsql } from "@/libsql/commit-patch-to-libsql.ts";
 import { Transaction } from "@/client/quad-store/mod.ts";
 import type * as rdfjs from "@rdfjs/types";
-import { LibsqlRdfjsStore } from "@/client/adapters/libsql/rdfjs-store/mod.ts";
+import { LibsqlRdfjsStore } from "@/libsql/rdfjs-store/mod.ts";
 import {
   initializeLibsqlSchema,
   LibsqlSchemaBuilder,
   LibsqlSearchQueryBuilder,
-} from "@/client/adapters/libsql/mod.ts";
+} from "@/libsql/mod.ts";
 import { canonize } from "rdf-canonize";
 import { encodeBase64Url } from "@std/encoding/base64url";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
@@ -24,7 +24,7 @@ import {
   ComunicaSparqlEngine,
   executeSparql,
 } from "./comunica-sparql-engine.ts";
-import { createDenokvStoresForTest } from "@/client/adapters/denokv/create-denokv-stores-for-test.ts";
+import { createDenokvStoresForTest } from "@/denokv/create-denokv-stores-for-test.ts";
 
 const queryEngine = new QueryEngine();
 

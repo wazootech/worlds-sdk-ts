@@ -181,10 +181,10 @@ create a fresh database per iteration and use `warmup: 5`, `n: 50`.
   ```
 
 **Production (millions of quads):** default to
-[`createLibsqlClient`](../src/client/adapters/libsql/create-libsql-client.ts)
-for hybrid search and faster preload; consider `createDenokvClient` only when
-benchmark tradeoffs match your deployment (warm graph, selective SPARQL). Track
-guidance in [#68](https://github.com/wazootech/worlds-client-ts/issues/68).
+[`createLibsqlClient`](../src/libsql/create-libsql-client.ts) for hybrid search
+and faster preload; consider `createDenokvClient` only when benchmark tradeoffs
+match your deployment (warm graph, selective SPARQL). Track guidance in
+[#68](https://github.com/wazootech/worlds-client-ts/issues/68).
 
 Baselines in the **pre-preload** table (below) are **not** directly comparable
 to **post-preload** captures.

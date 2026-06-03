@@ -4,10 +4,10 @@ import { Readable } from "node:stream";
 import {
   buildCountQuadsQuery,
   buildMatchQuadsQuery,
-} from "@/client/adapters/libsql/quad-store/libsql-quad-query-builder.ts";
-import { DEFAULT_LIBSQL_MATCH_PAGE_SIZE } from "@/client/adapters/libsql/quad-store/libsql-quad-query-builder.ts";
+} from "@/libsql/quad-store/libsql-quad-query-builder.ts";
+import { DEFAULT_LIBSQL_MATCH_PAGE_SIZE } from "@/libsql/quad-store/libsql-quad-query-builder.ts";
 
-import { quadFromLibsqlRow } from "@/client/adapters/libsql/libsql-quad-row.ts";
+import { quadFromLibsqlRow } from "@/libsql/libsql-quad-row.ts";
 
 /**
  * LibsqlRdfjsStoreOptions configures LibsqlRdfjsStore dependencies and read behavior.

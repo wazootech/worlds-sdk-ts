@@ -1,11 +1,11 @@
 import { createClient } from "@libsql/client";
-import { LibsqlSearchIndex } from "@/client/adapters/libsql/search-index/libsql-search-index.ts";
+import { LibsqlSearchIndex } from "@/libsql/search-index/libsql-search-index.ts";
 import { FakeEmbeddingService } from "@/client/search-index/embedding-service/mod.ts";
 import type { EmbeddingService } from "@/client/search-index/embedding-service/mod.ts";
 import {
   setupLibsqlSchemaForTest,
   testLibsqlSearchQueryBuilder,
-} from "@/client/adapters/libsql/libsql-test-fixtures.ts";
+} from "@/libsql/libsql-test-fixtures.ts";
 
 // Setup Failing Embedding Service to test graceful fallback
 class FailingEmbeddingService implements EmbeddingService {

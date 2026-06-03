@@ -13,7 +13,8 @@
     "./tfjs-universal-sentence-encoder": "./src/tfjs-universal-sentence-encoder/mod.ts",
     "./comunica": "./src/comunica/mod.ts",
     "./rdfjs": "./src/rdfjs/mod.ts",
-    "./denokv": "./src/denokv/mod.ts"
+    "./denokv": "./src/denokv/mod.ts",
+    "./ai-sdk": "./src/ai-sdk/mod.ts"
   },
   "imports": {
     "@/": "./src/",

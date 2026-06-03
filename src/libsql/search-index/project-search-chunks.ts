@@ -6,15 +6,15 @@ import type {
 import { chunkQuads } from "@/client/search-index/quad-chunker/mod.ts";
 import type * as rdfjs from "@rdfjs/types";
 import { hashQuads } from "@/client/quad-store/mod.ts";
-import type { LibsqlClientBaseOptions } from "@/client/adapters/libsql/libsql-client-base-options.ts";
+import type { LibsqlClientBaseOptions } from "@/libsql/libsql-client-base-options.ts";
 import type { LibsqlSearchQueryBuilder } from "./libsql-search-query-builder.ts";
-import { buildSelectLabelLiteralsForSubjects } from "@/client/adapters/libsql/quad-store/libsql-quad-query-builder.ts";
+import { buildSelectLabelLiteralsForSubjects } from "@/libsql/quad-store/libsql-quad-query-builder.ts";
 
 import {
   buildChunkFtsValue,
   resolveLabelPredicates,
 } from "./search-chunk-fts.ts";
-import { LibsqlBatchExecutor } from "@/client/adapters/libsql/libsql-batch-executor.ts";
+import { LibsqlBatchExecutor } from "@/libsql/libsql-batch-executor.ts";
 
 export interface ProjectSearchChunksOptions extends LibsqlClientBaseOptions {
   textSplitter: TextSplitterInterface;

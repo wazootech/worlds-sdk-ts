@@ -1,7 +1,7 @@
 import { assertEquals, assertExists, assertNotEquals } from "@std/assert";
 import { createClient } from "@libsql/client";
 import * as path from "@std/path";
-import { createLibsqlClient } from "@worlds/client/adapters/libsql";
+import { createLibsqlClient } from "@worlds/client/libsql";
 import type { Quad } from "@rdfjs/types";
 import {
   buildHexastorePerfFixtureChecksumInputs,

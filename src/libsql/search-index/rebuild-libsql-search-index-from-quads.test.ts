@@ -2,19 +2,19 @@ import { assertEquals, assertExists } from "@std/assert";
 import { createClient } from "@libsql/client";
 import { DataFactory } from "n3";
 import { FakeEmbeddingService } from "@/client/search-index/embedding-service/mod.ts";
-import { LibsqlSearchIndexProjector } from "@/client/adapters/libsql/search-index/libsql-search-index-projector.ts";
+import { LibsqlSearchIndexProjector } from "@/libsql/search-index/libsql-search-index-projector.ts";
 import {
   LibsqlQuadStore,
   type LibsqlQuadStoreOptions,
-} from "@/client/adapters/libsql/quad-store/mod.ts";
-import { LibsqlRdfjsStore } from "@/client/adapters/libsql/rdfjs-store/mod.ts";
+} from "@/libsql/quad-store/mod.ts";
+import { LibsqlRdfjsStore } from "@/libsql/rdfjs-store/mod.ts";
 import type { Patch, TransactionContext } from "@/client/quad-store/mod.ts";
 import {
   setupLibsqlSchemaForTest,
   sharedTextSplitter,
   testLibsqlSchemaBuilder,
   testLibsqlSearchQueryBuilder,
-} from "@/client/adapters/libsql/libsql-test-fixtures.ts";
+} from "@/libsql/libsql-test-fixtures.ts";
 
 /** Compat helper wrapping LibsqlQuadStore for testing. */
 function createLibsqlPersistHooks(

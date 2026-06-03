@@ -1,7 +1,7 @@
 import { type Client, createClient } from "@libsql/client";
 import { encodeHex } from "@std/encoding/hex";
 import * as path from "@std/path";
-import { DenokvRdfjsStore } from "@worlds/client/adapters/denokv";
+import { DenokvRdfjsStore } from "@worlds/client/denokv";
 import { SYNTHETIC_CORPUS_VERSION } from "./synthetic-data.ts";
 
 /**

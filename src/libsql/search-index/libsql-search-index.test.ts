@@ -6,7 +6,7 @@ import type { EmbeddingService } from "@/client/search-index/embedding-service/m
 import {
   setupLibsqlSchemaForTest,
   testLibsqlSearchQueryBuilder,
-} from "@/client/adapters/libsql/libsql-test-fixtures.ts";
+} from "@/libsql/libsql-test-fixtures.ts";
 
 // --- Tests ---
 

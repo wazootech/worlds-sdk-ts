@@ -4,8 +4,8 @@ import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 import { DataFactory } from "n3";
 
 import type { ClientInterface } from "@/client/client.ts";
-import type { LibsqlClientOptions } from "@/client/adapters/libsql/create-libsql-client.ts";
-import { createLibsqlClient } from "@/client/adapters/libsql/create-libsql-client.ts";
+import type { LibsqlClientOptions } from "@/libsql/create-libsql-client.ts";
+import { createLibsqlClient } from "@/libsql/create-libsql-client.ts";
 
 const { quad, namedNode, literal } = DataFactory;
 const queryEngine = new QueryEngine();

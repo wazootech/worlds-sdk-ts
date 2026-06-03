@@ -1,4 +1,4 @@
-import { createDenokvClient } from "@worlds/client/adapters/denokv";
+import { createDenokvClient } from "@worlds/client/denokv";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 
 if (import.meta.main) {

@@ -119,12 +119,12 @@ mathematical brevity.
 
 ### Resolution order (under `src/`)
 
-1. **Cross-domain.** `@/client/<domain>/mod.ts` (or a deeper `mod.ts` when the
-   domain has sub-exports), e.g. `@/client/quad-store/mod.ts`,
-   `@/client/adapters/libsql/mod.ts`.
+1. **Cross-domain.** `@/client/<domain>/mod.ts` or `@/<domain>/mod.ts` (or a
+   deeper `mod.ts` when the domain has sub-exports), e.g.
+   `@/client/quad-store/mod.ts`, `@/libsql/mod.ts`.
 2. **Same domain folder.** `./file.ts` or `./subfolder/mod.ts` for siblings and
    children.
-3. **Nested folder, parent barrel.** `@/client/adapters/libsql/mod.ts` from
+3. **Nested folder, parent barrel.** `@/libsql/mod.ts` from
    `libsql/search-index/` or `libsql/rdfjs-store/sync/` — not `../` and not
    `@worlds/client/...`.
 
@@ -135,16 +135,15 @@ Never use parent-relative `../` to reach another domain. Never import
 
 - ✅
   `import type { SparqlEngineInterface } from "@/client/sparql-engine/mod.ts"`
-  (from `adapters/comunica/`)
+  (from `comunica/`)
 - ✅ `@/client/quad-store/mod.ts`, `@/client/sparql-engine/mod.ts`,
-  `@/client/adapters/rdfjs/mod.ts` (from `adapters/libsql/`)
+  `@/rdfjs/mod.ts` (from `libsql/`)
 - ✅ `@/client/quad-store/mod.ts` (from `search-index/quad-chunker/`)
 - ✅ `import { Client } from "@/client/client.ts"` (adapter factories — not
   `@/mod.ts`, avoids root barrel cycles)
 - ✅ `./string-to-chars.ts` (from `tokenizer/tokenizer.ts`)
-- ✅ `./client.ts`, `./adapters/rdfjs/mod.ts` (from `src/client/client.test.ts`)
-- ✅ `@worlds/client/adapters/libsql` (from `examples/`, benchmarks, other
-  repos)
+- ✅ `./client.ts`, `../rdfjs/mod.ts` (from `src/client/client.test.ts`)
+- ✅ `@worlds/client/libsql` (from `examples/`, benchmarks, other repos)
 - ❌ `@worlds/client/sparql-engine` inside `src/`
 - ❌ `../../quad-store/mod.ts`, `../libsql-search-index.ts`
 - ❌ `Promise<import("@/client/sparql-engine/mod.ts").SparqlResponse>` — use a
@@ -163,10 +162,27 @@ When adding a new importable subpath, add it to `exports` in `deno.json` for
 in-repo imports (no duplicate `@worlds/client/*` entries in `imports`). Shared
 topology-agnostic patch buffering lives in `rdfjs-buffer/` (export
 `@worlds/client/quad-store`); durable adapter `*RdfjsStore` implementations live
-under `adapters/*/rdfjs-store/`. Under durable adapters, keep seam subfolders
-for `quad-store/`, `search-index/`, and `rdfjs-store/` (each with a `mod.ts`
-barrel). Internal SQL, KV, and sync helpers live under the seam that owns them;
-factories remain at the adapter root.
+under `src/*/rdfjs-store/` (e.g. `src/libsql/rdfjs-store/`). Under durable
+backends, keep seam subfolders for `quad-store/`, `search-index/`, and
+`rdfjs-store/` (each with a `mod.ts` barrel). Internal SQL, KV, and sync helpers
+live under the seam that owns them; factories remain at the adapter root.
+
+### Packaging and dependency resolution rationale
+
+To balance "batteries-included" convenience for SDK consumers with strict
+dependency isolation, all store implementations (e.g. `rdfjs`, `libsql`,
+`denokv`) are shipped in the single `@worlds/client` package via dedicated
+subpath exports.
+
+This topology relies on Deno/JSR's source-based publishing and dynamic runtime
+resolution:
+
+- **On-demand fetching**: Runtimes (like Deno) only resolve, download, and
+  compile dependencies actually traversed in the imported path. For example, a
+  client importing from `@worlds/client/rdfjs` will only fetch `n3` and
+  `@rdfjs/types`—never downloading `@libsql/client` or `@tensorflow/tfjs`.
+- **Cohesive versioning**: Keeps all core interfaces and concrete adapters
+  locked to the exact same version release, preventing version fragmentation.
 
 ### No inline imports
 
@@ -241,8 +257,8 @@ green-passing integration pipeline runs:
 - **Local embedding model caching:** The system relies on offline model
   execution via pre-cached TFJS Universal Sentence Encoder artifacts. The
   download script lives at
-  `src/client/adapters/tfjs-universal-sentence-encoder/download-tfjs-use.ts`.
-  USE lite loading and tokenization are vendored in that adapter (not
+  `src/tfjs-universal-sentence-encoder/download-tfjs-use.ts`. USE lite loading
+  and tokenization are vendored in that adapter (not
   `@tensorflow-models/universal-sentence-encoder`) so TF.js 4.x peers stay
   aligned. If changes are made to the embedding or search layers, developers
   must ensure the offline cache is warmed up by running the
@@ -323,8 +339,8 @@ latency during query execution at scale.
 ### LibSQL client entry point (hexastore)
 
 Hexastore indexes are provisioned at schema init. **`createLibsqlClient`**
-([`create-libsql-client.ts`](src/client/adapters/libsql/create-libsql-client.ts))
-— `LibsqlRdfjsStore` + `LibsqlQuadStore` + quad indexes; pass `queryEngine` to
+([`create-libsql-client.ts`](src/libsql/create-libsql-client.ts)) —
+`LibsqlRdfjsStore` + `LibsqlQuadStore` + quad indexes; pass `queryEngine` to
 enable SPARQL. `LibsqlRdfjsStore.match` keyset-pages by `quads.id`
 (`matchPageSize`, default 1000). Optional `countQuads` supplies Comunica join
 cardinality hints. Use `await createLibsqlClient({ client, queryEngine })`.
@@ -510,7 +526,7 @@ await client.reindex({
 After renaming an entity, refresh chunks for affected subjects:
 
 ```typescript
-import { refreshSearchChunksForSubjects } from "@worlds/client/adapters/libsql";
+import { refreshSearchChunksForSubjects } from "@worlds/client/libsql";
 
 await refreshSearchChunksForSubjects(["http://example.org/Aurelia"], {
   client: db,
@@ -520,8 +536,8 @@ await refreshSearchChunksForSubjects(["http://example.org/Aurelia"], {
 });
 ```
 
-Advanced: `rebuildLibsqlSearchIndexFromQuads` in
-`@worlds/client/adapters/libsql` remains available without a `Client` instance.
+Advanced: `rebuildLibsqlSearchIndexFromQuads` in `@worlds/client/libsql` remains
+available without a `Client` instance.
 
 ### Alignment with eval harness
 

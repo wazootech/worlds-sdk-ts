@@ -2,12 +2,12 @@ import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import type * as rdfjs from "@rdfjs/types";
 import { Client } from "@/client/client.ts";
 import type { ClientInterface } from "@/client/client.ts";
-import type { ComunicaQueryEngine } from "@/client/adapters/comunica/mod.ts";
-import { ComunicaSparqlEngine } from "@/client/adapters/comunica/mod.ts";
+import type { ComunicaQueryEngine } from "@/comunica/mod.ts";
+import { ComunicaSparqlEngine } from "@/comunica/mod.ts";
 import {
   LibsqlSearchIndex,
   LibsqlSearchIndexProjector,
-} from "@/client/adapters/libsql/search-index/mod.ts";
+} from "@/libsql/search-index/mod.ts";
 import { LibsqlQuadStore } from "./quad-store/mod.ts";
 
 import type { LibsqlClientBaseOptions } from "./libsql-client-base-options.ts";

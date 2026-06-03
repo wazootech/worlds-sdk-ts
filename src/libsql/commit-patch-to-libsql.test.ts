@@ -1,7 +1,7 @@
 import { assertEquals } from "@std/assert";
 import { createClient } from "@libsql/client";
 import { DataFactory } from "n3";
-import { LibsqlSearchIndexProjector } from "@/client/adapters/libsql/search-index/libsql-search-index-projector.ts";
+import { LibsqlSearchIndexProjector } from "@/libsql/search-index/libsql-search-index-projector.ts";
 import {
   LibsqlQuadStore,
   type LibsqlQuadStoreOptions,
@@ -14,8 +14,8 @@ import {
   setupLibsqlSchemaForTest,
   sharedTextSplitter,
   testLibsqlSearchQueryBuilder,
-} from "@/client/adapters/libsql/libsql-test-fixtures.ts";
-import { buildChunkFtsValue } from "@/client/adapters/libsql/search-index/search-chunk-fts.ts";
+} from "@/libsql/libsql-test-fixtures.ts";
+import { buildChunkFtsValue } from "@/libsql/search-index/search-chunk-fts.ts";
 
 const { quad, namedNode, literal } = DataFactory;
 

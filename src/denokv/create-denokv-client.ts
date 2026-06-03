@@ -1,8 +1,8 @@
 import { Client } from "@/client/client.ts";
 import type * as rdfjs from "@rdfjs/types";
 import type { ClientInterface } from "@/client/client.ts";
-import type { ComunicaQueryEngine } from "@/client/adapters/comunica/mod.ts";
-import { ComunicaSparqlEngine } from "@/client/adapters/comunica/mod.ts";
+import type { ComunicaQueryEngine } from "@/comunica/mod.ts";
+import { ComunicaSparqlEngine } from "@/comunica/mod.ts";
 
 import { DenokvRdfjsStore } from "./rdfjs-store/mod.ts";
 import { DenokvSearchIndex } from "./search-index/mod.ts";

@@ -10,8 +10,8 @@ import { buildSearchResultId } from "@/client/search-index/build-search-result-i
 import { filterQuads, isTextualLiteral } from "@/client/quad-store/mod.ts";
 import type { Quad } from "@/client/quad-store/mod.ts";
 import { toRdfjsQuad } from "@/client/quad-store/mod.ts";
-import { buildGenerationDataPrefix } from "@/client/adapters/denokv/kv/denokv-keys.ts";
-import { readActiveGeneration } from "@/client/adapters/denokv/kv/denokv-dataset-generation.ts";
+import { buildGenerationDataPrefix } from "@/denokv/kv/denokv-keys.ts";
+import { readActiveGeneration } from "@/denokv/kv/denokv-dataset-generation.ts";
 
 /**
  * DenokvSearchIndexOptions provides configurations for operating direct Kv search scans.

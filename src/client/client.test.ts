@@ -1,8 +1,8 @@
 import { assertEquals, assertRejects } from "@std/assert";
 import { DataFactory, Store } from "n3";
 import { Client } from "./client.ts";
-import { RdfjsQuadStore, RdfjsSearchIndex } from "./adapters/rdfjs/mod.ts";
-import { ComunicaSparqlEngine } from "./adapters/comunica/mod.ts";
+import { RdfjsQuadStore, RdfjsSearchIndex } from "../rdfjs/mod.ts";
+import { ComunicaSparqlEngine } from "../comunica/mod.ts";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 import { hashQuad, type Patch, Transaction } from "./quad-store/mod.ts";
 

@@ -7,7 +7,7 @@ import {
   fromRdfjsTerm,
   hashQuads,
 } from "@/client/quad-store/mod.ts";
-import type { LibsqlClientBaseOptions } from "@/client/adapters/libsql/libsql-client-base-options.ts";
+import type { LibsqlClientBaseOptions } from "@/libsql/libsql-client-base-options.ts";
 import {
   buildBulkInsertQuads,
   buildDeleteQuadsByQuadIds,

@@ -3,12 +3,12 @@ import { filterQuads } from "@/client/quad-store/mod.ts";
 import {
   type ProjectSearchChunksOptions,
   refreshSearchChunksForQuads,
-} from "@/client/adapters/libsql/search-index/project-search-chunks.ts";
-import { quadFromLibsqlRow } from "@/client/adapters/libsql/libsql-quad-row.ts";
+} from "@/libsql/search-index/project-search-chunks.ts";
+import { quadFromLibsqlRow } from "@/libsql/libsql-quad-row.ts";
 import {
   buildMatchQuadsQuery,
   DEFAULT_LIBSQL_MATCH_PAGE_SIZE,
-} from "@/client/adapters/libsql/quad-store/libsql-quad-query-builder.ts";
+} from "@/libsql/quad-store/libsql-quad-query-builder.ts";
 
 /**
  * RebuildLibsqlSearchIndexFromQuadsResult reports how many quads and chunk rows were processed.

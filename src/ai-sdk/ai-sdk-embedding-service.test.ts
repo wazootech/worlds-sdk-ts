@@ -22,16 +22,7 @@ Deno.test("AiSdkEmbeddingService.embed - generates mock embeddings correctly", a
 });
 
 Deno.test("AiSdkEmbeddingService.embed - returns empty array on empty input", async () => {
-  const mockModel = new MockEmbeddingModelV3({
-    doEmbed: () =>
-      Promise.resolve({
-        embeddings: [],
-        usage: { tokens: 0 },
-        warnings: [],
-      }),
-  });
-
-  const service = new AiSdkEmbeddingService({ model: mockModel });
+  const service = new AiSdkEmbeddingService({ model: null! });
   const result = await service.embed([]);
 
   assertEquals(result, []);

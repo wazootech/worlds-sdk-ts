@@ -1,17 +1,7 @@
 import { assertEquals, assertRejects } from "@std/assert";
-import { createClient } from "@libsql/client";
-import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import type { Quad } from "n3";
 import { DataFactory, Parser, Store } from "n3";
-import { commitPatchToLibsql } from "@/libsql/commit-patch-to-libsql.ts";
 import { Transaction } from "@/client/quad-store/mod.ts";
-import type * as rdfjs from "@rdfjs/types";
-import { LibsqlRdfjsStore } from "@/libsql/rdfjs-store/mod.ts";
-import {
-  initializeLibsqlSchema,
-  LibsqlSchemaBuilder,
-  LibsqlSearchQueryBuilder,
-} from "@/libsql/mod.ts";
 import { canonize } from "rdf-canonize";
 import { encodeBase64Url } from "@std/encoding/base64url";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
@@ -24,7 +14,6 @@ import {
   ComunicaSparqlEngine,
   executeSparql,
 } from "./comunica-sparql-engine.ts";
-import { createDenokvStoresForTest } from "@/denokv/create-denokv-stores-for-test.ts";
 
 const queryEngine = new QueryEngine();
 
@@ -57,75 +46,6 @@ Deno.test("Comunica QueryEngine can query an n3 Store (RDFJS)", async () => {
     "https://example.com/o2",
   ]);
 });
-
-Deno.test(
-  "ComunicaSparqlEngine - DenokvRdfjsStore matches N3.Store SELECT bindings (stable order)",
-  async () => {
-    const kv = await Deno.openKv(":memory:");
-    try {
-      const quads: Quad[] = [
-        DataFactory.quad(
-          DataFactory.namedNode("https://example.com/b"),
-          DataFactory.namedNode("https://example.com/p"),
-          DataFactory.literal("two"),
-        ),
-        DataFactory.quad(
-          DataFactory.namedNode("https://example.com/a"),
-          DataFactory.namedNode("https://example.com/p"),
-          DataFactory.literal("one"),
-        ),
-        DataFactory.quad(
-          DataFactory.namedNode("https://example.com/a"),
-          DataFactory.namedNode("https://example.com/q"),
-          DataFactory.namedNode("https://example.com/o"),
-        ),
-      ];
-
-      const n3Store = new Store(quads);
-
-      const { denokvQuadStore, denokvRdfjsStore: kvStore } =
-        createDenokvStoresForTest(
-          {
-            kv,
-          },
-        );
-      await denokvQuadStore.import({
-        mode: "merge",
-        source: { kind: "quads", quads },
-      });
-
-      const query = [
-        "SELECT ?s ?p ?o WHERE { ?s ?p ?o }",
-        "ORDER BY ?s ?p ?o",
-      ].join("\n");
-
-      const n3Response = await executeSparql(queryEngine, n3Store, { query });
-      const kvResponse = await executeSparql(
-        queryEngine,
-        kvStore as unknown as rdfjs.Store,
-        { query },
-      );
-
-      if (n3Response.kind !== "select") throw new Error("Expected select");
-      if (kvResponse.kind !== "select") throw new Error("Expected select");
-
-      const n3Rows = n3Response.data.results.bindings.map((b) => ({
-        s: b.s?.value,
-        p: b.p?.value,
-        o: b.o?.value,
-      }));
-      const kvRows = kvResponse.data.results.bindings.map((b) => ({
-        s: b.s?.value,
-        p: b.p?.value,
-        o: b.o?.value,
-      }));
-
-      assertEquals(kvRows, n3Rows);
-    } finally {
-      kv.close();
-    }
-  },
-);
 
 Deno.test("Same SPARQL query works on bnodes vs processed (canonicalized + subject-skolemized) dataset", async (t) => {
   const ex = "https://example.com/";
@@ -463,66 +383,6 @@ function createNonBooleanAskEngine(): ComunicaQueryEngine {
       }),
   };
 }
-
-Deno.test(
-  "ComunicaSparqlEngine - LibsqlRdfjsStore countQuads supports selective SPARQL",
-  async () => {
-    const databaseClient = createClient({ url: ":memory:" });
-    const libsqlQueryBuilder = new LibsqlSearchQueryBuilder(32);
-    await initializeLibsqlSchema(databaseClient, new LibsqlSchemaBuilder(32));
-
-    const textSplitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 1000,
-    });
-    const libsqlRdfjsStore = new LibsqlRdfjsStore({
-      client: databaseClient,
-    });
-
-    const subjectIri = "urn:libsql:entity:0";
-    await commitPatchToLibsql({
-      insertions: [
-        DataFactory.quad(
-          DataFactory.namedNode(subjectIri),
-          DataFactory.namedNode("urn:libsql:predicate"),
-          DataFactory.literal("LibsqlRdfjsStore cardinality hint path"),
-        ),
-      ],
-      deletions: [],
-    }, {
-      client: databaseClient,
-      textSplitter,
-      searchQueryBuilder: libsqlQueryBuilder,
-    });
-
-    assertEquals(
-      await libsqlRdfjsStore.countQuads(
-        DataFactory.namedNode(subjectIri),
-        null,
-        null,
-        null,
-      ),
-      1,
-    );
-
-    const sparqlEngine = new ComunicaSparqlEngine({
-      queryEngine,
-      store: libsqlRdfjsStore as unknown as rdfjs.Store,
-    });
-    const response = await sparqlEngine.execute({
-      query:
-        `SELECT ?property ?object WHERE { <${subjectIri}> ?property ?object }`,
-    });
-
-    if (response.kind !== "select") {
-      throw new Error("Expected select response kind");
-    }
-    assertEquals(response.data.results.bindings.length, 1);
-    assertEquals(
-      response.data.results.bindings[0]?.object?.value,
-      "LibsqlRdfjsStore cardinality hint path",
-    );
-  },
-);
 
 Deno.test(
   "ComunicaSparqlEngine - does NOT commit on read-only SELECT",

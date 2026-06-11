@@ -1,19 +1,17 @@
-<p align="center">
-  <a href="https://docs.wazoo.dev">
-    <img src="https://wazoo.dev/assets/wazoo.svg" alt="Wazoo Worlds" width="120" />
-  </a>
-</p>
 
-<p align="center">
+[    ](https://docs.wazoo.dev)
+
+<img src="https://wazoo.dev/assets/wazoo.svg" alt="Wazoo Worlds" width="120" />
+
   Worlds Client implements reactive, edge-native knowledge graph storage for agents.
-</p>
 
-<p align="center">
-  <a href="https://jsr.io/@worlds/client"><img src="https://jsr.io/badges/@worlds/client" alt="JSR" /></a>
-  <a href="https://jsr.io/@worlds/client/score"><img src="https://jsr.io/badges/@worlds/client/score" alt="JSR Score" /></a>
-  <a href="https://github.com/wazootech/worlds-client-ts"><img src="https://img.shields.io/badge/GitHub-black?logo=github" alt="GitHub" /></a>
-  <a href="https://deepwiki.com/wazootech/worlds-client-ts"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
-</p>
+![JSR](https://jsr.io/badges/@worlds/client)
+
+![JSR Score](https://jsr.io/badges/@worlds/client/score)
+
+![GitHub](https://img.shields.io/badge/GitHub-black?logo=github)
+
+![Ask DeepWiki](https://deepwiki.com/badge.svg)
 
 Worlds is the infrastructure layer for persistent, edge-native knowledge graphs.
 The TypeScript SDK provides transactional graph storage, hybrid search, and
@@ -69,10 +67,10 @@ const sparqlResponse = await client.sparql({
 console.log(sparqlResponse);
 ```
 
-> [!TIP]
+> \[!TIP\]
 > For production search and scale, use LibSQL with Turso Cloud. Deno KV can win
 > on selective post-preload SPARQL in warm Deno deployments — see
-> [Adapters](#adapters) and [benchmarks](benchmarks/README.md).
+> [Adapters](#adapters) and benchmarks.
 
 ## Core concepts
 
@@ -91,33 +89,33 @@ for structured traversal and reasoning.
 `createLibsqlClient` or `createDenokvClient`. Shared modules sit under
 `src/client/`:
 
-| Module             | Export                         | Role                                                        |
-| :----------------- | :----------------------------- | :---------------------------------------------------------- |
-| `quad-store`       | `@worlds/client/quad-store`    | Import/export API, patch types, RDF formats                 |
-| `rdfjs-buffer`     | `@worlds/client/quad-store`    | Shared patch buffering and import flush (topology-agnostic) |
-| `import-lifecycle` | `@worlds/client` (root barrel) | Import lifecycle hooks around durable commits               |
-| `*/rdfjs-store`    | `@worlds/client/libsql` (etc.) | Durable `*RdfjsStore` quad index + backend sync             |
+| Module | Export | Role |
+| --- | --- | --- |
+| `quad-store` | `@worlds/client/quad-store` | Import/export API, patch types, RDF formats |
+| `rdfjs-buffer` | `@worlds/client/quad-store` | Shared patch buffering and import flush (topology-agnostic) |
+| `import-lifecycle` | `@worlds/client` (root barrel) | Import lifecycle hooks around durable commits |
+| `*/rdfjs-store` | `@worlds/client/libsql` (etc.) | Durable `*RdfjsStore` quad index + backend sync |
 
 Do not confuse `@worlds/client/quad-store` with backend `rdfjs-store/` folders —
 they are different layers. Durable import flow: `Client.import` → `*QuadStore` →
 `importViaBufferedRdfjsStore` → `*RdfjsStore.commit` → backend `commitPatchTo*`.
 
 Regenerate merged API doc JSON with `deno task doc:json` (writes gitignored
-`docs/api.json`). Agent prompts, scale guidance, and coding rules:
+`file docs/api.json`). Agent prompts, scale guidance, and coding rules:
 [AGENTS.md](AGENTS.md).
 
 ## Adapters
 
-| Adapter               | Best for                                  | Persistence          | SPARQL                        |
-| :-------------------- | :---------------------------------------- | :------------------- | :---------------------------- |
-| RDF/JS (in-memory N3) | Dev, tests, demos                         | None (in-memory)     | Comunica over N3 `Store`      |
-| LibSQL                | Production default (search + bulk load)   | SQLite / Turso Cloud | LibsqlRdfjsStore quad indexes |
-| Deno KV               | Deno-native, warm graph, selective SPARQL | Deno KV store        | DenokvRdfjsStore quad indexes |
+| Adapter | Best for | Persistence | SPARQL |
+| --- | --- | --- | --- |
+| RDF/JS (in-memory N3) | Dev, tests, demos | None (in-memory) | Comunica over N3 `Store` |
+| LibSQL | Production default (search + bulk load) | SQLite / Turso Cloud | LibsqlRdfjsStore quad indexes |
+| Deno KV | Deno-native, warm graph, selective SPARQL | Deno KV store | DenokvRdfjsStore quad indexes |
 
 **Choosing LibSQL vs Deno KV:** LibSQL is the default for hybrid FTS/vector
 search and faster cold quad index preload at scale. Deno KV can be faster on
 selective SPARQL execute after preload in long-lived or cached processes —
-compare backends in [benchmarks/README.md](benchmarks/README.md) and
+compare backends in benchmarks/README.md and
 [discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69).
 
 ### RDF/JS (in-memory N3)
@@ -169,12 +167,12 @@ const client = createDenokvClient({
 
 ## Examples
 
-| Example                                | Description                            | Command                                |
-| :------------------------------------- | :------------------------------------- | :------------------------------------- |
-| [Hello world](examples/hello-world)    | In-memory graph with search            | `deno task example:hello-world`        |
-| [LibSQL](examples/libsql-hello-world)  | LibSQL hybrid search + SPARQL at scale | `deno task example:libsql-hello-world` |
-| [Deno KV](examples/denokv-hello-world) | KV-backed SPARQL + search              | `deno task example:denokv-hello-world` |
-| [AI SDK](examples/ai-sdk-hello-world)  | Vercel AI SDK tools with Gemini        | `deno task example:ai-sdk-hello-world` |
+| Example | Description | Command |
+| --- | --- | --- |
+| Hello world | In-memory graph with search | `deno task example:hello-world` |
+| LibSQL | LibSQL hybrid search + SPARQL at scale | `deno task example:libsql-hello-world` |
+| Deno KV | KV-backed SPARQL + search | `deno task example:denokv-hello-world` |
+| AI SDK | Vercel AI SDK tools with Gemini | `deno task example:ai-sdk-hello-world` |
 
 The [agent eval harness](https://github.com/wazootech/worlds-client-evals) lives
 in a separate repository and runs deterministic assertion checks against a
@@ -184,28 +182,28 @@ seeded LibSQL world.
 
 **Choosing a LibSQL topology**: quad index default (historical N3 hydrate path
 removed; in-memory N3 via RDF/JS adapter), warm containers, SPARQL query shape
-at scale, and bulk import strategies. [-> AGENTS.md](AGENTS.md)
+at scale, and bulk import strategies. [-&gt; AGENTS.md](AGENTS.md)
 
 **Agent integration**: search-then-SPARQL two-hop pattern for LLM tool use with
-hybrid retrieval. [-> AGENTS.md](AGENTS.md)
+hybrid retrieval. [-&gt; AGENTS.md](AGENTS.md)
 
 **Benchmarks**: local-only performance captures, quad index perf methodology
 (LibSQL + Denokv), and regression policy.
-[-> benchmarks/README.md](benchmarks/README.md)
+-&gt; benchmarks/README.md
 
 ## Development workflow
 
 All CI checks must pass before merging updates. Performance benchmarks are
 **local only** (no CI regression gate); see
-[`benchmarks/README.md`](benchmarks/README.md).
+`file benchmarks/README.md`.
 
-| Command           | Description                                  |
-| :---------------- | :------------------------------------------- |
-| `deno fmt`        | Format all code using native Deno formatter. |
-| `deno task lint`  | Run strict static analysis checks.           |
-| `deno task test`  | Execute comprehensive test suites.           |
-| `deno task bench` | Run performance benchmarks locally.          |
-| `deno task ci`    | Run complete CI pipeline sequentially.       |
+| Command | Description |
+| --- | --- |
+| `deno fmt` | Format all code using native Deno formatter. |
+| `deno task lint` | Run strict static analysis checks. |
+| `deno task test` | Execute comprehensive test suites. |
+| `deno task bench` | Run performance benchmarks locally. |
+| `deno task ci` | Run complete CI pipeline sequentially. |
 
 ## Quicklinks
 

@@ -2,28 +2,20 @@
   <a href="https://docs.wazoo.dev">
     <img src="https://wazoo.dev/assets/wazoo.svg" alt="Wazoo Worlds" width="120" />
   </a>
-</p>
-
-<p align="center">
-  Worlds Client implements reactive, edge-native knowledge graph storage for agents.
-</p>
-
-<p align="center">
+  <br /><br />
+  <em>Persistent, edge-native knowledge graph storage for agents.</em>
+  <br /><br />
   <a href="https://jsr.io/@worlds/client"><img src="https://jsr.io/badges/@worlds/client" alt="JSR" /></a>
   <a href="https://jsr.io/@worlds/client/score"><img src="https://jsr.io/badges/@worlds/client/score" alt="JSR Score" /></a>
   <a href="https://github.com/wazootech/worlds-client-ts"><img src="https://img.shields.io/badge/GitHub-black?logo=github" alt="GitHub" /></a>
   <a href="https://deepwiki.com/wazootech/worlds-client-ts"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
 </p>
 
-Worlds is the infrastructure layer for persistent, edge-native knowledge graphs.
-The TypeScript SDK provides transactional graph storage, hybrid search, and
-declarative SPARQL querying for agents and applications.
-
-- **Store**: Persist RDF knowledge graphs on SQLite, Turso, or Deno KV.
-- **Search**: Hybrid retrieval combining keyword FTS5 and vector embeddings.
-- **Query**: Built-in SPARQL engine for declarative graph traversal and
+- **Store** — Persist RDF knowledge graphs on SQLite, Turso, or Deno KV.
+- **Search** — Hybrid retrieval combining keyword FTS5 and vector embeddings.
+- **Query** — Built-in SPARQL engine for declarative graph traversal and
   reasoning.
-- **Sync**: Transactional mutation queue with dual-layer persistence.
+- **Sync** — Transactional mutation queue with dual-layer persistence.
 
 ## Install
 

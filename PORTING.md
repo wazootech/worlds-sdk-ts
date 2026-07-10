@@ -1,15 +1,16 @@
 # Porting guide
 
-This repository is being split into smaller packages. The important part is not just *what* moved, but *where it lives now*.
+This repository is being split into smaller packages. The important part is not
+just _what_ moved, but _where it lives now_.
 
 ## Destination repos
 
-| Old home | New home | Status |
-| --- | --- | --- |
-| `wazootech/worlds-client-ts` | Core client, RDF/JS, Comunica, and search-chunker abstractions | stays here |
-| `wazootech/worlds-libsql` | LibSQL persistence + LibSQL search/index logic | created |
-| `wazootech/worlds-denokv` | Deno KV persistence + Deno KV search/index logic | created |
-| future embedding-provider repos | concrete embedding demos and provider-specific code | pending |
+| Old home                        | New home                                                       | Status     |
+| ------------------------------- | -------------------------------------------------------------- | ---------- |
+| `wazootech/worlds-client-ts`    | Core client, RDF/JS, Comunica, and search-chunker abstractions | stays here |
+| `wazootech/worlds-libsql`       | LibSQL persistence + LibSQL search/index logic                 | created    |
+| `wazootech/worlds-denokv`       | Deno KV persistence + Deno KV search/index logic               | created    |
+| future embedding-provider repos | concrete embedding demos and provider-specific code            | pending    |
 
 ## What stays in `wazootech/worlds-client-ts`
 
@@ -21,7 +22,8 @@ Keep the shared, backend-agnostic layer here:
 - `src/search-index/embedding-service/` — embedding abstraction only
 - `src/client/` — `Client`, interfaces, patch types, transactions, helpers
 
-This repo should own the stable API surface that both backend packages depend on.
+This repo should own the stable API surface that both backend packages depend
+on.
 
 ## What moves to `wazootech/worlds-libsql`
 
@@ -59,7 +61,8 @@ import { createDenokvClient } from "@worlds/denokv";
 
 ## What leaves into separate embedding repos
 
-The abstraction can stay in `worlds-client-ts`, but provider-specific embedding code should not.
+The abstraction can stay in `worlds-client-ts`, but provider-specific embedding
+code should not.
 
 That means:
 
@@ -97,10 +100,13 @@ import { createDenokvClient } from "@worlds/denokv";
 3. Move Deno KV logic into `wazootech/worlds-denokv`.
 4. Split embedding-provider implementations into their own repos.
 5. Update downstream repos to import from the new package homes.
-6. Delete the old backend-specific code from `worlds-client-ts` once the new repos are the source of truth.
+6. Delete the old backend-specific code from `worlds-client-ts` once the new
+   repos are the source of truth.
 
 ## Rule of thumb
 
-If the code answers "how do we store, index, or query the graph?" it belongs in `worlds-client-ts`, `worlds-libsql`, or `worlds-denokv` depending on backend.
+If the code answers "how do we store, index, or query the graph?" it belongs in
+`worlds-client-ts`, `worlds-libsql`, or `worlds-denokv` depending on backend.
 
-If the code answers "how do we generate embeddings with a specific provider?" it belongs in a dedicated embedding repo, not in this core package.
+If the code answers "how do we generate embeddings with a specific provider?" it
+belongs in a dedicated embedding repo, not in this core package.

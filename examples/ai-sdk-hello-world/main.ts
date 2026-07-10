@@ -1,6 +1,8 @@
-import { createClient } from "@libsql/client";
-import { createLibsqlClient } from "@worlds/client/libsql";
+import { Client } from "@worlds/client";
+import { ComunicaSparqlEngine } from "@worlds/client/comunica";
+import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/client/rdfjs";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
+import { Store } from "n3";
 import { GRAPH_GROUNDED_AGENT_SYSTEM_PROMPT } from "./agent-prompts.ts";
 import { createTools } from "./tools.ts";
 import { generateText, stepCountIs } from "ai";
@@ -9,13 +11,14 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 if (import.meta.main) {
   const google = createGoogleGenerativeAI();
 
-  console.log("Initializing embedded LibSQL knowledge base...");
-  const database = createClient({ url: ":memory:" });
+  console.log("Initializing embedded in-memory knowledge base...");
+  const store = new Store();
   const queryEngine = new QueryEngine();
 
-  const client = await createLibsqlClient({
-    client: database,
-    queryEngine,
+  const client = new Client({
+    quadStore: new RdfjsQuadStore({ store }),
+    searchIndex: new RdfjsSearchIndex(store),
+    sparqlEngine: new ComunicaSparqlEngine({ queryEngine, store: store }),
   });
 
   console.log("Ingesting initial knowledge...");

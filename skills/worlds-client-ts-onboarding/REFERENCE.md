@@ -22,31 +22,24 @@ graph TD
     Client --> SearchIndex[Search Index Interface]
     Client --> SparqlEngine[SPARQL Engine Interface]
     
-    QuadStore --> LibsqlQuadStore[LibSQL / Deno KV Adapters]
-    SearchIndex --> HybridSearch[FTS5 + TF.js Embeddings]
+    QuadStore --> RdfjsQuadStore[RDF/JS In-Memory Store]
+    SearchIndex --> RdfjsSearchIndex[RDF/JS In-Memory Search]
     SparqlEngine --> Comunica[Comunica SPARQL Engine]
 ```
 
-## Files to read first
+## Files to discover in the workspace
 
-To understand how the codebase is structured, start by reading these files in
-order:
+Read these workspace files at runtime using the Read tool. Paths are relative to
+the workspace root:
 
-1. **[examples/hello-world/main.ts](../../examples/hello-world/main.ts)**
-   - _Why_: The simplest demonstration of the SDK. Sets up an in-memory client
-     using standard N3 quad stores, imports turtle data, searches, and queries
-     it with SPARQL.
-2. **[src/client/client.ts](../../src/client/client.ts)**
-   - _Why_: The primary orchestration layer. It exposes the core SDK methods
-     (`import`, `export`, `search`, `sparql`, `reindex`) and delegates them to
-     the injected adapters.
-3. **[src/client/client.test.ts](../../src/client/client.test.ts)**
-   - _Why_: A clean suite of tests showing exactly how the Client interacts with
-     quad stores and search indexes in an isolated environment.
-4. **[AGENTS.md](../../AGENTS.md)**
-   - _Why_: The absolute behavioral source of truth. Contains core glossaries,
-     coding standards, naming conventions, import path conventions, and the
-     agent prompt contract.
+| File                           | Purpose                                                           |
+| ------------------------------ | ----------------------------------------------------------------- |
+| `deno.json`                    | Package metadata, export map, available tasks                     |
+| `README.md`                    | Project overview, quickstart, adapter ecosystem                   |
+| `AGENTS.md`                    | Coding conventions, glossary, import rules, agent prompt contract |
+| `examples/hello-world/main.ts` | Minimal in-memory client demonstration                            |
+| `src/client/client.ts`         | Core `Client` orchestration layer                                 |
+| `src/client/client.test.ts`    | Client integration test suite                                     |
 
 ## Tests to run
 

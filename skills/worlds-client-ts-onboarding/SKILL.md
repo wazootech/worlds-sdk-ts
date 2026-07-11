@@ -27,13 +27,15 @@ they are ready to proceed.
   dependencies.
 - Proactively run `deno task download:tfjs-use` to download the offline search
   model files.
-- **Validation**: Check if `src/tfjs-universal-sentence-encoder/model/` exists
-  and contains `.bin` files. If missing, diagnose using
+- **Validation**: From the workspace root, check whether
+  `src/tfjs-universal-sentence-encoder/model/` exists and contains `.bin` files.
+  If missing, diagnose using
   [TROUBLESHOOTING.md](TROUBLESHOOTING.md#tensorflowjs-use-offline-models-missing).
 
 ### In-memory hello world execution
 
-- Inspect the available example tasks in [deno.json](../../deno.json).
+- Inspect the workspace `deno.json` tasks at runtime (read `deno.json` from the
+  workspace root with the Read tool).
 - Proactively run the basic in-memory hello-world task on their system.
 - Print the output and walk them through the printed results (Turtle data
   ingestion, in-memory keyword search, and SPARQL SELECT).

@@ -11,7 +11,7 @@ Is Deno installed globally on your machine?
   └── [Yes] ──> Is Deno up to date?
                   ├── [No]  ──> Run: Deno upgrade
                   └── [Yes] ──> 1. Run: Deno install --allow-scripts
-                                2. Run a task command from deno.json
+                                2. Run a task from workspace deno.json
 ```
 
 ### Symptoms
@@ -25,7 +25,7 @@ Is Deno installed globally on your machine?
 Are you running Semantic Search and getting file loading errors?
   ├── [Yes] ──> Did you run the TFJS-USE download task?
   │               ├── [No]  ──> Run: deno task download:tfjs-use
-  │               └── [Yes] ──> Check if 'src/tfjs-universal-sentence-encoder/model/' contains .bin and .json files.
+  │               └── [Yes] ──> From the workspace root, check if 'src/tfjs-universal-sentence-encoder/model/' contains .bin and .json files.
   └── [No]  ──> Continue setup.
 ```
 
@@ -74,9 +74,9 @@ Are your changes rejected by the CI formatting pipeline?
 
 ```
 Are you getting import resolution errors during local test execution or when doing a dry-run publish?
-  ├── [Yes] ──> Search your modified files in 'src/' for imports starting with '@worlds/client'
+  ├── [Yes] ──> Search modified files under 'src/' in the workspace for imports starting with '@worlds/client'
   │               ├── [Found] ──> Replace them with relative imports or '@/' (e.g. '@/client/quad-store/mod.ts').
-  │               └── [None]  ──> Run: deno task publish:dry to check export maps in deno.json.
+  │               └── [None]  ──> Run: deno task publish:dry to check export maps in workspace deno.json.
   └── [No]  ──> Continue setup.
 ```
 

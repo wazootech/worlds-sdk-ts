@@ -93,8 +93,9 @@ for structured traversal and reasoning.
 | `@worlds/client/ai-sdk`        | Vercel AI SDK tool bindings                          |
 
 Regenerate merged API doc JSON with `deno task doc:json` (writes gitignored
-`docs/api.json`). Agent prompts, scale guidance, and coding rules:
-[AGENTS.md](AGENTS.md).
+`docs/api.json`). For architecture documentation (package topology, runtime
+model), see [ARCHITECTURE.md](ARCHITECTURE.md). For agent coding rules and
+conventions, see [AGENTS.md](AGENTS.md).
 
 ## Adapters
 
@@ -151,7 +152,8 @@ seeded LibSQL world.
 ## Advanced
 
 **Agent integration**: search-then-SPARQL two-hop pattern for LLM tool use with
-hybrid retrieval. See [AGENTS.md](AGENTS.md).
+hybrid retrieval. See [AGENTS.md](AGENTS.md) and
+[ARCHITECTURE.md](ARCHITECTURE.md).
 
 **LibSQL/Deno KV benchmarks**: Quad index performance methodology, regression
 policy, and comparison tables live in the adapter repos

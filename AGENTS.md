@@ -3,6 +3,9 @@
 This document serves as the authoritative behavioral and stylistic manual for
 all AI Agents writing code in this repository.
 
+> For stable architecture documentation (package topology, runtime model, and
+> non-goals), see [ARCHITECTURE.md](ARCHITECTURE.md).
+
 ## Domain model and core glossary
 
 This glossary standardizes the core vocabulary and systemic invariants governing
@@ -319,125 +322,10 @@ stores.
 > [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv)). This package
 > only ships the in-memory `RdfjsQuadStore` and `RdfjsSearchIndex`.
 
-## Architectural system map
+## Architecture
 
-To maintain absolute alignment and prevent context drift, all development must
-adhere to the core architectural pillars of the system:
-
-### Ephemeral in-memory execution model
-
-Local RDF/JS workflows use high-speed in-memory `N3.Store` processing.
-Production LibSQL and Deno KV adapters run SPARQL on persistent hexastore
-indexes (no full N3 hydration per query), which removes recurrent network hop
-latency during query execution at scale.
-
-### Client lifecycle (runtime)
-
-**In-memory:**
-`new Client({ quadStore: new RdfjsQuadStore(store), searchIndex: new RdfjsSearchIndex(store), sparqlEngine? })`
-with an N3 `Store`.
-
-**Durable:** `await createLibsqlClient(...)` / `createDenokvClient(...)` —
-factories return `ClientInterface` instances (`new Client` internally).
-
-For standard Comunica SPARQL, pass a Comunica `queryEngine` into factory options
-(e.g. `createLibsqlClient({ queryEngine })`) or wire `ComunicaSparqlEngine` when
-assembling `new Client` manually.
-
-Custom assembly uses `new Client` with `ClientOptions`; wire
-`LibsqlSearchIndex`, `createLibsqlPersistHooks`, and suffixed stores directly
-when you need warm-start control beyond `createLibsqlClient`. Durable backends
-share buffer → `commit()` → `commitBufferedPatch` → `persistPatch` for import
-and SPARQL UPDATE; import commits run `ImportLifecycle` (`beforeImport` /
-`afterImport`) inside `commitBufferedPatch` when `PatchCommitContext.importMode`
-is set. `importViaBufferedRdfjsStore` materializes quads and calls
-`rdfjsStore.commit({ importMode })`. Replace import: LibSQL wipes
-`quads`/`chunks` in `commitPatchToLibsql`; Deno KV generation-swap in
-`commitPatchToDenokv`. Do not reintroduce pre-commit `onReplace` drains on the
-shared import helper. `createLibsqlPersistHooks` and `createDenokvPersistHooks`
-apply `searchIndexOnImport` via flat `commitHandler`, `beforeImport`, and
-`afterImport` wired onto `*RdfjsStore`. LibSQL defers built-in chunk projection
-via `searchIndexOnImport: "deferred"`; Deno KV supports the same defer hooks for
-external search indexes via
-`createDenokvPersistHooks({ searchIndexOnImport: "deferred", reindex })`.
-
-- **Long-running (Fly.io, DigitalOcean, 24/7 Deno):** one `Client` at process
-  boot. See the adapter repos for durable client examples
-  ([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
-  [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv)).
-
-Benchmark methodology and hexastore perf comparison tables live in the adapter
-repos and
-[discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69).
-Historical hydrate+N3 crossover:
-[discussion #45](https://github.com/wazootech/worlds-client-ts/discussions/45).
-Scale guidance for very large graphs:
-[#68](https://github.com/wazootech/worlds-client-ts/issues/68).
-
-### Decoupled store lifecycle via dependency injection
-
-To support high-throughput, serverless container warm-starts, graph store
-construction is fully externalized from the generalized `Client` factory. The
-caller injects initialized `quadStore` / `searchIndex` (and optional
-`sparqlEngine`) directly, allowing trivial container-level caching across
-sequential HTTP invocations.
-
-### Sterile orchestration via adapters
-
-All active instrumentation (proxies, observers, and transactional mutation
-queues) is isolated strictly inside adapters (e.g. `createLibsqlClient`). The
-`ClientInterface` contract is the portable API; `Client` and durable factories
-wire topology-specific stores behind it.
-
-### Topology decision (LibSQL vs Deno KV vs in-memory)
-
-**Production default:** `createLibsqlClient` when you need hybrid FTS/vector
-search, Turso/SQLite operations, and fast cold hexastore preload at scale (see
-the [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) repo and
-[discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69)).
-
-**Consider Deno KV** when Deno Deploy / KV is fixed, the graph is warm or
-preloaded (`BENCH_REUSE_DB`-style reuse), and the hot path is subject-bound
-SPARQL execute — benchmarks show faster post-preload execute at 10k+ quads vs
-LibSQL, but much slower cold import/preload.
-
-**Avoid Deno KV for** cold large imports, hybrid search at scale, and workloads
-needing FTS5 + vectors (`DenokvSearchIndex` is O(N) scan).
-
-**In-memory RDF/JS:** `new Client` + `RdfjsQuadStore` / `RdfjsSearchIndex` for
-tests, local dev, and single-process demos only.
-
-### Resilient hybrid search with vectorless fallbacks
-
-The system natively supports three search topologies: Hybrid (Fused),
-Semantic-Only, and Keyword-Only. If upstream embedding services time out or are
-completely omitted, the system gracefully degrades to high-speed SQLite FTS5
-keyword searching without service interruption.
-
-LibSQL discovery indexing: `chunks.value` stores literal API text;
-`chunks.fts_value` stores subject local name, predicate phrase, literal, and
-configured label aliases (`labelPredicates` extends defaults). Vectors embed a
-deduplicated union of `fts_value` and `value` per chunk, keyed by `fts_value`.
-Search discovers subject IRIs; SPARQL disambiguates (Discovery@k vs SPARQL evals
-are separate). After schema upgrades call `rebuildLibsqlSearchIndexFromQuads`;
-after entity renames call `refreshSearchChunksForSubjects` (label commits fan
-out automatically). Keep AI tool descriptions and system prompts aligned with
-[worlds-client-evals](https://github.com/wazootech/worlds-client-evals)
-(`src/tools/create-eval-tools.ts`, `eval-agent-system-prompt.ts`) and
-`examples/ai-sdk-hello-world/agent-prompts.ts`.
-
-### Stable reciprocal rank fusion relevance blending
-
-To combine vector cosine similarity and Okapi BM25 keyword metrics without
-fragile hyperparameter calibration, the search query assembler standardizes on
-Reciprocal Rank Fusion (RRF). Relevance scoring is calculated using discrete
-rank positions blended with a standard smoothing constant ($k = 60$).
-
-### Deterministic quad-based identity
-
-The system enforces stable, canonical, URL-safe base64 identifiers computed via
-`hashQuad` for all search results and database synchronizer records. This
-secures precise, duplicate-free idempotency checks and stable ranking sweeps.
+For stable architecture documentation (package topology, runtime model, two-hop
+query pattern, and non-goals), see [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Agent prompt contract
 
@@ -532,63 +420,5 @@ Keep AI tool descriptions and system prompts aligned with
 
 ## Scale and topology guidance
 
-### Choosing a LibSQL topology
-
-LibSQL uses quad indexes at schema init. SPARQL runs on `LibsqlRdfjsStore`
-(hexastore) with no full N3 hydration per request. Client import/export uses
-`LibsqlQuadStore`.
-
-### SPARQL query shape at scale
-
-At millions of quads, pick the topology at integration time.
-
-| Concern         | Production default                                                                                                           |
-| :-------------- | :--------------------------------------------------------------------------------------------------------------------------- |
-| LibSQL topology | `createLibsqlClient` with `LibsqlRdfjsStore` + `LibsqlQuadStore`, no full N3 mirror per request                              |
-| Hot-path SPARQL | Bind at least one term (subject, predicate, or object). Subject-bound property lookups match hexastore perf selective shapes |
-| Avoid at scale  | Unbound `?s ?p ?o` (even with `LIMIT`) on libsqlStore; fullScan degrades to hundreds of ms as quads grow                     |
-| Cardinality     | `LibsqlRdfjsStore.countQuads` is used by Comunica when hexastore SPARQL is wired (no extra adapter config)                   |
-
-Query helpers (same shapes as benchmarks):
-
-```typescript
-const selectiveQuery =
-  `SELECT ?property ?object WHERE { <urn:entity:0> ?property ?object }`;
-const devScanQuery =
-  "SELECT ?subject ?property ?object WHERE { ?subject ?property ?object } LIMIT 100";
-```
-
-### Warm container patterns
-
-- **Serverless / edge (warm isolate):** build one `Client` once in module scope
-  per isolate; reuse across HTTP requests.
-- **Long-running (Fly.io, DigitalOcean, 24/7 Deno):** one `Client` at process
-  boot. LibSQL does not require N3 hydration; build one `Client` per
-  process/isolate and reuse it across requests.
-
-### Bulk import strategies
-
-| Value                                | Behavior                                                                         |
-| :----------------------------------- | :------------------------------------------------------------------------------- |
-| `searchIndexOnImport: "incremental"` | Default. Chunks each quad on commit (inline FTS/vector projection).              |
-| `searchIndexOnImport: "deferred"`    | Persists quads on each import, rebuilds FTS/vector chunks in one pass afterward. |
-| `searchIndexOnImport: "disabled"`    | Skips chunking entirely. Call `client.reindex()` before searching.               |
-
-Use `"deferred"` or `"disabled"` for SPARQL-only bulk loads or large initial
-imports where indexing can happen once at the end. On LibSQL, `reindex()`
-rebuilds FTS/vector chunks; on Deno KV and in-memory RDF/JS `reindex()` is
-typically a safe no-op unless you supply an external `reindex` hook on patch
-sync.
-
-### Benchmark references
-
-- Canonical hexastore perf write-up:
-  [discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69)
-- Local numbers and methodology: [`benchmarks/README.md`](benchmarks/README.md)
-  in the adapter repos
-  ([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
-  [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv))
-- Scale roadmap (millions of quads):
-  [#68](https://github.com/wazootech/worlds-client-ts/issues/68)
-- Historical hydrate+N3 crossover:
-  [discussion #45](https://github.com/wazootech/worlds-client-ts/discussions/45)
+See [ARCHITECTURE.md](ARCHITECTURE.md) for package topology, scale
+considerations, and benchmark references.

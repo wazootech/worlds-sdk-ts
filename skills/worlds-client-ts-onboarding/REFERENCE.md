@@ -36,18 +36,14 @@ order:
    - _Why_: The simplest demonstration of the SDK. Sets up an in-memory client
      using standard N3 quad stores, imports turtle data, searches, and queries
      it with SPARQL.
-2. **[examples/libsql-hello-world/main.ts](../../examples/libsql-hello-world/main.ts)**
-   - _Why_: Demonstrates production configuration using durable LibSQL (SQLite),
-     hybrid FTS5 and vector search, and selective, subject-bound SPARQL
-     querying.
-3. **[src/client/client.ts](../../src/client/client.ts)**
+2. **[src/client/client.ts](../../src/client/client.ts)**
    - _Why_: The primary orchestration layer. It exposes the core SDK methods
      (`import`, `export`, `search`, `sparql`, `reindex`) and delegates them to
      the injected adapters.
-4. **[src/client/client.test.ts](../../src/client/client.test.ts)**
+3. **[src/client/client.test.ts](../../src/client/client.test.ts)**
    - _Why_: A clean suite of tests showing exactly how the Client interacts with
      quad stores and search indexes in an isolated environment.
-5. **[AGENTS.md](../../AGENTS.md)**
+4. **[AGENTS.md](../../AGENTS.md)**
    - _Why_: The absolute behavioral source of truth. Contains core glossaries,
      coding standards, naming conventions, import path conventions, and the
      agent prompt contract.
@@ -64,11 +60,11 @@ deno install --allow-scripts
 To verify the local installation, run:
 
 ```bash
-# Run all tests (including Deno KV and SQLite tests)
+# Run all tests
 deno task test
 
 # Run only the core client test suite
-deno test --allow-all --unstable-kv src/client/client.test.ts
+deno test --allow-all src/client/client.test.ts
 ```
 
 ## Ecosystem integration and peripherals

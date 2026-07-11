@@ -22,7 +22,7 @@ Is Deno installed globally on your machine?
 ## TensorFlow.js USE offline models missing
 
 ```
-Are you running the LibSQL example or Semantic Search and getting file loading errors?
+Are you running Semantic Search and getting file loading errors?
   ├── [Yes] ──> Did you run the TFJS-USE download task?
   │               ├── [No]  ──> Run: deno task download:tfjs-use
   │               └── [Yes] ──> Check if 'src/tfjs-universal-sentence-encoder/model/' contains .bin and .json files.
@@ -36,21 +36,6 @@ Are you running the LibSQL example or Semantic Search and getting file loading e
   `TypeError: Cannot read properties of undefined (reading 'load')` or model
   fetch failures.
 - Offline vectorization throws file-not-found exceptions.
-
-## Unstable KV API errors
-
-```
-Are you trying to run Deno KV examples or benchmarks and getting 'Deno.openKv is not a function'?
-  ├── [Yes] ──> Check your CLI command. Did you include the '--unstable-kv' flag?
-  │               ├── [No]  ──> Append '--unstable-kv' (e.g., 'deno run --unstable-kv ...') or use 'deno task example:denokv-hello-world'
-  │               └── [Yes] ──> Ensure Deno is up-to-date.
-  └── [No]  ──> Continue setup.
-```
-
-### Symptoms
-
-- Unhandled rejection: `TypeError: Deno.openKv is not a function`.
-- Task `example:denokv-hello-world` fails instantly.
 
 ## Missing environment variables
 

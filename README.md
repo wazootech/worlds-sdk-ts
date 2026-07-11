@@ -11,11 +11,13 @@
   <a href="https://deepwiki.com/wazootech/worlds-client-ts"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
 </p>
 
-- **Store** — Persist RDF knowledge graphs on SQLite, Turso, or Deno KV.
+- **Portable facade** — Unified `Client` API that works across in-memory,
+  LibSQL/Turso, and Deno KV backends.
 - **Search** — Hybrid retrieval combining keyword FTS5 and vector embeddings.
 - **Query** — Built-in SPARQL engine for declarative graph traversal and
   reasoning.
-- **Sync** — Transactional mutation queue with dual-layer persistence.
+- **In-memory RDF/JS** — Zero-setup N3-based graph store and search for dev,
+  tests, and demos.
 
 ## Install
 
@@ -61,9 +63,9 @@ const sparqlResponse = await client.sparql({
 console.log(sparqlResponse);
 ```
 
-> \[!TIP\] For production search and scale, use LibSQL with Turso Cloud. Deno KV
-> can win on selective post-preload SPARQL in warm Deno deployments — see
-> [Adapters](#adapters) and benchmarks.
+> [!TIP]
+> For production search and scale, use the durable LibSQL (`@worlds/libsql`) or
+> Deno KV (`@worlds/denokv`) backends.
 
 ## Core concepts
 
@@ -78,40 +80,40 @@ for structured traversal and reasoning.
 
 ## Module layout
 
-`Client` is the portable facade; durable backends assemble it via
-`createLibsqlClient` or `createDenokvClient`. Shared modules sit under
-`src/client/`:
+`Client` is the portable facade. Shared modules sit under `src/client/`:
 
-| Module             | Export                         | Role                                                        |
-| ------------------ | ------------------------------ | ----------------------------------------------------------- |
-| `quad-store`       | `@worlds/client/quad-store`    | Import/export API, patch types, RDF formats                 |
-| `rdfjs-buffer`     | `@worlds/client/quad-store`    | Shared patch buffering and import flush (topology-agnostic) |
-| `import-lifecycle` | `@worlds/client` (root barrel) | Import lifecycle hooks around durable commits               |
-| `*/rdfjs-store`    | `@worlds/client/libsql` (etc.) | Durable `*RdfjsStore` quad index + backend sync             |
-
-Do not confuse `@worlds/client/quad-store` with backend `rdfjs-store/` folders —
-they are different layers. Durable import flow: `Client.import` → `*QuadStore` →
-`importViaBufferedRdfjsStore` → `*RdfjsStore.commit` → backend `commitPatchTo*`.
+| Export                         | Role                                                 |
+| ------------------------------ | ---------------------------------------------------- |
+| `@worlds/client`               | Root barrel: `Client`, interfaces, patch types       |
+| `@worlds/client/quad-store`    | Quad import/export API, RDF formats, patch buffering |
+| `@worlds/client/search-index`  | Search index interface and types                     |
+| `@worlds/client/sparql-engine` | SPARQL engine interface                              |
+| `@worlds/client/rdfjs`         | In-memory N3 `RdfjsQuadStore` and `RdfjsSearchIndex` |
+| `@worlds/client/comunica`      | `ComunicaSparqlEngine` adapter                       |
+| `@worlds/client/ai-sdk`        | Vercel AI SDK tool bindings                          |
 
 Regenerate merged API doc JSON with `deno task doc:json` (writes gitignored
-`file docs/api.json`). Agent prompts, scale guidance, and coding rules:
+`docs/api.json`). Agent prompts, scale guidance, and coding rules:
 [AGENTS.md](AGENTS.md).
 
 ## Adapters
 
-| Adapter               | Best for                                  | Persistence          | SPARQL                        |
-| --------------------- | ----------------------------------------- | -------------------- | ----------------------------- |
-| RDF/JS (in-memory N3) | Dev, tests, demos                         | None (in-memory)     | Comunica over N3 `Store`      |
-| LibSQL                | Production default (search + bulk load)   | SQLite / Turso Cloud | LibsqlRdfjsStore quad indexes |
-| Deno KV               | Deno-native, warm graph, selective SPARQL | Deno KV store        | DenokvRdfjsStore quad indexes |
+This package provides the core in-memory RDF/JS backend. Durable backends live
+in separate packages:
+
+| Package                                                        | Persistence          | Search               | SPARQL                        |
+| -------------------------------------------------------------- | -------------------- | -------------------- | ----------------------------- |
+| `@worlds/client` (this package)                                | In-memory (N3 Store) | RDF/JS keyword       | Comunica over N3 Store        |
+| [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) | SQLite / Turso Cloud | Hybrid FTS5 + vector | LibsqlRdfjsStore quad indexes |
+| [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) | Deno KV              | Keyword FTS          | DenokvRdfjsStore quad indexes |
 
 **Choosing LibSQL vs Deno KV:** LibSQL is the default for hybrid FTS/vector
 search and faster cold quad index preload at scale. Deno KV can be faster on
-selective SPARQL execute after preload in long-lived or cached processes —
-compare backends in benchmarks/README.md and
-[discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69).
+selective SPARQL execute after preload in long-lived or cached processes. See
+[discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69)
+for benchmark methodology.
 
-### RDF/JS (in-memory N3)
+### In-memory (dev, tests, demos)
 
 ```typescript
 import { Client } from "@worlds/client";
@@ -131,41 +133,16 @@ const client = new Client({
 });
 ```
 
-### LibSQL (production default)
-
-```typescript
-import { createLibsqlClient } from "@worlds/client/libsql";
-import { createClient } from "@libsql/client";
-import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
-
-const db = createClient({ url: "file:./worlds.db" });
-const client = await createLibsqlClient({
-  client: db,
-  queryEngine: new QueryEngine(),
-});
-```
-
-### Deno KV (Deno-native durable)
-
-```typescript
-import { createDenokvClient } from "@worlds/client/denokv";
-import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
-
-const kv = await Deno.openKv();
-const client = createDenokvClient({
-  kv,
-  queryEngine: new QueryEngine(),
-});
-```
-
 ## Examples
 
-| Example     | Description                            | Command                                |
-| ----------- | -------------------------------------- | -------------------------------------- |
-| Hello world | In-memory graph with search            | `deno task example:hello-world`        |
-| LibSQL      | LibSQL hybrid search + SPARQL at scale | `deno task example:libsql-hello-world` |
-| Deno KV     | KV-backed SPARQL + search              | `deno task example:denokv-hello-world` |
-| AI SDK      | Vercel AI SDK tools with Gemini        | `deno task example:ai-sdk-hello-world` |
+| Example     | Description                     | Command                                |
+| ----------- | ------------------------------- | -------------------------------------- |
+| Hello world | In-memory graph with search     | `deno task example:hello-world`        |
+| AI SDK      | Vercel AI SDK tools with Gemini | `deno task example:ai-sdk-hello-world` |
+
+For LibSQL or Deno KV examples, see the
+[`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) and
+[`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) repositories.
 
 The [agent eval harness](https://github.com/wazootech/worlds-client-evals) lives
 in a separate repository and runs deterministic assertion checks against a
@@ -173,28 +150,24 @@ seeded LibSQL world.
 
 ## Advanced
 
-**Choosing a LibSQL topology**: quad index default (historical N3 hydrate path
-removed; in-memory N3 via RDF/JS adapter), warm containers, SPARQL query shape
-at scale, and bulk import strategies. [-&gt; AGENTS.md](AGENTS.md)
-
 **Agent integration**: search-then-SPARQL two-hop pattern for LLM tool use with
-hybrid retrieval. [-&gt; AGENTS.md](AGENTS.md)
+hybrid retrieval. See [AGENTS.md](AGENTS.md).
 
-**Benchmarks**: local-only performance captures, quad index perf methodology
-(LibSQL + Denokv), and regression policy. -&gt; benchmarks/README.md
+**LibSQL/Deno KV benchmarks**: Quad index performance methodology, regression
+policy, and comparison tables live in the adapter repos
+([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
+[`@worlds/denokv`](https://github.com/wazootech/worlds-denokv)).
 
 ## Development workflow
 
-All CI checks must pass before merging updates. Performance benchmarks are
-**local only** (no CI regression gate); see `file benchmarks/README.md`.
+All CI checks must pass before merging updates.
 
-| Command           | Description                                  |
-| ----------------- | -------------------------------------------- |
-| `deno fmt`        | Format all code using native Deno formatter. |
-| `deno task lint`  | Run strict static analysis checks.           |
-| `deno task test`  | Execute comprehensive test suites.           |
-| `deno task bench` | Run performance benchmarks locally.          |
-| `deno task ci`    | Run complete CI pipeline sequentially.       |
+| Command          | Description                                  |
+| ---------------- | -------------------------------------------- |
+| `deno fmt`       | Format all code using native Deno formatter. |
+| `deno task lint` | Run strict static analysis checks.           |
+| `deno task test` | Execute comprehensive test suites.           |
+| `deno task ci`   | Run complete CI pipeline sequentially.       |
 
 ## Quicklinks
 

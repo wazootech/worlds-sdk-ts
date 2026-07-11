@@ -10,19 +10,20 @@ the client-side edge semantic environments:
 
 ### Graph store
 
-The in-memory RDF surface used by adapters and Comunica. Production LibSQL and
-Deno KV paths query **persistent hexastore** stores (`LibsqlRdfjsStore`,
-`DenokvRdfjsStore`) without hydrating a full N3 mirror per request. The RDF/JS
-adapter still uses `N3.Store` for local development and tests.
+The in-memory RDF surface used by adapters and Comunica. Durable backends
+(LibSQL/Turso, Deno KV) query **persistent hexastore** stores
+(`LibsqlRdfjsStore`, `DenokvRdfjsStore`) in their respective packages. This
+package provides `N3.Store` for local development and tests.
 
 ### Durable reads vs in-memory N3
 
-**Production LibSQL and Deno KV** factories wire hexastore `*RdfjsStore`
-implementations only — Comunica SPARQL and search read durable indexes directly,
-with no per-query N3 mirror. **In-memory RDF/JS** (`RdfjsQuadStore` over
-`N3.Store`) is the intentional local-dev and test topology. Historical
-**libsql-n3** (hydrate durable quads into N3, then query) was removed from the
-package; see [CHANGELOG.md](CHANGELOG.md) and
+**In-memory RDF/JS** (`RdfjsQuadStore` over `N3.Store`) is the intentional
+local-dev and test topology in this package. Durable backends
+([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
+[`@worlds/denokv`](https://github.com/wazootech/worlds-denokv)) wire hexastore
+`*RdfjsStore` implementations and read durable indexes directly with no
+per-query N3 mirror. Historical **libsql-n3** (hydrate durable quads into N3,
+then query) was removed; see [CHANGELOG.md](CHANGELOG.md) and
 [discussion #45](https://github.com/wazootech/worlds-client-ts/discussions/45)
 for crossover methodology only.
 
@@ -121,11 +122,10 @@ mathematical brevity.
 
 1. **Cross-domain.** `@/client/<domain>/mod.ts` or `@/<domain>/mod.ts` (or a
    deeper `mod.ts` when the domain has sub-exports), e.g.
-   `@/client/quad-store/mod.ts`, `@/libsql/mod.ts`.
+   `@/client/quad-store/mod.ts`.
 2. **Same domain folder.** `./file.ts` or `./subfolder/mod.ts` for siblings and
    children.
-3. **Nested folder, parent barrel.** `@/libsql/mod.ts` from
-   `libsql/search-index/` or `libsql/rdfjs-store/sync/` — not `../` and not
+3. **Nested folder, parent barrel.** Use `@/client/mod.ts` — not `../` and not
    `@worlds/client/...`.
 
 Never use parent-relative `../` to reach another domain. Never import
@@ -137,15 +137,12 @@ Never use parent-relative `../` to reach another domain. Never import
   `import type { SparqlEngineInterface } from "@/client/sparql-engine/mod.ts"`
   (from `comunica/`)
 - ✅ `@/client/quad-store/mod.ts`, `@/client/sparql-engine/mod.ts`,
-  `@/rdfjs/mod.ts` (from `libsql/`)
-- ✅ `@/client/quad-store/mod.ts` (from `search-index/quad-chunker/`)
-- ✅ `import { Client } from "@/client/client.ts"` (adapter factories — not
-  `@/mod.ts`, avoids root barrel cycles)
+  `@/client/search-index/mod.ts`
+- ✅ `import { Client } from "@/client/client.ts"` (avoids root barrel cycles)
 - ✅ `./string-to-chars.ts` (from `tokenizer/tokenizer.ts`)
 - ✅ `./client.ts`, `../rdfjs/mod.ts` (from `src/client/client.test.ts`)
-- ✅ `@worlds/client/libsql` (from `examples/`, benchmarks, other repos)
 - ❌ `@worlds/client/sparql-engine` inside `src/`
-- ❌ `../../quad-store/mod.ts`, `../libsql-search-index.ts`
+- ❌ `../../quad-store/mod.ts`
 - ❌ `Promise<import("@/client/sparql-engine/mod.ts").SparqlResponse>` — use a
   top-level `import type` instead
 
@@ -161,28 +158,24 @@ When adding a new importable subpath, add it to `exports` in `deno.json` for
 `@worlds/client/...` consumers. Mirror the file path under `@/client/...` for
 in-repo imports (no duplicate `@worlds/client/*` entries in `imports`). Shared
 topology-agnostic patch buffering lives in `rdfjs-buffer/` (export
-`@worlds/client/quad-store`); durable adapter `*RdfjsStore` implementations live
-under `src/*/rdfjs-store/` (e.g. `src/libsql/rdfjs-store/`). Under durable
-backends, keep seam subfolders for `quad-store/`, `search-index/`, and
-`rdfjs-store/` (each with a `mod.ts` barrel). Internal SQL, KV, and sync helpers
-live under the seam that owns them; factories remain at the adapter root.
+`@worlds/client/quad-store`). Durable adapter `*RdfjsStore` implementations live
+in the external [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql)
+and [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) repositories.
 
 ### Packaging and dependency resolution rationale
 
-To balance "batteries-included" convenience for SDK consumers with strict
-dependency isolation, all store implementations (e.g. `rdfjs`, `libsql`,
-`denokv`) are shipped in the single `@worlds/client` package via dedicated
-subpath exports.
+This package ships only the core client abstractions and the in-memory RDF/JS
+backend. Durable backends (LibSQL/Turso, Deno KV) are published as separate JSR
+packages: [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) and
+[`@worlds/denokv`](https://github.com/wazootech/worlds-denokv).
 
-This topology relies on Deno/JSR's source-based publishing and dynamic runtime
+This package relies on Deno/JSR's source-based publishing and dynamic runtime
 resolution:
 
 - **On-demand fetching**: Runtimes (like Deno) only resolve, download, and
-  compile dependencies actually traversed in the imported path. For example, a
-  client importing from `@worlds/client/rdfjs` will only fetch `n3` and
-  `@rdfjs/types`—never downloading `@libsql/client` or `@tensorflow/tfjs`.
-- **Cohesive versioning**: Keeps all core interfaces and concrete adapters
-  locked to the exact same version release, preventing version fragmentation.
+  compile dependencies actually traversed in the imported path. Importing from
+  `@worlds/client/rdfjs` fetches `n3` and `@rdfjs/types` — but never downloads
+  `@libsql/client` or `@tensorflow/tfjs`.
 
 ### No inline imports
 
@@ -247,9 +240,6 @@ green-passing integration pipeline runs:
   checks green.
 
 - **Mandatory execution flags:**
-  - **Unstable KV:** Any execution task, example, or test interacting with the
-    Deno KV backend (e.g. `DenokvSearchIndex`, `DenokvQuadStore`) must be
-    executed with the `--unstable-kv` flag.
   - **Environment variables:** Any execution task requiring remote endpoints or
     API tokens must be executed with the `--env` flag to cleanly load `.env`
     variables into the process.
@@ -273,15 +263,15 @@ green-passing integration pipeline runs:
   vendor directory and `links` config are intact.
 
 - **Test-driven execution boundaries:** Always run local tests with
-  `deno task ci` or `deno test --allow-all --unstable-kv` to verify that all
-  code compiles, formats, and passes operational invariants without errors prior
-  to opening pull requests.
+  `deno task ci` or `deno test --allow-all` to verify that all code compiles,
+  formats, and passes operational invariants without errors prior to opening
+  pull requests.
 
-- **Local benchmarks only:** Run `deno task bench` for performance captures.
-  There is no CI benchmark regression gate. Document methodology and results in
-  `benchmarks/README.md` and
-  [discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69);
-  do not add committed `baselines.ci.json` or workflow-based bench checks.
+- **Local benchmarks only:** Benchmark suites live in the adapter repos
+  ([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
+  [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv)) and in
+  [discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69).
+  There is no CI benchmark regression gate in this repo.
 
 - **GitHub Actions CI:** Pull requests and pushes to `main` run
   [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (`deno task ci`: fmt,
@@ -324,6 +314,11 @@ KV: `client.import` → `DenokvQuadStore` (native KV bulk path). Both use
 `new Client({ quadStore, searchIndex, sparqlEngine? })` with the suffixed
 stores.
 
+> These conventions apply to the durable adapter repos
+> ([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
+> [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv)). This package
+> only ships the in-memory `RdfjsQuadStore` and `RdfjsSearchIndex`.
+
 ## Architectural system map
 
 To maintain absolute alignment and prevent context drift, all development must
@@ -335,15 +330,6 @@ Local RDF/JS workflows use high-speed in-memory `N3.Store` processing.
 Production LibSQL and Deno KV adapters run SPARQL on persistent hexastore
 indexes (no full N3 hydration per query), which removes recurrent network hop
 latency during query execution at scale.
-
-### LibSQL client entry point (hexastore)
-
-Hexastore indexes are provisioned at schema init. **`createLibsqlClient`**
-([`create-libsql-client.ts`](src/libsql/create-libsql-client.ts)) —
-`LibsqlRdfjsStore` + `LibsqlQuadStore` + quad indexes; pass `queryEngine` to
-enable SPARQL. `LibsqlRdfjsStore.match` keyset-pages by `quads.id`
-(`matchPageSize`, default 1000). Optional `countQuads` supplies Comunica join
-cardinality hints. Use `await createLibsqlClient({ client, queryEngine })`.
 
 ### Client lifecycle (runtime)
 
@@ -376,19 +362,17 @@ external search indexes via
 `createDenokvPersistHooks({ searchIndexOnImport: "deferred", reindex })`.
 
 - **Long-running (Fly.io, DigitalOcean, 24/7 Deno):** one `Client` at process
-  boot. See [`examples/libsql-hello-world`](examples/libsql-hello-world).
+  boot. See the adapter repos for durable client examples
+  ([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
+  [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv)).
 
-Use `benchmarks/sparql-perf-libsql.bench.ts` and
-`benchmarks/sparql-perf-denokv.bench.ts` (requires `--unstable-kv`) to compare
-LibSQL and Denokv hexastore execute on the same harness;
-[`benchmarks/README.md`](benchmarks/README.md) and
-[discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69)
-document post-preload methodology. Historical hydrate+N3 vs libsql crossover:
+Benchmark methodology and hexastore perf comparison tables live in the adapter
+repos and
+[discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69).
+Historical hydrate+N3 crossover:
 [discussion #45](https://github.com/wazootech/worlds-client-ts/discussions/45).
 Scale guidance for very large graphs:
-[#68](https://github.com/wazootech/worlds-client-ts/issues/68). SPARQL
-query-shape examples are inlined in `examples/libsql-hello-world`; see README
-**Scale and SPARQL query shape**.
+[#68](https://github.com/wazootech/worlds-client-ts/issues/68).
 
 ### Decoupled store lifecycle via dependency injection
 
@@ -409,7 +393,7 @@ wire topology-specific stores behind it.
 
 **Production default:** `createLibsqlClient` when you need hybrid FTS/vector
 search, Turso/SQLite operations, and fast cold hexastore preload at scale (see
-[`benchmarks/README.md`](benchmarks/README.md) and
+the [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) repo and
 [discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69)).
 
 **Consider Deno KV** when Deno Deploy / KV is fixed, the graph is warm or
@@ -526,7 +510,7 @@ await client.reindex({
 After renaming an entity, refresh chunks for affected subjects:
 
 ```typescript
-import { refreshSearchChunksForSubjects } from "@worlds/client/libsql";
+import { refreshSearchChunksForSubjects } from "@worlds/libsql";
 
 await refreshSearchChunksForSubjects(["http://example.org/Aurelia"], {
   client: db,
@@ -536,7 +520,7 @@ await refreshSearchChunksForSubjects(["http://example.org/Aurelia"], {
 });
 ```
 
-Advanced: `rebuildLibsqlSearchIndexFromQuads` in `@worlds/client/libsql` remains
+Advanced: `rebuildLibsqlSearchIndexFromQuads` in `@worlds/libsql` remains
 available without a `Client` instance.
 
 ### Alignment with eval harness
@@ -601,6 +585,9 @@ sync.
 - Canonical hexastore perf write-up:
   [discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69)
 - Local numbers and methodology: [`benchmarks/README.md`](benchmarks/README.md)
+  in the adapter repos
+  ([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
+  [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv))
 - Scale roadmap (millions of quads):
   [#68](https://github.com/wazootech/worlds-client-ts/issues/68)
 - Historical hydrate+N3 crossover:

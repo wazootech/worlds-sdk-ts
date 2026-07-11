@@ -44,11 +44,10 @@ they are ready to proceed.
 
 ### Durable edge persistence
 
+- Explain that durable backends (LibSQL, Deno KV) live in separate packages:
+  [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) and
+  [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv).
 - Explain selective/grounded SPARQL query shapes vs full-scan queries.
-- Proactively run the SQL-backed (LibSQL) hello-world task found in the
-  [deno.json](../../deno.json) task list.
-- Print the output and walk them through how the LibSQL engine handles the
-  grounded SPARQL query.
 
 ### Environment verification
 

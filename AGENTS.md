@@ -6,6 +6,34 @@ all AI Agents writing code in this repository.
 > For stable architecture documentation (package topology, runtime model, and
 > non-goals), see [ARCHITECTURE.md](ARCHITECTURE.md).
 
+## Workspace boundary
+
+This repository is the lean `@worlds/client` package, not the Wazoo multi-repo
+workspace. Sibling Wazoo repositories MUST live under
+`C:\Users\ethan\Documents\GitHub\wazootech`.
+
+Before working across Wazoo repositories:
+
+1. Identify the exact repository in scope.
+2. Use the existing clone under
+   `C:\Users\ethan\Documents\GitHub\wazootech\<repo-name>`.
+3. If the clone is missing, create or restore it under the `wazootech` workspace
+   root, never inside this package repo.
+4. Run the parent workspace baseline checker from
+   `C:\Users\ethan\Documents\GitHub\wazootech`:
+   `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-repo-baselines.ps1`.
+
+Do not clone, copy, scaffold, or create worktrees for sibling projects inside
+this repository. Local spillover folders such as `_wazoo-*`, `_worlds-*`,
+`_wazoopedia`, and `_console-worktrees` are ignored only as a last-resort guard;
+their presence indicates the environment should be cleaned up before continuing.
+
+Workspace-boundary or local-environment fixes MUST be committed atomically. Do
+not combine guardrail cleanup, remote/path corrections, generated files, and
+product code in one commit. If additional implementation work is needed, finish
+and push the environment guardrail commit first, then start a separate branch or
+commit for the product change.
+
 ## Domain model and core glossary
 
 This glossary standardizes the core vocabulary and systemic invariants governing

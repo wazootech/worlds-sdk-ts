@@ -129,13 +129,25 @@ const sparqlResponse = await client.sparql({
 
 ## SPARQL engine choice
 
-The SDK uses `@comunica/query-sparql-rdfjs-lite` as its SPARQL query engine, wrapped by `ComunicaSparqlEngine`. The lite variant was chosen over the full `@comunica/query-sparql` because Worlds only queries in-process RDF/JS Store sources (LibSQL, Deno KV, N3). The full engine's HTTP federation, file source, and serialization actors are unnecessary. Lite is smaller, faster to instantiate, and edge-safe.
+The SDK uses `@comunica/query-sparql-rdfjs-lite` as its SPARQL query engine,
+wrapped by `ComunicaSparqlEngine`. The lite variant was chosen over the full
+`@comunica/query-sparql` because Worlds only queries in-process RDF/JS Store
+sources (LibSQL, Deno KV, N3). The full engine's HTTP federation, file source,
+and serialization actors are unnecessary. Lite is smaller, faster to
+instantiate, and edge-safe.
 
-The `ComunicaQueryEngine` interface is a structural type requiring only `query(query, { sources, baseIRI })`. The `SparqlEngineInterface` abstraction (`execute(request)`) makes any engine — a different Comunica variant or a custom implementation — swappable without changing client code.
+The `ComunicaQueryEngine` interface is a structural type requiring only
+`query(query, { sources, baseIRI })`. The `SparqlEngineInterface` abstraction
+(`execute(request)`) makes any engine — a different Comunica variant or a custom
+implementation — swappable without changing client code.
 
-A custom engine is feasible through `SparqlEngineInterface` but would require reimplementing SPARQL 1.1 parsing, algebra compilation, join optimization, and result serialization. Comunica provides a mature, spec-compliant baseline.
+A custom engine is feasible through `SparqlEngineInterface` but would require
+reimplementing SPARQL 1.1 parsing, algebra compilation, join optimization, and
+result serialization. Comunica provides a mature, spec-compliant baseline.
 
-See [Wazoopedia decision record](https://github.com/wazootech/wazoopedia/blob/main/wiki/Decision_Sparql_Engine_Rdfjs_Lite.md) for full rationale.
+See
+[Wazoopedia decision record](https://github.com/wazootech/wazoopedia/blob/main/wiki/Decision_Sparql_Engine_Rdfjs_Lite.md)
+for full rationale.
 
 ## Scale considerations
 

@@ -127,19 +127,29 @@ const sparqlResponse = await client.sparql({
 - Combining them delivers both discovery and precision without depending on a
   single unreliable retrieval mode.
 
-## Scale considerations
+## SPARQL engine choice
 
-- In-memory RDF/JS is suitable for development, tests, and single-process demos
-  with small graphs.
-- For millions of quads and production workloads, use
-  [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) (default) or
-  [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv).
-- LibSQL is preferred for hybrid FTS/vector search and fast cold hexastore
-  preload.
-- Deno KV can be faster on selective SPARQL execute after preload in long-lived
-  processes.
-- Benchmark methodology and comparison tables live in the adapter repos and
-  [discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69).
+The SDK uses `@comunica/query-sparql-rdfjs-lite` as its SPARQL query engine,
+wrapped by `ComunicaSparqlEngine`. The lite variant was chosen over the full
+`@comunica/query-sparql` because Worlds only queries in-process RDF/JS Store
+sources (LibSQL, Deno KV, N3). The full engine's HTTP federation, file source,
+and serialization actors are unnecessary. Lite is smaller, faster to
+instantiate, and edge-safe.
+
+The `ComunicaQueryEngine` interface is a structural type requiring only
+`query(query, { sources, baseIRI })`. The `SparqlEngineInterface` abstraction
+(`execute(request)`) makes any engine — a different Comunica variant or a custom
+implementation — swappable without changing client code.
+
+A custom engine is feasible through `SparqlEngineInterface` but would require
+reimplementing SPARQL 1.1 parsing, algebra compilation, join optimization, and
+result serialization. Comunica provides a mature, spec-compliant baseline.
+
+See
+[Wazoopedia decision record](https://github.com/wazootech/wazoopedia/blob/main/wiki/Decision_Sparql_Engine_Rdfjs_Lite.md)
+for full rationale.
+
+## Scale considerations
 
 ## Non-goals
 

@@ -6,6 +6,12 @@ import type { QuadFilter } from "@/client/quad-store/mod.ts";
 export interface SearchRequest extends QuadFilter {
   /** The fuzzy text query evaluated against the graph's Literal objects. */
   query: string;
+
+  /** topK overrides the default search result limit at the SQL level (number of candidates returned before post-filtering). */
+  topK?: number;
+
+  /** minScore filters out results with a combined rank below this threshold (0.0 to 1.0). */
+  minScore?: number;
 }
 
 /**

@@ -211,9 +211,18 @@ async function handleBindings(
     throw new Error("SPARQL bindings result is missing metadata.");
   }
 
-  const bindingsStream = await queryType.execute() as ComunicaEventStream<
-    ComunicaBinding
-  >;
+  let bindingsStream: ComunicaEventStream<ComunicaBinding>;
+  try {
+    bindingsStream = await queryType.execute() as ComunicaEventStream<
+      ComunicaBinding
+    >;
+  } catch (error) {
+    throw new Error(
+      `SPARQL bindings stream execution failed: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+  }
   const vars = (await queryType.metadata()).variables.map((v) => v.value);
 
   const bindings = await new Promise<SparqlBinding[]>((resolve, reject) => {
@@ -222,14 +231,21 @@ async function handleBindings(
 
     const onData = (binding: ComunicaBinding) => {
       if (finished) return;
-      const bindingObj: SparqlBinding = {};
-      for (const v of vars) {
-        const term = binding.get?.(v);
-        if (term) {
-          bindingObj[v] = toSparqlValue(term);
+      try {
+        const bindingObj: SparqlBinding = {};
+        for (const v of vars) {
+          const term = binding.get?.(v);
+          if (term) {
+            bindingObj[v] = toSparqlValue(term);
+          }
+        }
+        b.push(bindingObj);
+      } catch (error) {
+        if (!finished) {
+          finished = true;
+          reject(error);
         }
       }
-      b.push(bindingObj);
     };
 
     const onEnd = () => {
@@ -260,7 +276,16 @@ async function handleBindings(
 async function handleBoolean(
   queryType: ComunicaQueryResult,
 ): Promise<SparqlAskResults> {
-  const boolean = await queryType.execute();
+  let boolean: unknown;
+  try {
+    boolean = await queryType.execute();
+  } catch (error) {
+    throw new Error(
+      `SPARQL boolean result execute failed: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+  }
   if (typeof boolean !== "boolean") {
     throw new Error("SPARQL boolean result returned a non-boolean payload.");
   }

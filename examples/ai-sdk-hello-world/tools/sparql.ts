@@ -40,8 +40,9 @@ export function createExecuteSparqlTool(
       ),
     }),
     execute: async (request: SparqlRequest) => {
+      const query = request.query ?? request.update ?? "";
       if (options?.allowUpdates === false) {
-        if (/\b(INSERT|DELETE|DROP|CLEAR|LOAD|CREATE)\b/i.test(request.query)) {
+        if (/\b(INSERT|DELETE|DROP|CLEAR|LOAD|CREATE)\b/i.test(query)) {
           return {
             success: false,
             error:

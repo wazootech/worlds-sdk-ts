@@ -145,10 +145,6 @@ export async function executeSparql(
   store: rdfjs.Store,
   request: SparqlRequest,
 ): Promise<SparqlResponse> {
-  const query = request.query ?? request.update;
-  if (query === undefined) {
-    throw new Error("SparqlRequest must specify either query or update");
-  }
   const timeoutMs = request.timeoutMs ?? DEFAULT_SPARQL_TIMEOUT_MS;
   return await new Promise((resolve, reject) => {
     let timer: ReturnType<typeof setTimeout> | undefined = undefined;
@@ -164,7 +160,7 @@ export async function executeSparql(
       reject(new Error("SPARQL query timed out"));
     }, timeoutMs);
 
-    queryEngine.query(query, {
+    queryEngine.query(request.query, {
       sources: [store],
       baseIRI: request.baseIri,
     }).then(async (queryResult) => {

@@ -1,3 +1,5 @@
+import type * as rdfjs from "@rdfjs/types";
+
 /**
  * SparqlEngineInterface executes raw SPARQL queries/updates against a data adapter.
  */
@@ -30,23 +32,23 @@ export interface SparqlRequest {
 export type SparqlResponse =
   | { kind: "select"; data: SparqlSelectResults }
   | { kind: "ask"; data: SparqlAskResults }
-  // TODO: Implement "construct" result type to support CONSTRUCT/DESCRIBE queries (which return rdfjs.Quad[]).
+  | { kind: "construct"; data: SparqlConstructResults }
   | { kind: "void" };
 
 /**
  * SparqlAskResults is the specific format for an ASK boolean query.
  */
-export type SparqlAskResults = {
+export interface SparqlAskResults {
   head: {
     link?: Array<string> | null;
   };
   boolean: boolean;
-};
+}
 
 /**
  * SparqlSelectResults is the tabular format returned by SELECT queries.
  */
-export type SparqlSelectResults = {
+export interface SparqlSelectResults {
   head: {
     vars: Array<string>;
     link?: Array<string> | null;
@@ -54,10 +56,18 @@ export type SparqlSelectResults = {
   results: {
     bindings: Array<SparqlBinding>;
   };
-};
+}
 
 /**
- * A specific value bound to a variable within a SPARQL result binding.
+ * SparqlConstructResults is the quad stream returned by CONSTRUCT/DESCRIBE queries.
+ */
+export interface SparqlConstructResults {
+  quads: Array<rdfjs.Quad>;
+}
+
+/**
+ * SparqlValue is a specific value bound to a variable within a SPARQL result
+ * binding.
  */
 export type SparqlValue =
   | { type: "uri"; value: string }
@@ -66,6 +76,8 @@ export type SparqlValue =
     type: "literal";
     value: string;
     "xml:lang"?: string;
+    /** Base direction ("ltr"/"rtl") of an RDF 1.2 directional language-tagged literal, per the SPARQL 1.2 results JSON/XML formats. */
+    "its:dir"?: "ltr" | "rtl";
     datatype?: string;
   }
   | {

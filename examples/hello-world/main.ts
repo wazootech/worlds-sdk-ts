@@ -1,16 +1,14 @@
 import { Client } from "@worlds/client";
-import { ComunicaSparqlEngine } from "@worlds/client/comunica";
+import { WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/client/rdfjs";
-import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 import { Store } from "n3";
 
 if (import.meta.main) {
   const store = new Store();
-  const queryEngine = new QueryEngine();
   const client = new Client({
     quadStore: new RdfjsQuadStore({ store }),
     searchIndex: new RdfjsSearchIndex(store),
-    sparqlEngine: new ComunicaSparqlEngine({ queryEngine, store: store }),
+    sparqlEngine: new WazooSparqlEngine({ store }),
   });
 
   await client.import({

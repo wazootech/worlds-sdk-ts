@@ -61,19 +61,15 @@ interface ClientOptions {
 
 ```typescript
 import { Client } from "@worlds/client";
-import { ComunicaSparqlEngine } from "@worlds/client/comunica";
+import { WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/client/rdfjs";
-import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 import { Store } from "n3";
 
 const store = new Store();
 const client = new Client({
   quadStore: new RdfjsQuadStore({ store }),
   searchIndex: new RdfjsSearchIndex(store),
-  sparqlEngine: new ComunicaSparqlEngine({
-    queryEngine: new QueryEngine(),
-    store,
-  }),
+  sparqlEngine: new WazooSparqlEngine({ store }),
 });
 ```
 
@@ -129,25 +125,36 @@ const sparqlResponse = await client.sparql({
 
 ## SPARQL engine choice
 
-The SDK uses `@comunica/query-sparql-rdfjs-lite` as its SPARQL query engine,
-wrapped by `ComunicaSparqlEngine`. The lite variant was chosen over the full
-`@comunica/query-sparql` because Worlds only queries in-process RDF/JS Store
-sources (LibSQL, Deno KV, N3). The full engine's HTTP federation, file source,
-and serialization actors are unnecessary. Lite is smaller, faster to
-instantiate, and edge-safe.
+`@worlds/client` is engine-agnostic: the `SparqlEngineInterface` abstraction
+(`execute(request)`) makes any engine swappable without changing client code.
+Two engines implement it today:
+
+- **Wazoo (default)** —
+  [`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine) is the
+  opinionated minimal default. It is a zero-runtime-dependency SPARQL 1.1 & 1.2
+  engine that implements the same `SparqlEngineInterface` as
+  `ComunicaSparqlEngine`, so it drops into a `Client` unchanged and runs over
+  any `rdfjs.Store` (N3 here; `LibsqlRdfjsStore` / `DenokvRdfjsStore` in the
+  durable backends). It covers SELECT / ASK / CONSTRUCT / DESCRIBE plus UPDATE
+  and is differentially tested against Comunica.
+- **Comunica (compatible alternative)** — `@comunica/query-sparql-rdfjs-lite`,
+  wrapped by `ComunicaSparqlEngine` (`@worlds/client/comunica`). The lite
+  variant was chosen over the full `@comunica/query-sparql` because Worlds only
+  queries in-process RDF/JS Store sources (LibSQL, Deno KV, N3). The full
+  engine's HTTP federation, file source, and serialization actors are
+  unnecessary. Lite is smaller, faster to instantiate, and edge-safe.
 
 The `ComunicaQueryEngine` interface is a structural type requiring only
-`query(query, { sources, baseIRI })`. The `SparqlEngineInterface` abstraction
-(`execute(request)`) makes any engine — a different Comunica variant or a custom
-implementation — swappable without changing client code.
+`query(query, { sources, baseIRI })`. A custom engine remains feasible through
+`SparqlEngineInterface`.
 
-A custom engine is feasible through `SparqlEngineInterface` but would require
-reimplementing SPARQL 1.1 parsing, algebra compilation, join optimization, and
-result serialization. Comunica provides a mature, spec-compliant baseline.
+Behavioral deltas when swapping engines: `ComunicaSparqlEngine` enforces
+`timeoutMs` and accepts a request-level `baseIri`; the wazoo engine derives the
+base IRI from the query's `BASE` directive and does not yet enforce a timeout.
 
 See
 [Wazoopedia decision record](https://github.com/wazootech/wazoopedia/blob/main/wiki/Decision_Sparql_Engine_Rdfjs_Lite.md)
-for full rationale.
+for the original Comunica rationale.
 
 ## Scale considerations
 

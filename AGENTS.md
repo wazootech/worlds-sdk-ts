@@ -41,10 +41,11 @@ the client-side edge semantic environments:
 
 ### Graph store
 
-The in-memory RDF surface used by adapters and Comunica. Durable backends
-(LibSQL/Turso, Deno KV) query **persistent hexastore** stores
-(`LibsqlRdfjsStore`, `DenokvRdfjsStore`) in their respective packages. This
-package provides `N3.Store` for local development and tests.
+The in-memory RDF surface used by adapters and SPARQL engines (the Wazoo engine
+by default, with Comunica optional). Durable backends (LibSQL/Turso, Deno KV)
+query **persistent hexastore** stores (`LibsqlRdfjsStore`, `DenokvRdfjsStore`)
+in their respective packages. This package provides `N3.Store` for local
+development and tests.
 
 ### Durable reads vs in-memory N3
 
@@ -341,7 +342,8 @@ Public graph persistence facades must use explicit suffixes:
 
 LibSQL: `client.import` → `LibsqlQuadStore` → `LibsqlRdfjsStore.commit()`. Deno
 KV: `client.import` → `DenokvQuadStore` (native KV bulk path). Both use
-`*RdfjsStore` for Comunica SPARQL. Advanced assembly uses explicit
+`*RdfjsStore` for the SPARQL engine (Wazoo by default, Comunica optional).
+Advanced assembly uses explicit
 `new Client({ quadStore, searchIndex, sparqlEngine? })` with the suffixed
 stores.
 

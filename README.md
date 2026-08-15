@@ -14,8 +14,8 @@
 - **Portable facade** — Unified `Client` API that works across in-memory,
   LibSQL/Turso, and Deno KV backends.
 - **Search** — Hybrid retrieval combining keyword FTS5 and vector embeddings.
-- **Query** — Built-in SPARQL engine for declarative graph traversal and
-  reasoning.
+- **Query** — The zero-dependency Wazoo SPARQL engine as the opinionated minimal
+  default, with Comunica still available as a compatible alternative.
 - **In-memory RDF/JS** — Zero-setup N3-based graph store and search for dev,
   tests, and demos.
 
@@ -29,19 +29,15 @@ deno add jsr:@worlds/client
 
 ```typescript
 import { Client } from "@worlds/client";
-import { ComunicaSparqlEngine } from "@worlds/client/comunica";
+import { WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/client/rdfjs";
-import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 import { Store } from "n3";
 
 const store = new Store();
 const client = new Client({
-  quadStore: new RdfjsQuadStore(store),
+  quadStore: new RdfjsQuadStore({ store }),
   searchIndex: new RdfjsSearchIndex(store),
-  sparqlEngine: new ComunicaSparqlEngine({
-    queryEngine: new QueryEngine(),
-    store,
-  }),
+  sparqlEngine: new WazooSparqlEngine({ store }),
 });
 
 await client.import({
@@ -66,6 +62,9 @@ console.log(sparqlResponse);
 > [!TIP]
 > For production search and scale, use the durable LibSQL (`@worlds/libsql`) or
 > Deno KV (`@worlds/denokv`) backends.
+>
+> Prefer Comunica? Swap `WazooSparqlEngine` for `ComunicaSparqlEngine` from
+> `@worlds/client/comunica` — both implement the same `SparqlEngineInterface`.
 
 ## Core concepts
 
@@ -76,7 +75,9 @@ transactional import and export.
 with vector similarity via an embedding service and quad chunker.
 
 **SPARQL engine**: Evaluates declarative queries and updates against the graph
-for structured traversal and reasoning.
+for structured traversal and reasoning. The zero-dependency
+[`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine) is the default;
+Comunica remains available via `@worlds/client/comunica`.
 
 ## Module layout
 
@@ -92,6 +93,12 @@ for structured traversal and reasoning.
 | `@worlds/client/comunica`      | `ComunicaSparqlEngine` adapter                       |
 | `@worlds/client/ai-sdk`        | Vercel AI SDK tool bindings                          |
 
+The recommended default engine is the external
+[`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine) package, which
+implements the same `SparqlEngineInterface` as `ComunicaSparqlEngine`.
+`@worlds/client/comunica` remains available when the Comunica engine is
+preferred.
+
 Regenerate merged API doc JSON with `deno task doc:json` (writes gitignored
 `docs/api.json`). For architecture documentation (package topology, runtime
 model), see [ARCHITECTURE.md](ARCHITECTURE.md). For agent coding rules and
@@ -104,7 +111,7 @@ in separate packages:
 
 | Package                                                        | Persistence          | Search               | SPARQL                        |
 | -------------------------------------------------------------- | -------------------- | -------------------- | ----------------------------- |
-| `@worlds/client` (this package)                                | In-memory (N3 Store) | RDF/JS keyword       | Comunica over N3 Store        |
+| `@worlds/client` (this package)                                | In-memory (N3 Store) | RDF/JS keyword       | Wazoo (default) or Comunica   |
 | [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) | SQLite / Turso Cloud | Hybrid FTS5 + vector | LibsqlRdfjsStore quad indexes |
 | [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) | Deno KV              | Keyword FTS          | DenokvRdfjsStore quad indexes |
 
@@ -118,6 +125,26 @@ for benchmark methodology.
 
 ```typescript
 import { Client } from "@worlds/client";
+import { WazooSparqlEngine } from "@wazoo/sparql-engine";
+import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/client/rdfjs";
+import { Store } from "n3";
+
+const store = new Store();
+const client = new Client({
+  quadStore: new RdfjsQuadStore({ store }),
+  searchIndex: new RdfjsSearchIndex(store),
+  sparqlEngine: new WazooSparqlEngine({ store }),
+});
+```
+
+### Comunica alternative
+
+`WazooSparqlEngine` and `ComunicaSparqlEngine` implement the same
+`SparqlEngineInterface`, so switching engines is a one-line change with no
+client code changes:
+
+```typescript
+import { Client } from "@worlds/client";
 import { ComunicaSparqlEngine } from "@worlds/client/comunica";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/client/rdfjs";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
@@ -125,7 +152,7 @@ import { Store } from "n3";
 
 const store = new Store();
 const client = new Client({
-  quadStore: new RdfjsQuadStore(store),
+  quadStore: new RdfjsQuadStore({ store }),
   searchIndex: new RdfjsSearchIndex(store),
   sparqlEngine: new ComunicaSparqlEngine({
     queryEngine: new QueryEngine(),

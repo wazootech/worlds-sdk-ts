@@ -1,6 +1,6 @@
 {
   "name": "@worlds/client",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "nodeModulesDir": "auto",
   "exports": {
     ".": "./src/mod.ts",

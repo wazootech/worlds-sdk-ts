@@ -52,6 +52,7 @@
     "test": "deno test --allow-all",
     "publish:dry": "deno publish --dry-run --allow-dirty",
     "doc:json": "deno -A ./scripts/generate-doc-json.ts",
+    "interface-parity": "deno run --allow-read --allow-net scripts/interface-parity.ts",
     "ci": {
       "description": "Formats, lints, checks, and tests the code",
       "dependencies": [

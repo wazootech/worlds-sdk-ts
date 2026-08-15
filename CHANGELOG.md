@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.19
+
+### Changed
+
+- Default the in-memory SPARQL engine to `@wazoo/sparql-engine`
+  (`WazooSparqlEngine`), keeping Comunica as the compatible alternative via
+  `@worlds/client/comunica`.
+- Reconcile `SparqlEngineInterface` with `@wazoo/sparql-engine` under the
+  identical-spec policy: add the `construct` result variant and RDF 1.2
+  `its:dir` literal direction, and collapse `SparqlRequest.query`/`update` into
+  a single required `query` field.
+
 ## Unreleased
 
 ### Breaking

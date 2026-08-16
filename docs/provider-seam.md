@@ -14,7 +14,7 @@ not two implementations of the same thing. Neither replaces the other.
 | Durability / scale       | Turso Cloud, per-world databases                                       | single local file, single process                                         |
 | Keyword search           | FTS5                                                                   | keyword scan (JS substring or SQL `LIKE`)                                 |
 | Vector / semantic search | LibSQL vector module (`F32_BLOB`, `libsql_vector_idx`, `vector_top_k`) | none by default; `sqlite-vec` via `loadExtension` is the optional upgrade |
-| RRF hybrid fusion        | SQL-side (`vector_top_k` + FTS rank)                                   | JS-side, keyword-only first                                               |
+| RRF hybrid fusion        | SQL-side (`vector_top_k` + FTS rank)                                   | JS-side over keyword + vector candidates (see hybrid avenue below)        |
 | RDF/JS quad store        | columnar quads + 7 covering indexes + keyset paging                    | term-keyed quads + JSON payload, synchronous                              |
 
 The original "drop `LibsqlStore` in favor of `SqliteStore`" idea is rejected:
@@ -114,9 +114,54 @@ Implements `SearchIndexInterface.search`/`reindex` by building backend SQL.
 
 - LibSQL: `LibsqlSearchQueryBuilder` — FTS5 + `vector_top_k` RRF, dimension
   guardrails, `sanitizeFtsQuery`.
-- SQLite: keyword-only builder (SQL `LIKE` or a JS scan); RRF fusion, if any,
-  happens in JS over keyword results. `sqlite-vec` is the only path to vector
-  ranking, behind the same `EmbeddingService` seam.
+- SQLite: signal-source adapter — keyword candidates via `LIKE` scan or a JS
+  inverted index, vector candidates via `sqlite-vec` `vec0` or a JS cosine scan.
+  Fusion happens in the shared Worlds layer, not in the adapter. `sqlite-vec` is
+  one of two vector paths (the other is zero-extension JS cosine), both behind
+  the same `EmbeddingService` seam.
+
+## Avenue: full hybrid RRF on SQLite storage
+
+SQLite is **not** capped at keyword-only. Full hybrid RRF is reachable on
+`node:sqlite`; it just decomposes differently than it does on LibSQL.
+
+RRF fusion itself is storage-agnostic arithmetic: two ranked candidate lists in,
+one fused score out (`1/(60 + rank)` per signal, summed). LibSQL happens to do
+that arithmetic in SQL because both signals already live in the database. SQLite
+cannot, so the fusion moves into the shared Worlds layer — which is the portable
+home anyway. What changes per backend is only **signal retrieval**:
+
+| Signal  | LibSQL (`@worlds/libsql`)         | SQLite (`@worlds/sqlite`)                                         |
+| ------- | --------------------------------- | ----------------------------------------------------------------- |
+| Keyword | FTS5 `MATCH` (in SQL)             | `LIKE` scan, or a JS-side inverted index over `chunks`            |
+| Vector  | `vector_top_k` (in SQL)           | `sqlite-vec` `vec0` via `loadExtension`, or a JS-side cosine scan |
+| Fusion  | `COALESCE(1/(60+rank), 0)` in SQL | shared JS RRF over the two candidate lists                        |
+
+This reframes `SearchQueryBuilder` as a **signal-source adapter** rather than a
+whole-search implementation. It returns ranked candidates for keyword and/or
+vector signals; the shared Worlds layer does chunking, embedding, subject alias
+discovery, and RRF fusion identically on both backends.
+
+The worlds layer therefore **extends the `SqliteStore` core** exactly as the
+user intended: `SqliteStore` remains the pure quad primitive (no search), and
+the Worlds search layer sits above it, materializing `chunks` and retrieving
+signals through the adapter. The avenue has three stages, each a drop-in upgrade
+of the SQLite signal adapter:
+
+1. **Keyword-only** — `LIKE` scan or JS inverted index; no vector signal.
+   `createSqliteClient` v1.
+2. **Hybrid (extension-assisted)** — load `sqlite-vec`, keep `vec0` vectors in
+   the `chunks` table, retrieve `vec0` top-K plus keyword candidates, fuse in
+   JS. Fully hybrid RRF, one loadable extension, no LibSQL required.
+3. **Hybrid (zero-extension)** — JS-side cosine over in-memory vectors for small
+   worlds; same fusion path, no native code. Degrades gracefully to stage 1 as
+   vector count grows.
+
+Because stages 1–3 differ only in the SQLite `SearchQueryBuilder`, the Worlds
+layer, `QuadStoreBackend`, and `createSqliteClient` assembly are written once.
+This is the concrete answer to "can SQLite do the same hybrid search as LibSQL":
+yes, with a swapped vector backend, and the seam makes that swap a strategy
+change rather than a fork.
 
 ## What is shared (lives in `@worlds/sdk`)
 
@@ -140,7 +185,7 @@ shared surface needed, and they are the seam this doc proposes.
   today). Keeps its name and its LibSQL vector + FTS5 identity.
 - **`@worlds/sqlite`** — zero-dependency local backend for the "local file +
   search" product goal. New package (or `@worlds/sdk/sqlite` subpath). Keyword
-  search first; `sqlite-vec` vectors later.
+  search in v1; full hybrid RRF via `sqlite-vec` or JS cosine later.
 - **`@worlds/sdk`** — interfaces + shared orchestration + in-memory RDF/JS
   backend + the four strategy-object interfaces.
 - **`@wazoo/sparql-engine`** — engine + `SqliteStore` quad primitive. Stays a
@@ -162,10 +207,11 @@ shared surface needed, and they are the seam this doc proposes.
    `LibsqlSchemaBuilder`, `LibsqlQuadStoreBackend`, `LibsqlSearchQueryBuilder`)
    without changing behavior.
 3. Add `@worlds/sqlite` with `SqliteConnectionDriver`, `SqliteSchemaBuilder`,
-   `SqliteQuadStoreBackend` (over `@wazoo/sparql-engine/sqlite`), and a
-   keyword-only `SqliteSearchQueryBuilder`, wired by `createSqliteClient`.
-4. Optional later: `sqlite-vec` vector path in the SQLite `SearchQueryBuilder`
-   behind `loadExtension`.
+   `SqliteQuadStoreBackend` (over `@wazoo/sparql-engine/sqlite`), and a keyword
+   signal adapter (`SqliteSearchQueryBuilder`), wired by `createSqliteClient`.
+4. Add the SQLite vector signal as a strategy swap: `sqlite-vec` `vec0` behind
+   `loadExtension`, or a zero-extension JS cosine scan. Fusion stays in the
+   shared Worlds layer.
 
 ## Non-goals
 

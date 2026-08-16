@@ -1,4 +1,4 @@
-import type { ClientInterface } from "@worlds/client";
+import type { ClientInterface } from "@worlds/sdk";
 import {
   createExecuteSparqlTool,
   createExportRdfTool,

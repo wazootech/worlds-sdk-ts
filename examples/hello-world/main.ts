@@ -1,6 +1,6 @@
-import { Client } from "@worlds/client";
+import { Client } from "@worlds/sdk";
 import { WazooSparqlEngine } from "@wazoo/sparql-engine";
-import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/client/rdfjs";
+import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
 import { Store } from "n3";
 
 if (import.meta.main) {

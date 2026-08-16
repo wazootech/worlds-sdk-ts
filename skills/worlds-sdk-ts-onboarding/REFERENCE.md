@@ -1,6 +1,6 @@
 # Codebase reference and introduction
 
-This document provides a high-level walkthrough of the `@worlds/client`
+This document provides a high-level walkthrough of the `@worlds/sdk`
 architecture, listing the key entry points, testing procedures, and the
 front-to-back integration plan.
 
@@ -82,16 +82,16 @@ pull JSR packages directly into Node.js, Bun, or Yarn environments:
 
 ```bash
 # Node.js projects
-npx jsr add @worlds/client
+npx jsr add @worlds/sdk
 
 # Bun projects
-bunx jsr add @worlds/client
+bunx jsr add @worlds/sdk
 
 # Yarn projects
-yarn dlx jsr add @worlds/client
+yarn dlx jsr add @worlds/sdk
 
 # Pnpm projects
-pnpm dlx jsr add @worlds/client
+pnpm dlx jsr add @worlds/sdk
 ```
 
 This automates compiler bindings and resolves dependencies cleanly for modern

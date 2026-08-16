@@ -5,7 +5,7 @@ import denoJson from "../deno.json" with { type: "json" };
 
 /** DocJsonEntryPoint records one deno.json export and its source file. */
 interface DocJsonEntryPoint {
-  /** subpath is the @worlds/client export key (e.g. "./adapters/libsql"). */
+  /** subpath is the @worlds/sdk export key (e.g. "./adapters/libsql"). */
   subpath: string;
   /** file is the repository-relative entry file path. */
   file: string;

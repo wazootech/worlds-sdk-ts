@@ -1,6 +1,6 @@
 import { tool } from "ai";
-import type { ClientInterface } from "@worlds/client";
-import type { SparqlRequest } from "@worlds/client/sparql-engine";
+import type { ClientInterface } from "@worlds/sdk";
+import type { SparqlRequest } from "@worlds/sdk/sparql-engine";
 import { z } from "zod";
 import { EXECUTE_SPARQL_TOOL_DESCRIPTION } from "./agent-tool-descriptions.ts";
 

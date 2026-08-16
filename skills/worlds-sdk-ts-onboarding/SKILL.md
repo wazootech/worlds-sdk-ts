@@ -1,5 +1,5 @@
 ---
-name: worlds-client-ts-onboarding
+name: worlds-sdk-ts-onboarding
 description: Onboard new contributors to the wazoo-worlds codebase by guiding them through installation, running examples, understanding the client architecture, and troubleshooting common environment and runtime errors. Use when a contributor needs to set up their development environment, run demo scripts or tests, understand client or store concepts, or debug runtime gotchas in the wazoo-worlds repository.
 ---
 
@@ -62,9 +62,9 @@ they are ready to proceed.
 - Explain that the goal is to build new full-stack projects and peripherals on
   top of the worlds ecosystem using this client library.
 - Explain how to install the JSR package in new JavaScript/TypeScript projects:
-  - Node: `npx jsr add @worlds/client`
-  - Bun: `bunx jsr add @worlds/client`
-  - Yarn: `yarn dlx jsr add @worlds/client`
+  - Node: `npx jsr add @worlds/sdk`
+  - Bun: `bunx jsr add @worlds/sdk`
+  - Yarn: `yarn dlx jsr add @worlds/sdk`
 - Tell them: "Let's do it! Now that we know the client fundamentals, let's build
   the "Worlds" ecosystem!"
 
@@ -72,9 +72,8 @@ they are ready to proceed.
 
 - **Certified**: Upon completing the final stage, congratulate them!
 - **Open issue hunter**: If the user has the `gh` cli installed, then use it to
-  list the open issues on `wazootech/worlds-client-ts` (specifically
-  prioritizing those labeled `good first issue`) to find conducive, proactive
-  next steps.
+  list the open issues on `wazootech/worlds-sdk-ts` (specifically prioritizing
+  those labeled `good first issue`) to find conducive, proactive next steps.
 
 ### [Celebratory ASCII art](https://patorjk.com/software/taag/#p=display&f=ANSI+Shadow&t=Worlds)
 

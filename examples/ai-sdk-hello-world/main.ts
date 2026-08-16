@@ -1,6 +1,6 @@
-import { Client } from "@worlds/client";
-import { ComunicaSparqlEngine } from "@worlds/client/comunica";
-import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/client/rdfjs";
+import { Client } from "@worlds/sdk";
+import { ComunicaSparqlEngine } from "@worlds/sdk/comunica";
+import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 import { Store } from "n3";
 import { GRAPH_GROUNDED_AGENT_SYSTEM_PROMPT } from "./agent-prompts.ts";

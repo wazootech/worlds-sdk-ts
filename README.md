@@ -5,10 +5,10 @@
   <br /><br />
   <em>Persistent, edge-native knowledge graph storage for agents.</em>
   <br /><br />
-  <a href="https://jsr.io/@worlds/client"><img src="https://jsr.io/badges/@worlds/client" alt="JSR" /></a>
-  <a href="https://jsr.io/@worlds/client/score"><img src="https://jsr.io/badges/@worlds/client/score" alt="JSR Score" /></a>
-  <a href="https://github.com/wazootech/worlds-client-ts"><img src="https://img.shields.io/badge/GitHub-black?logo=github" alt="GitHub" /></a>
-  <a href="https://deepwiki.com/wazootech/worlds-client-ts"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
+  <a href="https://jsr.io/@worlds/sdk"><img src="https://jsr.io/badges/@worlds/sdk" alt="JSR" /></a>
+  <a href="https://jsr.io/@worlds/sdk/score"><img src="https://jsr.io/badges/@worlds/sdk/score" alt="JSR Score" /></a>
+  <a href="https://github.com/wazootech/worlds-sdk-ts"><img src="https://img.shields.io/badge/GitHub-black?logo=github" alt="GitHub" /></a>
+  <a href="https://deepwiki.com/wazootech/worlds-sdk-ts"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
 </p>
 
 - **Portable facade** — Unified `Client` API that works across in-memory,
@@ -22,15 +22,15 @@
 ## Install
 
 ```bash
-deno add jsr:@worlds/client
+deno add jsr:@worlds/sdk
 ```
 
 ## Quickstart
 
 ```typescript
-import { Client } from "@worlds/client";
+import { Client } from "@worlds/sdk";
 import { WazooSparqlEngine } from "@wazoo/sparql-engine";
-import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/client/rdfjs";
+import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
 import { Store } from "n3";
 
 const store = new Store();
@@ -64,7 +64,7 @@ console.log(sparqlResponse);
 > Deno KV (`@worlds/denokv`) backends.
 >
 > Prefer Comunica? Swap `WazooSparqlEngine` for `ComunicaSparqlEngine` from
-> `@worlds/client/comunica` — both implement the same `SparqlEngineInterface`.
+> `@worlds/sdk/comunica` — both implement the same `SparqlEngineInterface`.
 
 ## Core concepts
 
@@ -77,27 +77,26 @@ with vector similarity via an embedding service and quad chunker.
 **SPARQL engine**: Evaluates declarative queries and updates against the graph
 for structured traversal and reasoning. The zero-dependency
 [`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine) is the default;
-Comunica remains available via `@worlds/client/comunica`.
+Comunica remains available via `@worlds/sdk/comunica`.
 
 ## Module layout
 
 `Client` is the portable facade. Shared modules sit under `src/client/`:
 
-| Export                         | Role                                                 |
-| ------------------------------ | ---------------------------------------------------- |
-| `@worlds/client`               | Root barrel: `Client`, interfaces, patch types       |
-| `@worlds/client/quad-store`    | Quad import/export API, RDF formats, patch buffering |
-| `@worlds/client/search-index`  | Search index interface and types                     |
-| `@worlds/client/sparql-engine` | SPARQL engine interface                              |
-| `@worlds/client/rdfjs`         | In-memory N3 `RdfjsQuadStore` and `RdfjsSearchIndex` |
-| `@worlds/client/comunica`      | `ComunicaSparqlEngine` adapter                       |
-| `@worlds/client/ai-sdk`        | Vercel AI SDK tool bindings                          |
+| Export                      | Role                                                 |
+| --------------------------- | ---------------------------------------------------- |
+| `@worlds/sdk`               | Root barrel: `Client`, interfaces, patch types       |
+| `@worlds/sdk/quad-store`    | Quad import/export API, RDF formats, patch buffering |
+| `@worlds/sdk/search-index`  | Search index interface and types                     |
+| `@worlds/sdk/sparql-engine` | SPARQL engine interface                              |
+| `@worlds/sdk/rdfjs`         | In-memory N3 `RdfjsQuadStore` and `RdfjsSearchIndex` |
+| `@worlds/sdk/comunica`      | `ComunicaSparqlEngine` adapter                       |
+| `@worlds/sdk/ai-sdk`        | Vercel AI SDK tool bindings                          |
 
 The recommended default engine is the external
 [`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine) package, which
 implements the same `SparqlEngineInterface` as `ComunicaSparqlEngine`.
-`@worlds/client/comunica` remains available when the Comunica engine is
-preferred.
+`@worlds/sdk/comunica` remains available when the Comunica engine is preferred.
 
 Regenerate merged API doc JSON with `deno task doc:json` (writes gitignored
 `docs/api.json`). For architecture documentation (package topology, runtime
@@ -111,22 +110,22 @@ in separate packages:
 
 | Package                                                        | Persistence          | Search               | SPARQL                        |
 | -------------------------------------------------------------- | -------------------- | -------------------- | ----------------------------- |
-| `@worlds/client` (this package)                                | In-memory (N3 Store) | RDF/JS keyword       | Wazoo (default) or Comunica   |
+| `@worlds/sdk` (this package)                                   | In-memory (N3 Store) | RDF/JS keyword       | Wazoo (default) or Comunica   |
 | [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) | SQLite / Turso Cloud | Hybrid FTS5 + vector | LibsqlRdfjsStore quad indexes |
 | [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) | Deno KV              | Keyword FTS          | DenokvRdfjsStore quad indexes |
 
 **Choosing LibSQL vs Deno KV:** LibSQL is the default for hybrid FTS/vector
 search and faster cold quad index preload at scale. Deno KV can be faster on
 selective SPARQL execute after preload in long-lived or cached processes. See
-[discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69)
-for benchmark methodology.
+[discussion #69](https://github.com/wazootech/worlds-sdk-ts/discussions/69) for
+benchmark methodology.
 
 ### In-memory (dev, tests, demos)
 
 ```typescript
-import { Client } from "@worlds/client";
+import { Client } from "@worlds/sdk";
 import { WazooSparqlEngine } from "@wazoo/sparql-engine";
-import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/client/rdfjs";
+import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
 import { Store } from "n3";
 
 const store = new Store();
@@ -144,9 +143,9 @@ const client = new Client({
 client code changes:
 
 ```typescript
-import { Client } from "@worlds/client";
-import { ComunicaSparqlEngine } from "@worlds/client/comunica";
-import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/client/rdfjs";
+import { Client } from "@worlds/sdk";
+import { ComunicaSparqlEngine } from "@worlds/sdk/comunica";
+import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
 import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
 import { Store } from "n3";
 
@@ -202,6 +201,6 @@ All CI checks must pass before merging updates.
 
 - [Documentation](https://docs.wazoo.dev)
 - [Wazoo Technologies](https://wazoo.dev)
-- [Support](https://github.com/wazootech/worlds-client-ts/issues)
+- [Support](https://github.com/wazootech/worlds-sdk-ts/issues)
 
 Developed with [**@wazootech**](https://github.com/wazootech)

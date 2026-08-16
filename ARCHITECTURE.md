@@ -185,6 +185,9 @@ See [AGENTS.md](AGENTS.md) for detailed agent coding rules and conventions.
 
 ## Related documents
 
+- [docs/provider-seam.md](docs/provider-seam.md) — How durable backends
+  (`@worlds/libsql`, `@worlds/sqlite`) compose from `ConnectionDriver` /
+  `QuadStore` / `SearchQueryBuilder` / `SchemaBuilder` strategy objects.
 - [AGENTS.md](AGENTS.md) — Imperative coding rules, naming conventions, CI
   guidance (read this before writing code).
 - [README.md](README.md) — User-facing overview, quickstart, and examples.

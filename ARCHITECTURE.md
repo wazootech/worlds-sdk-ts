@@ -1,25 +1,25 @@
 # Architecture
 
-This document describes the stable architecture of `@worlds/client` and how it
+This document describes the stable architecture of `@worlds/sdk` and how it
 relates to the Worlds ecosystem.
 
 ## Package topology
 
-`@worlds/client` ships the core client abstractions and the in-memory RDF/JS
+`@worlds/sdk` ships the core client abstractions and the in-memory RDF/JS
 backend. Durable backends are published as separate packages.
 
 ### In this package
 
-| Export                                           | Role                                                                            |
-| ------------------------------------------------ | ------------------------------------------------------------------------------- |
-| `@worlds/client`                                 | Root barrel: `Client`, interfaces, patch types, embedding-service, quad-chunker |
-| `@worlds/client/quad-store`                      | Quad import/export API, RDF formats, patch transactions                         |
-| `@worlds/client/search-index`                    | Search index interface and types                                                |
-| `@worlds/client/sparql-engine`                   | SPARQL engine interface                                                         |
-| `@worlds/client/rdfjs`                           | In-memory `RdfjsQuadStore` and `RdfjsSearchIndex` over `N3.Store`               |
-| `@worlds/client/comunica`                        | `ComunicaSparqlEngine` adapter                                                  |
-| `@worlds/client/ai-sdk`                          | Vercel AI SDK embedding service                                                 |
-| `@worlds/client/tfjs-universal-sentence-encoder` | Offline TF.js USE embedding service                                             |
+| Export                                        | Role                                                                            |
+| --------------------------------------------- | ------------------------------------------------------------------------------- |
+| `@worlds/sdk`                                 | Root barrel: `Client`, interfaces, patch types, embedding-service, quad-chunker |
+| `@worlds/sdk/quad-store`                      | Quad import/export API, RDF formats, patch transactions                         |
+| `@worlds/sdk/search-index`                    | Search index interface and types                                                |
+| `@worlds/sdk/sparql-engine`                   | SPARQL engine interface                                                         |
+| `@worlds/sdk/rdfjs`                           | In-memory `RdfjsQuadStore` and `RdfjsSearchIndex` over `N3.Store`               |
+| `@worlds/sdk/comunica`                        | `ComunicaSparqlEngine` adapter                                                  |
+| `@worlds/sdk/ai-sdk`                          | Vercel AI SDK embedding service                                                 |
+| `@worlds/sdk/tfjs-universal-sentence-encoder` | Offline TF.js USE embedding service                                             |
 
 ### External durable backends
 
@@ -60,9 +60,9 @@ interface ClientOptions {
 ### In-memory topology (dev, tests, demos)
 
 ```typescript
-import { Client } from "@worlds/client";
+import { Client } from "@worlds/sdk";
 import { WazooSparqlEngine } from "@wazoo/sparql-engine";
-import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/client/rdfjs";
+import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
 import { Store } from "n3";
 
 const store = new Store();
@@ -125,7 +125,7 @@ const sparqlResponse = await client.sparql({
 
 ## SPARQL engine choice
 
-`@worlds/client` is engine-agnostic: the `SparqlEngineInterface` abstraction
+`@worlds/sdk` is engine-agnostic: the `SparqlEngineInterface` abstraction
 (`execute(request)`) makes any engine swappable without changing client code.
 Two engines implement it today:
 
@@ -138,11 +138,11 @@ Two engines implement it today:
   durable backends). It covers SELECT / ASK / CONSTRUCT / DESCRIBE plus UPDATE
   and is differentially tested against Comunica.
 - **Comunica (compatible alternative)** — `@comunica/query-sparql-rdfjs-lite`,
-  wrapped by `ComunicaSparqlEngine` (`@worlds/client/comunica`). The lite
-  variant was chosen over the full `@comunica/query-sparql` because Worlds only
-  queries in-process RDF/JS Store sources (LibSQL, Deno KV, N3). The full
-  engine's HTTP federation, file source, and serialization actors are
-  unnecessary. Lite is smaller, faster to instantiate, and edge-safe.
+  wrapped by `ComunicaSparqlEngine` (`@worlds/sdk/comunica`). The lite variant
+  was chosen over the full `@comunica/query-sparql` because Worlds only queries
+  in-process RDF/JS Store sources (LibSQL, Deno KV, N3). The full engine's HTTP
+  federation, file source, and serialization actors are unnecessary. Lite is
+  smaller, faster to instantiate, and edge-safe.
 
 The `ComunicaQueryEngine` interface is a structural type requiring only
 `query(query, { sources, baseIRI })`. A custom engine remains feasible through
@@ -160,7 +160,7 @@ for the original Comunica rationale.
 
 ## Non-goals
 
-- `@worlds/client` does not include a hosted Wazoo API client.
+- `@worlds/sdk` does not include a hosted Wazoo API client.
 - Durable/immediate persistent backends (LibSQL, Deno KV) are not implemented
   inside this package. They ship in separate JSR packages with different
   lifecycle and dependency profiles.

@@ -8,7 +8,7 @@ all AI Agents writing code in this repository.
 
 ## Workspace boundary
 
-This repository is the lean `@worlds/client` package, not the Wazoo multi-repo
+This repository is the lean `@worlds/sdk` package, not the Wazoo multi-repo
 workspace. Sibling Wazoo repositories MUST live under
 `C:\Users\ethan\Documents\GitHub\wazootech`.
 
@@ -56,8 +56,8 @@ local-dev and test topology in this package. Durable backends
 `*RdfjsStore` implementations and read durable indexes directly with no
 per-query N3 mirror. Historical **libsql-n3** (hydrate durable quads into N3,
 then query) was removed; see [CHANGELOG.md](CHANGELOG.md) and
-[discussion #45](https://github.com/wazootech/worlds-client-ts/discussions/45)
-for crossover methodology only.
+[discussion #45](https://github.com/wazootech/worlds-sdk-ts/discussions/45) for
+crossover methodology only.
 
 ### Synchronization
 
@@ -142,11 +142,11 @@ mathematical brevity.
 
 - **`@/` (in-repo only):** `"@/": "./src/"` under `imports`. Use `@/client/...`
   inside `src/` for cross-domain imports. Never use the published package name
-  (`@worlds/client/...`) in `src/` — real `deno publish` resolves that as an
+  (`@worlds/sdk/...`) in `src/` — real `deno publish` resolves that as an
   external JSR dependency and fails
   ([denoland/deno#25191](https://github.com/denoland/deno/issues/25191),
   [maintainer guidance](https://github.com/denoland/deno/issues/25191#issuecomment-2308790000)).
-- **`@worlds/client/...` (public):** `exports` only. Examples, benchmarks, and
+- **`@worlds/sdk/...` (public):** `exports` only. Examples, benchmarks, and
   external apps use documented export subpaths — not `@/` and not deep file
   paths.
 
@@ -158,10 +158,10 @@ mathematical brevity.
 2. **Same domain folder.** `./file.ts` or `./subfolder/mod.ts` for siblings and
    children.
 3. **Nested folder, parent barrel.** Use `@/client/mod.ts` — not `../` and not
-   `@worlds/client/...`.
+   `@worlds/sdk/...`.
 
 Never use parent-relative `../` to reach another domain. Never import
-`@worlds/client/...` anywhere under `src/`.
+`@worlds/sdk/...` anywhere under `src/`.
 
 ### Examples
 
@@ -173,7 +173,7 @@ Never use parent-relative `../` to reach another domain. Never import
 - ✅ `import { Client } from "@/client/client.ts"` (avoids root barrel cycles)
 - ✅ `./string-to-chars.ts` (from `tokenizer/tokenizer.ts`)
 - ✅ `./client.ts`, `../rdfjs/mod.ts` (from `src/client/client.test.ts`)
-- ❌ `@worlds/client/sparql-engine` inside `src/`
+- ❌ `@worlds/sdk/sparql-engine` inside `src/`
 - ❌ `../../quad-store/mod.ts`
 - ❌ `Promise<import("@/client/sparql-engine/mod.ts").SparqlResponse>` — use a
   top-level `import type` instead
@@ -187,12 +187,12 @@ would cycle — e.g. `chunk-quads.ts` uses `@/client/quad-store/mod.ts`, not
 ### Public surface changes
 
 When adding a new importable subpath, add it to `exports` in `deno.json` for
-`@worlds/client/...` consumers. Mirror the file path under `@/client/...` for
-in-repo imports (no duplicate `@worlds/client/*` entries in `imports`). Shared
+`@worlds/sdk/...` consumers. Mirror the file path under `@/client/...` for
+in-repo imports (no duplicate `@worlds/sdk/*` entries in `imports`). Shared
 topology-agnostic patch buffering lives in `rdfjs-buffer/` (export
-`@worlds/client/quad-store`). Durable adapter `*RdfjsStore` implementations live
-in the external [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql)
-and [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) repositories.
+`@worlds/sdk/quad-store`). Durable adapter `*RdfjsStore` implementations live in
+the external [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) and
+[`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) repositories.
 
 ### Packaging and dependency resolution rationale
 
@@ -206,7 +206,7 @@ resolution:
 
 - **On-demand fetching**: Runtimes (like Deno) only resolve, download, and
   compile dependencies actually traversed in the imported path. Importing from
-  `@worlds/client/rdfjs` fetches `n3` and `@rdfjs/types` — but never downloads
+  `@worlds/sdk/rdfjs` fetches `n3` and `@rdfjs/types` — but never downloads
   `@libsql/client` or `@tensorflow/tfjs`.
 
 ### No inline imports
@@ -255,10 +255,10 @@ documentation files:
   - ✅ **Prefer:** `### AI SDK agent`
 - **Suppression of horizontal rules:** Avoid utilizing `---` divider lines to
   segment documents. Let empty lines establish boundaries cleanly.
-- **No pinned JSR versions in docs:** Link and refer to `@worlds/client` (or
-  `jsr:@worlds/client`) without `@x.y.z` suffixes in README, examples,
-  benchmarks, and AGENTS. Version lives only in `deno.json` for publish;
-  consumers pin via `deno add jsr:@worlds/client` or their own lockfile.
+- **No pinned JSR versions in docs:** Link and refer to `@worlds/sdk` (or
+  `jsr:@worlds/sdk`) without `@x.y.z` suffixes in README, examples, benchmarks,
+  and AGENTS. Version lives only in `deno.json` for publish; consumers pin via
+  `deno add jsr:@worlds/sdk` or their own lockfile.
 
 ## Development constraints and CI hygiene
 
@@ -302,27 +302,27 @@ green-passing integration pipeline runs:
 - **Local benchmarks only:** Benchmark suites live in the adapter repos
   ([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
   [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv)) and in
-  [discussion #69](https://github.com/wazootech/worlds-client-ts/discussions/69).
+  [discussion #69](https://github.com/wazootech/worlds-sdk-ts/discussions/69).
   There is no CI benchmark regression gate in this repo.
 
 - **GitHub Actions CI:** Pull requests and pushes to `main` run
   [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (`deno task ci`: fmt,
   lint, check, test). Open PRs show the **CI** check before merge.
-- **JSR publish (`deno publish`):** The package is `@worlds/client` on JSR.
-  Pushes to `main` also run
+- **JSR publish (`deno publish`):** The package is `@worlds/sdk` on JSR. Pushes
+  to `main` also run
   [`.github/workflows/publish.yml`](.github/workflows/publish.yml):
   `deno task ci` → `deno task publish:dry` → `deno publish`. Before any release
   or import/`exports` refactor, run the same sequence locally.
   - **Version:** Bump `"version"` in `deno.json` for each JSR release (CI does
     not auto-bump).
   - **In-repo imports:** Only `@/` under `src/` (see import conventions). Do not
-    add `@worlds/client/*` to `imports`; `exports` alone defines the public
-    package surface.
+    add `@worlds/sdk/*` to `imports`; `exports` alone defines the public package
+    surface.
   - **Dry-run smoke:** `deno task publish:dry`
     (`deno publish --dry-run
     --allow-dirty`) is required in CI before merge.
-  - **If publish fails** with `export '…' not found in jsr:@worlds/client` or
-    `unresolvable 'jsr:' dependency`, search `src/` for `@worlds/client` imports
+  - **If publish fails** with `export '…' not found in jsr:@worlds/sdk` or
+    `unresolvable 'jsr:' dependency`, search `src/` for `@worlds/sdk` imports
     and replace them with `@/client/...` per
     [denoland/deno#25191](https://github.com/denoland/deno/issues/25191).
   - **Packaging:** JSR strips `links` and `exclude` from `deno.json`; the

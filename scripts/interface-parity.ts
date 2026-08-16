@@ -9,7 +9,7 @@
  * single-sided edit fails CI here instead of silently forking the contract.
  *
  * This is the mirror of `sparql-engine`'s own `test/interface-parity.ts`, which
- * guards the reverse direction (sparql-engine diffs against @worlds/client).
+ * guards the reverse direction (sparql-engine diffs against @worlds/sdk).
  */
 
 const SPARQL_INTERFACE_URL =

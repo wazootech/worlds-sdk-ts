@@ -74,7 +74,7 @@ Are your changes rejected by the CI formatting pipeline?
 
 ```
 Are you getting import resolution errors during local test execution or when doing a dry-run publish?
-  ├── [Yes] ──> Search modified files under 'src/' in the workspace for imports starting with '@worlds/client'
+  ├── [Yes] ──> Search modified files under 'src/' in the workspace for imports starting with '@worlds/sdk'
   │               ├── [Found] ──> Replace them with relative imports or '@/' (e.g. '@/client/quad-store/mod.ts').
   │               └── [None]  ──> Run: deno task publish:dry to check export maps in workspace deno.json.
   └── [No]  ──> Continue setup.
@@ -82,7 +82,7 @@ Are you getting import resolution errors during local test execution or when doi
 
 ### Symptoms
 
-- Errors such as: `export '...' not found in jsr:@worlds/client` or
+- Errors such as: `export '...' not found in jsr:@worlds/sdk` or
   `unresolvable 'jsr:' dependency`.
 - JSR publish dry-run fails with diagnostic errors.
 
@@ -92,8 +92,8 @@ Are you getting import resolution errors during local test execution or when doi
 Integrating this client into a new project or checking out console prior art?
   ├── [Step 1] ──> Initialize your Node/Bun project or checkout the prior art repository.
   ├── [Step 2] ──> In the project directory, run:
-  │                  ├── [Using Node/npm] ──> npx jsr add @worlds/client
-  │                  ├── [Using Bun]      ──> bunx jsr add @worlds/client
-  │                  └── [Using Yarn]     ──> yarn dlx jsr add @worlds/client
+  │                  ├── [Using Node/npm] ──> npx jsr add @worlds/sdk
+  │                  ├── [Using Bun]      ──> bunx jsr add @worlds/sdk
+  │                  └── [Using Yarn]     ──> yarn dlx jsr add @worlds/sdk
   └── [Step 3] ──> Import and configure the Client to start building your application.
 ```

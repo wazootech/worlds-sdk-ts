@@ -1,9 +1,6 @@
 import { tool } from "ai";
-import type { ClientInterface } from "@worlds/client";
-import type {
-  SearchRequest,
-  SearchResponse,
-} from "@worlds/client/search-index";
+import type { ClientInterface } from "@worlds/sdk";
+import type { SearchRequest, SearchResponse } from "@worlds/sdk/search-index";
 import { z } from "zod";
 import { SEARCH_WORLD_TOOL_DESCRIPTION } from "./agent-tool-descriptions.ts";
 

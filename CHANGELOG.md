@@ -1,12 +1,23 @@
 # Changelog
 
+## 0.1.0
+
+### Breaking
+
+- Renamed the package from `@worlds/client` to `@worlds/sdk`, and the repository
+  from `wazootech/worlds-client-ts` to `wazootech/worlds-sdk-ts`. The
+  `worlds-client-ts` name now refers to the generated data-plane HTTP client
+  (mirroring `wazoo-client-ts`). Update imports: `@worlds/client` →
+  `@worlds/sdk`; all export subpaths are unchanged (e.g. `@worlds/client/rdfjs`
+  becomes `@worlds/sdk/rdfjs`).
+
 ## 0.0.19
 
 ### Changed
 
 - Default the in-memory SPARQL engine to `@wazoo/sparql-engine`
   (`WazooSparqlEngine`), keeping Comunica as the compatible alternative via
-  `@worlds/client/comunica`.
+  `@worlds/sdk/comunica`.
 - Reconcile `SparqlEngineInterface` with `@wazoo/sparql-engine` under the
   identical-spec policy: add the `construct` result variant and RDF 1.2
   `its:dir` literal direction, and collapse `SparqlRequest.query`/`update` into
@@ -28,7 +39,7 @@
   `createLibsqlStores`, `createDenokvClientFromStores`, and
   `createDenokvStores`. Custom assembly uses explicit
   `new Client({ quadStore, searchIndex, sparqlEngine? })`.
-- Narrowed `@worlds/client/adapters/libsql` and `@worlds/client/adapters/denokv`
+- Narrowed `@worlds/sdk/adapters/libsql` and `@worlds/sdk/adapters/denokv`
   exports to factory entry points, suffixed stores, and search helpers; SQL/KV
   internals are in-repo only under durable adapter seam folders such as
   `libsql/rdfjs-store/sql/` and `denokv/rdfjs-store/kv/`.
@@ -56,37 +67,34 @@
   **`deduplicateBuffers`**; **`CommittingRdfjsStore`** →
   **`ImportCommitTarget`**; **`createRdfjsCommittingStore`** →
   **`createImportCommitTarget`**.
-- Renamed `@worlds/client/rdfjs-store` → **`@worlds/client/quad-store`** (shared
-  patch buffering and import orchestration). Adapter `*RdfjsStore`
-  implementations remain under `@worlds/client/adapters/*/rdfjs-store/`.
+- Renamed `@worlds/sdk/rdfjs-store` → **`@worlds/sdk/quad-store`** (shared patch
+  buffering and import orchestration). Adapter `*RdfjsStore` implementations
+  remain under `@worlds/sdk/adapters/*/rdfjs-store/`.
 - Removed dead `wire-durable-client.ts` stub (logic lives in durable factories).
 
 ### Migration
 
 ```typescript
 // Before
-import { Client } from "@worlds/client";
-import { createLibsqlAdapter } from "@worlds/client/adapters/libsql";
+import { Client } from "@worlds/sdk";
+import { createLibsqlAdapter } from "@worlds/sdk/adapters/libsql";
 const client = new Client(
   await createLibsqlAdapter({ client: db, queryEngine }),
 );
 await client.rebuildSearchIndex();
 
 // After
-import { createLibsqlClient } from "@worlds/client/adapters/libsql";
+import { createLibsqlClient } from "@worlds/sdk/adapters/libsql";
 const client = await createLibsqlClient({ client: db, queryEngine });
 await client.reindex();
 
-// Shared buffering (was @worlds/client/rdfjs-store)
-import { importViaBufferedRdfjsStore } from "@worlds/client/quad-store";
+// Shared buffering (was @worlds/sdk/rdfjs-store)
+import { importViaBufferedRdfjsStore } from "@worlds/sdk/quad-store";
 
 // In-memory (replaces createRdfjsClient)
-import { Client } from "@worlds/client";
-import {
-  RdfjsQuadStore,
-  RdfjsSearchIndex,
-} from "@worlds/client/adapters/rdfjs";
-import { ComunicaSparqlEngine } from "@worlds/client/adapters/comunica";
+import { Client } from "@worlds/sdk";
+import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/adapters/rdfjs";
+import { ComunicaSparqlEngine } from "@worlds/sdk/adapters/comunica";
 import { Store } from "n3";
 
 const store = new Store();
@@ -101,12 +109,12 @@ const memoryClient = new Client({
 
 - Removed misnamed LibSQL query helpers `buildHydrateQuery` and
   `buildHydrateQuadsPageQuery` from `LibsqlQueryBuilder` (not exported from
-  `@worlds/client/adapters/libsql`; breaking only for deep imports of
+  `@worlds/sdk/adapters/libsql`; breaking only for deep imports of
   `libsql-query-builder.ts`). `rebuildLibsqlSearchIndexFromQuads` now
   keyset-pages via `buildMatchQuadsQuery` with `filterQuads` in TypeScript for
   include/exclude.
 - Durable `LibsqlQuadStore` and `DenokvQuadStore` extend shared
-  `BufferedRdfjsQuadStore` (`@worlds/client/quad-store`), delegating import and
+  `BufferedRdfjsQuadStore` (`@worlds/sdk/quad-store`), delegating import and
   export to `importViaBufferedRdfjsStore` / `exportFromRdfjsStore`.
 - LibSQL SPARQL is configured by passing a Comunica `queryEngine` directly into
   adapter options (no `createSparqlEngine` callback or factory helper).
@@ -126,8 +134,8 @@ const memoryClient = new Client({
 
 ### Breaking
 
-- Removed `@worlds/client/adapters/libsql-n3` (`createLibsqlN3Adapter`) and
-  `@worlds/client/quad-store/n3` (`createProxiedN3Store`).
+- Removed `@worlds/sdk/adapters/libsql-n3` (`createLibsqlN3Adapter`) and
+  `@worlds/sdk/quad-store/n3` (`createProxiedN3Store`).
 - Removed `createComunicaSparqlEngineFactory` and `createSparqlEngine` adapter
   callbacks; pass `queryEngine` into adapter options instead.
 - Renamed `LibsqlStore` / `LibsqlStoreOptions` to `LibsqlRdfjsStore` /
@@ -143,7 +151,7 @@ const memoryClient = new Client({
 
 ```typescript
 // Before
-import { ComunicaSparqlEngine } from "@worlds/client/adapters/comunica";
+import { ComunicaSparqlEngine } from "@worlds/sdk/adapters/comunica";
 
 createSparqlEngine: ({ store }) =>
   new ComunicaSparqlEngine({ queryEngine, store }),
@@ -154,19 +162,16 @@ queryEngine,
 
 ```typescript
 // Before
-import { LibsqlStore } from "@worlds/client/adapters/libsql";
+import { LibsqlStore } from "@worlds/sdk/adapters/libsql";
 
 // After
-import {
-  LibsqlQuadStore,
-  LibsqlRdfjsStore,
-} from "@worlds/client/adapters/libsql";
+import { LibsqlQuadStore, LibsqlRdfjsStore } from "@worlds/sdk/adapters/libsql";
 ```
 
 Most apps keep using `createLibsqlClient` unchanged:
 
 ```typescript
-import { createLibsqlClient } from "@worlds/client/adapters/libsql";
+import { createLibsqlClient } from "@worlds/sdk/adapters/libsql";
 
 const adapter = await createLibsqlClient({ client, queryEngine });
 ```
@@ -175,14 +180,14 @@ Custom LibSQL assembly (removed `createLibsqlClientFromStores` and
 `createLibsqlClientInfrastructure`; prefer `createLibsqlClient` when possible):
 
 ```typescript
-import { Client } from "@worlds/client";
-import { ComunicaSparqlEngine } from "@worlds/client/adapters/comunica";
+import { Client } from "@worlds/sdk";
+import { ComunicaSparqlEngine } from "@worlds/sdk/adapters/comunica";
 import {
   createLibsqlClient,
   LibsqlQuadStore,
   LibsqlRdfjsStore,
   LibsqlSearchIndex,
-} from "@worlds/client/adapters/libsql";
+} from "@worlds/sdk/adapters/libsql";
 
 // Default path (recommended):
 const adapter = await createLibsqlClient({ client, queryEngine });
@@ -212,13 +217,13 @@ Deno KV custom assembly (removed `createDenokvClientFromStores`; prefer
 `createDenokvClient` when possible):
 
 ```typescript
-import { Client } from "@worlds/client";
+import { Client } from "@worlds/sdk";
 import {
   createDenokvClient,
   DenokvQuadStore,
   DenokvRdfjsStore,
   DenokvSearchIndex,
-} from "@worlds/client/adapters/denokv";
+} from "@worlds/sdk/adapters/denokv";
 
 const adapter = createDenokvClient({ kv, keyPrefix, queryEngine });
 
@@ -231,17 +236,17 @@ const customAdapter = new Client({
 ```
 
 Shared import helpers (`getFormat`, `parseQuads`, `materializeImportQuads`) are
-exported from `@worlds/client/quad-store` (no new export subpath).
+exported from `@worlds/sdk/quad-store` (no new export subpath).
 
 ## 0.0.15
 
 ### Breaking
 
-- Removed `@worlds/client/adapters/libsql/n3`. Use
-  `@worlds/client/adapters/libsql-n3` (`createLibsqlN3Adapter`).
-- Removed `@worlds/client/adapters/rdfjs/n3`. N3 patch capture moved to
-  `@worlds/client/quad-store/n3` as `createProxiedN3Store` (formerly
-  `proxyStore` on the old path).
+- Removed `@worlds/sdk/adapters/libsql/n3`. Use `@worlds/sdk/adapters/libsql-n3`
+  (`createLibsqlN3Adapter`).
+- Removed `@worlds/sdk/adapters/rdfjs/n3`. N3 patch capture moved to
+  `@worlds/sdk/quad-store/n3` as `createProxiedN3Store` (formerly `proxyStore`
+  on the old path).
 - Removed libsql SPARQL query-pattern helper exports; use inline SPARQL strings
   in application code.
 - Renamed `ClientOptions` to `Adapter`. The interface describes the composed
@@ -257,18 +262,18 @@ exported from `@worlds/client/quad-store` (no new export subpath).
 
 ### Added
 
-- `mergePatches` on `@worlds/client/quad-store` for concatenating drained N3
-  patch batches before persistence.
-- `@worlds/client/quad-store/n3` (`createProxiedN3Store`).
+- `mergePatches` on `@worlds/sdk/quad-store` for concatenating drained N3 patch
+  batches before persistence.
+- `@worlds/sdk/quad-store/n3` (`createProxiedN3Store`).
 
 ### Migration
 
 ```typescript
 // Before
-import { createLibsqlN3Adapter } from "@worlds/client/adapters/libsql/n3";
+import { createLibsqlN3Adapter } from "@worlds/sdk/adapters/libsql/n3";
 
 // After
-import { createLibsqlN3Adapter } from "@worlds/client/adapters/libsql-n3";
+import { createLibsqlN3Adapter } from "@worlds/sdk/adapters/libsql-n3";
 ```
 
 ```typescript
@@ -281,11 +286,11 @@ const client = new Client(await createLibsqlClient({ client: db }));
 
 ```typescript
 // Before
-import { proxyStore } from "@worlds/client/adapters/rdfjs/n3";
+import { proxyStore } from "@worlds/sdk/adapters/rdfjs/n3";
 
 // After
-import { createProxiedN3Store } from "@worlds/client/quad-store/n3";
-import { mergePatches } from "@worlds/client/quad-store";
+import { createProxiedN3Store } from "@worlds/sdk/quad-store/n3";
+import { mergePatches } from "@worlds/sdk/quad-store";
 
 const { store, drainPatches } = createProxiedN3Store(baseStore);
 const patch = mergePatches(drainPatches());
@@ -296,9 +301,9 @@ const patch = mergePatches(drainPatches());
 ### Added
 
 - `createComunicaSparqlEngineFactory` and
-  `createComunicaLibsqlSparqlEngineFactory` on
-  `@worlds/client/adapters/comunica` — preset helpers that return typed
-  `createSparqlEngine` callbacks for standard Comunica wiring.
+  `createComunicaLibsqlSparqlEngineFactory` on `@worlds/sdk/adapters/comunica` —
+  preset helpers that return typed `createSparqlEngine` callbacks for standard
+  Comunica wiring.
 
 ## 0.0.13
 
@@ -315,7 +320,7 @@ const patch = mergePatches(drainPatches());
 const client = await createLibsqlClient({ client: db });
 
 // After
-import { Client } from "@worlds/client";
+import { Client } from "@worlds/sdk";
 const client = new Client(await createLibsqlClientOptions({ client: db }));
 ```
 

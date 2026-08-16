@@ -24,6 +24,14 @@ export interface SparqlRequest {
 
   /** Query timeout in milliseconds (defaults to 30 seconds). */
   timeoutMs?: number;
+
+  /**
+   * signal aborts the request: the execute promise rejects (with the
+   * signal's reason when it is an Error, else a generic abort error) and
+   * the evaluation is cancelled at the next pattern/join boundary. The
+   * engine composes it with the timeout — whichever fires first wins.
+   */
+  signal?: AbortSignal;
 }
 
 /**

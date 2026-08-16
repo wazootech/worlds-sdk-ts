@@ -1,5 +1,4 @@
 import type * as rdfjs from "@rdfjs/types";
-import type { Store } from "n3";
 import type {
   ReindexRequest,
   ReindexResponse,
@@ -15,8 +14,13 @@ import { filterQuads, isTextualLiteral } from "@/client/quad-store/mod.ts";
  * RdfjsSearchIndex is the implementation of SearchIndexInterface that uses an RDF/JS store.
  */
 export class RdfjsSearchIndex implements SearchIndexInterface {
+  /**
+   * The search index only reads via match() and size, so any RDF/JS store
+   * exposing those (N3.Store, @wazoo/sparql-engine MemoryStore/SqliteStore,
+   * LibsqlStore) is interchangeable here — no N3-specific surface needed.
+   */
   public constructor(
-    private readonly store: Store,
+    private readonly store: rdfjs.Store & { size: number },
   ) {}
 
   public async search(request: SearchRequest): Promise<SearchResponse> {

@@ -4,21 +4,24 @@
  * Proves that the in-house stores — the engine's MemoryStore and
  * @worlds/sqlite's SqliteStore (the durable node:sqlite store, moved out of
  * @wazoo/sparql-engine/sqlite on 2026-08-17) — are truly interchangeable
- * with the client's own stores (N3.Store, LibsqlStore) end to end: the same
+ * with the client's own stores (MemoryStore, LibsqlStore) end to end: the same
  * Client facade, wired with RdfjsQuadStore + RdfjsSearchIndex + a sparql
  * engine over one shared RDF/JS store, works identically across engines and
  * stores.
  */
 import type * as rdfjs from "@rdfjs/types";
 import { assertEquals } from "@std/assert";
-import { DataFactory as N3 } from "n3";
-import { MemoryStore, WazooSparqlEngine } from "@wazoo/sparql-engine";
+import {
+  DataFactory,
+  MemoryStore,
+  WazooSparqlEngine,
+} from "@wazoo/sparql-engine";
 import { SqliteStore } from "@worlds/sqlite";
 import { Client } from "./client.ts";
 import type { SparqlBinding, SparqlResponse } from "./sparql-engine/mod.ts";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "../rdfjs/mod.ts";
 
-const { quad, namedNode, literal } = N3;
+const { quad, namedNode, literal } = DataFactory;
 
 const SEED_TURTLE = `
   <urn:alice> a <http://schema.org/Person> ; <http://schema.org/name> "Alice" ; <http://schema.org/knows> <urn:bob> .

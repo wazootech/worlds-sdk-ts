@@ -13,8 +13,8 @@ primitives:
    `*RdfjsStore` and `*QuadStore`).
 2. **Search Index**: A hybrid search index supporting Vector Semantic similarity
    and SQLite FTS5 Keyword search.
-3. **SPARQL Engine**: A query evaluator (the Wazoo engine by default, with
-   Comunica as a compatible alternative) for graph traversal and reasoning.
+3. **SPARQL Engine**: A query evaluator (the Wazoo engine) for graph traversal
+   and reasoning.
 
 ```mermaid
 graph TD
@@ -24,8 +24,7 @@ graph TD
     
     QuadStore --> RdfjsQuadStore[RDF/JS In-Memory Store]
     SearchIndex --> RdfjsSearchIndex[RDF/JS In-Memory Search]
-    SparqlEngine --> Wazoo[Wazoo SPARQL Engine (default)]
-    SparqlEngine -.-> Comunica[Comunica SPARQL Engine (alternative)]
+    SparqlEngine --> Wazoo[Wazoo SPARQL Engine]
 ```
 
 ## Files to discover in the workspace

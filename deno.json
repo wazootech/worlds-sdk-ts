@@ -10,7 +10,6 @@
     "./search-index/quad-chunker": "./src/client/search-index/quad-chunker/mod.ts",
     "./sparql-engine": "./src/client/sparql-engine/mod.ts",
     "./tfjs-universal-sentence-encoder": "./src/tfjs-universal-sentence-encoder/mod.ts",
-    "./comunica": "./src/comunica/mod.ts",
     "./rdfjs": "./src/rdfjs/mod.ts",
     "./ai-sdk": "./src/ai-sdk/mod.ts"
   },
@@ -18,7 +17,6 @@
     "@/": "./src/",
     "ai": "npm:ai@^6.0.195",
     "@ai-sdk/google": "npm:@ai-sdk/google@^3.0.80",
-    "@comunica/query-sparql-rdfjs-lite": "npm:@comunica/query-sparql-rdfjs-lite@^5.2.3",
     "@rdfjs/types": "npm:@rdfjs/types@^2.0.1",
     "@wazoo/sparql-engine": "jsr:@wazoo/sparql-engine@^0.3.0",
     "@worlds/sqlite": "jsr:@worlds/sqlite@^0.1.0",
@@ -36,12 +34,6 @@
     "@langchain/textsplitters": "npm:@langchain/textsplitters@^1.0.1",
     "zod": "npm:zod@^4.4.3"
   },
-  "links": [
-    "./vendor/jsonld-context-parser"
-  ],
-  "exclude": [
-    "vendor/jsonld-context-parser/**"
-  ],
   "tasks": {
     "download:tfjs-use": "deno -A ./src/tfjs-universal-sentence-encoder/download-tfjs-use.ts",
     "example:hello-world": "deno -A ./examples/hello-world/main.ts",

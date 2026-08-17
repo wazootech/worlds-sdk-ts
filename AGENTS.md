@@ -40,11 +40,10 @@ the client-side edge semantic environments:
 
 ### Graph store
 
-The in-memory RDF surface used by adapters and SPARQL engines (the Wazoo engine
-by default, with Comunica optional). Durable backends (LibSQL/Turso, Deno KV)
-query **persistent hexastore** stores (`LibsqlRdfjsStore`, `DenokvRdfjsStore`)
-in their respective packages. This package provides `N3.Store` for local
-development and tests.
+The in-memory RDF surface used by adapters and the SPARQL engine (the Wazoo
+engine). Durable backends (LibSQL/Turso, Deno KV) query **persistent hexastore**
+stores (`LibsqlRdfjsStore`, `DenokvRdfjsStore`) in their respective packages.
+This package provides `N3.Store` for local development and tests.
 
 ### Durable reads vs in-memory N3
 
@@ -166,7 +165,6 @@ Never use parent-relative `../` to reach another domain. Never import
 
 - ✅
   `import type { SparqlEngineInterface } from "@/client/sparql-engine/mod.ts"`
-  (from `comunica/`)
 - ✅ `@/client/quad-store/mod.ts`, `@/client/sparql-engine/mod.ts`,
   `@/client/search-index/mod.ts`
 - ✅ `import { Client } from "@/client/client.ts"` (avoids root barrel cycles)
@@ -285,14 +283,6 @@ green-passing integration pipeline runs:
   must ensure the offline cache is warmed up by running the
   `deno task download:tfjs-use` command.
 
-- **Vendored jsonld-context-parser workaround:** Comunica's upstream
-  `jsonld-context-parser` has a known JSR compatibility issue. A patched copy
-  lives in `vendor/jsonld-context-parser/`, redirected via
-  `"links": ["./vendor/jsonld-context-parser"]` in `deno.json`. This redirect is
-  local-only — JSR strips `links` and `exclude` during packaging. If you hit
-  `jsonld-context-parser` resolution errors in the local test suite, ensure the
-  vendor directory and `links` config are intact.
-
 - **Test-driven execution boundaries:** Always run local tests with
   `deno task ci` or `deno test --allow-all` to verify that all code compiles,
   formats, and passes operational invariants without errors prior to opening
@@ -324,8 +314,6 @@ green-passing integration pipeline runs:
     `unresolvable 'jsr:' dependency`, search `src/` for `@worlds/sdk` imports
     and replace them with `@/client/...` per
     [denoland/deno#25191](https://github.com/denoland/deno/issues/25191).
-  - **Packaging:** JSR strips `links` and `exclude` from `deno.json`; the
-    vendored `jsonld-context-parser` redirect is local-only (see below).
 
 ## Store naming conventions
 
@@ -341,8 +329,7 @@ Public graph persistence facades must use explicit suffixes:
 
 LibSQL: `client.import` → `LibsqlQuadStore` → `LibsqlRdfjsStore.commit()`. Deno
 KV: `client.import` → `DenokvQuadStore` (native KV bulk path). Both use
-`*RdfjsStore` for the SPARQL engine (Wazoo by default, Comunica optional).
-Advanced assembly uses explicit
+`*RdfjsStore` for the SPARQL engine (Wazoo). Advanced assembly uses explicit
 `new Client({ quadStore, searchIndex, sparqlEngine? })` with the suffixed
 stores.
 
@@ -442,10 +429,13 @@ available without a `Client` instance.
 
 ### Alignment with eval harness
 
-Keep AI tool descriptions and system prompts aligned with
+Keep AI tool descriptions and system prompts aligned across
+`examples/ai-sdk-hello-world/` (`agent-prompts.ts`, `tools/`). The eval harness
+that defined these prompts lived in
 [worlds-client-evals](https://github.com/wazootech/worlds-client-evals)
-(`src/tools/create-eval-tools.ts`, `eval-agent-system-prompt.ts`) and
-`examples/ai-sdk-hello-world/agent-prompts.ts`.
+(`src/tools/create-eval-tools.ts`, `eval-agent-system-prompt.ts`), which is now
+archived; agent evaluation and memory benchmarking continues in
+[wazoo-memorybench](https://github.com/wazootech/wazoo-memorybench).
 
 ## Scale and topology guidance
 

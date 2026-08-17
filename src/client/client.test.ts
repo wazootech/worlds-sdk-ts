@@ -2,18 +2,15 @@ import { assertEquals, assertRejects } from "@std/assert";
 import { DataFactory, Store } from "n3";
 import { Client } from "./client.ts";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "../rdfjs/mod.ts";
-import { ComunicaSparqlEngine } from "../comunica/mod.ts";
-import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
+import { WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { hashQuad, type Patch, Transaction } from "./quad-store/mod.ts";
 
 const { quad, namedNode, literal } = DataFactory;
-const queryEngine = new QueryEngine();
 
 function createTestClient(store: Store): Client {
   return new Client({
     quadStore: new RdfjsQuadStore({ store }),
-    sparqlEngine: new ComunicaSparqlEngine({
-      queryEngine,
+    sparqlEngine: new WazooSparqlEngine({
       store: store,
       createTransaction: () => {
         return new Transaction({
@@ -215,8 +212,7 @@ Deno.test("Client - queryEngine enables SELECT queries", async () => {
   const client = new Client({
     quadStore: new RdfjsQuadStore({ store }),
     searchIndex: new RdfjsSearchIndex(store),
-    sparqlEngine: new ComunicaSparqlEngine({
-      queryEngine,
+    sparqlEngine: new WazooSparqlEngine({
       store: store,
       createTransaction: () => {
         return new Transaction({

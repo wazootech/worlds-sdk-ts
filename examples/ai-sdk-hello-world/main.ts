@@ -1,7 +1,6 @@
 import { Client } from "@worlds/sdk";
-import { ComunicaSparqlEngine } from "@worlds/sdk/comunica";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
-import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
+import { WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { Store } from "n3";
 import { GRAPH_GROUNDED_AGENT_SYSTEM_PROMPT } from "./agent-prompts.ts";
 import { createTools } from "./tools.ts";
@@ -13,12 +12,11 @@ if (import.meta.main) {
 
   console.log("Initializing embedded in-memory knowledge base...");
   const store = new Store();
-  const queryEngine = new QueryEngine();
 
   const client = new Client({
     quadStore: new RdfjsQuadStore({ store }),
     searchIndex: new RdfjsSearchIndex(store),
-    sparqlEngine: new ComunicaSparqlEngine({ queryEngine, store: store }),
+    sparqlEngine: new WazooSparqlEngine({ store: store }),
   });
 
   console.log("Ingesting initial knowledge...");

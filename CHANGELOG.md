@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Breaking
+
+- Removed the Comunica adapter (`@worlds/sdk/comunica`), its vendored
+  `jsonld-context-parser`, and the `@comunica/query-sparql-rdfjs-lite`
+  dependency. `@wazoo/sparql-engine` (`WazooSparqlEngine`) is now the only
+  SPARQL engine; wire it into `Client` exactly as before.
+
 ## 0.1.0
 
 ### Breaking

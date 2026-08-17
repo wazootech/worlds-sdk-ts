@@ -1,8 +1,10 @@
 /**
  * GRAPH_GROUNDED_AGENT_SYSTEM_PROMPT defines stable behavior for search-then-SPARQL agents.
  *
- * Keep aligned with worlds-client-evals `src/runner/eval-agent-system-prompt.ts`
- * (eval substitutes {{discovery}} / {{query}} via compileEvalPrompt).
+ * Keep aligned with the eval harness prompt pattern: worlds-client-evals
+ * `src/runner/eval-agent-system-prompt.ts` substituted {{discovery}} / {{query}}
+ * via compileEvalPrompt. worlds-client-evals is archived; evaluation continues
+ * in wazoo-memorybench.
  */
 export const GRAPH_GROUNDED_AGENT_SYSTEM_PROMPT =
   `You are a graph-grounded assistant over an RDF knowledge base.

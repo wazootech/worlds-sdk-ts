@@ -17,7 +17,6 @@ backend. Durable backends are published as separate packages.
 | `@worlds/sdk/search-index`                    | Search index interface and types                                                |
 | `@worlds/sdk/sparql-engine`                   | SPARQL engine interface                                                         |
 | `@worlds/sdk/rdfjs`                           | In-memory `RdfjsQuadStore` and `RdfjsSearchIndex` over `N3.Store`               |
-| `@worlds/sdk/comunica`                        | `ComunicaSparqlEngine` adapter                                                  |
 | `@worlds/sdk/ai-sdk`                          | Vercel AI SDK embedding service                                                 |
 | `@worlds/sdk/tfjs-universal-sentence-encoder` | Offline TF.js USE embedding service                                             |
 
@@ -127,34 +126,21 @@ const sparqlResponse = await client.sparql({
 
 `@worlds/sdk` is engine-agnostic: the `SparqlEngineInterface` abstraction
 (`execute(request)`) makes any engine swappable without changing client code.
-Two engines implement it today:
+The single engine shipped today is:
 
-- **Wazoo (default)** —
-  [`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine) is the
-  opinionated minimal default. It is a zero-runtime-dependency SPARQL 1.1 & 1.2
-  engine that implements the same `SparqlEngineInterface` as
-  `ComunicaSparqlEngine`, so it drops into a `Client` unchanged and runs over
-  any `rdfjs.Store` (N3 here; `LibsqlRdfjsStore` / `DenokvRdfjsStore` in the
-  durable backends). It covers SELECT / ASK / CONSTRUCT / DESCRIBE plus UPDATE
-  and is differentially tested against Comunica.
-- **Comunica (compatible alternative)** — `@comunica/query-sparql-rdfjs-lite`,
-  wrapped by `ComunicaSparqlEngine` (`@worlds/sdk/comunica`). The lite variant
-  was chosen over the full `@comunica/query-sparql` because Worlds only queries
-  in-process RDF/JS Store sources (LibSQL, Deno KV, N3). The full engine's HTTP
-  federation, file source, and serialization actors are unnecessary. Lite is
-  smaller, faster to instantiate, and edge-safe.
+- **Wazoo** — [`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine) is
+  the opinionated minimal default. It is a zero-runtime-dependency SPARQL 1.1 &
+  1.2 engine that implements `SparqlEngineInterface`, drops into a `Client`
+  unchanged, and runs over any `rdfjs.Store` (N3 here; `LibsqlRdfjsStore` /
+  `DenokvRdfjsStore` in the durable backends). It covers SELECT / ASK /
+  CONSTRUCT / DESCRIBE plus UPDATE, enforces `timeoutMs`, and accepts a
+  request-level `baseIri`.
 
-The `ComunicaQueryEngine` interface is a structural type requiring only
-`query(query, { sources, baseIRI })`. A custom engine remains feasible through
-`SparqlEngineInterface`.
-
-Behavioral deltas when swapping engines: `ComunicaSparqlEngine` enforces
-`timeoutMs` and accepts a request-level `baseIri`; the wazoo engine derives the
-base IRI from the query's `BASE` directive and does not yet enforce a timeout.
+A custom engine remains feasible through `SparqlEngineInterface`.
 
 See
 [Wazoopedia decision record](https://github.com/wazootech/wazoopedia/blob/main/wiki/Decision_Sparql_Engine_Rdfjs_Lite.md)
-for the original Comunica rationale.
+for the original SPARQL engine rationale.
 
 ## Scale considerations
 

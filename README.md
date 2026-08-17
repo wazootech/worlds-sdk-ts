@@ -15,7 +15,7 @@
   LibSQL/Turso, and Deno KV backends.
 - **Search** — Hybrid retrieval combining keyword FTS5 and vector embeddings.
 - **Query** — The zero-dependency Wazoo SPARQL engine as the opinionated minimal
-  default, with Comunica still available as a compatible alternative.
+  default.
 - **In-memory RDF/JS** — Zero-setup N3-based graph store and search for dev,
   tests, and demos.
 
@@ -62,9 +62,6 @@ console.log(sparqlResponse);
 > [!TIP]
 > For production search and scale, use the durable LibSQL (`@worlds/libsql`) or
 > Deno KV (`@worlds/denokv`) backends.
->
-> Prefer Comunica? Swap `WazooSparqlEngine` for `ComunicaSparqlEngine` from
-> `@worlds/sdk/comunica` — both implement the same `SparqlEngineInterface`.
 
 ## Core concepts
 
@@ -75,9 +72,8 @@ transactional import and export.
 with vector similarity via an embedding service and quad chunker.
 
 **SPARQL engine**: Evaluates declarative queries and updates against the graph
-for structured traversal and reasoning. The zero-dependency
-[`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine) is the default;
-Comunica remains available via `@worlds/sdk/comunica`.
+for structured traversal and reasoning, powered by the zero-dependency
+[`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine).
 
 ## Module layout
 
@@ -90,13 +86,11 @@ Comunica remains available via `@worlds/sdk/comunica`.
 | `@worlds/sdk/search-index`  | Search index interface and types                     |
 | `@worlds/sdk/sparql-engine` | SPARQL engine interface                              |
 | `@worlds/sdk/rdfjs`         | In-memory N3 `RdfjsQuadStore` and `RdfjsSearchIndex` |
-| `@worlds/sdk/comunica`      | `ComunicaSparqlEngine` adapter                       |
 | `@worlds/sdk/ai-sdk`        | Vercel AI SDK tool bindings                          |
 
-The recommended default engine is the external
+The SPARQL engine is the external
 [`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine) package, which
-implements the same `SparqlEngineInterface` as `ComunicaSparqlEngine`.
-`@worlds/sdk/comunica` remains available when the Comunica engine is preferred.
+implements `SparqlEngineInterface`.
 
 Regenerate merged API doc JSON with `deno task doc:json` (writes gitignored
 `docs/api.json`). For architecture documentation (package topology, runtime
@@ -110,7 +104,7 @@ in separate packages:
 
 | Package                                                        | Persistence          | Search               | SPARQL                        |
 | -------------------------------------------------------------- | -------------------- | -------------------- | ----------------------------- |
-| `@worlds/sdk` (this package)                                   | In-memory (N3 Store) | RDF/JS keyword       | Wazoo (default) or Comunica   |
+| `@worlds/sdk` (this package)                                   | In-memory (N3 Store) | RDF/JS keyword       | Wazoo                         |
 | [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) | SQLite / Turso Cloud | Hybrid FTS5 + vector | LibsqlRdfjsStore quad indexes |
 | [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) | Deno KV              | Keyword FTS          | DenokvRdfjsStore quad indexes |
 
@@ -136,30 +130,6 @@ const client = new Client({
 });
 ```
 
-### Comunica alternative
-
-`WazooSparqlEngine` and `ComunicaSparqlEngine` implement the same
-`SparqlEngineInterface`, so switching engines is a one-line change with no
-client code changes:
-
-```typescript
-import { Client } from "@worlds/sdk";
-import { ComunicaSparqlEngine } from "@worlds/sdk/comunica";
-import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
-import { QueryEngine } from "@comunica/query-sparql-rdfjs-lite";
-import { Store } from "n3";
-
-const store = new Store();
-const client = new Client({
-  quadStore: new RdfjsQuadStore({ store }),
-  searchIndex: new RdfjsSearchIndex(store),
-  sparqlEngine: new ComunicaSparqlEngine({
-    queryEngine: new QueryEngine(),
-    store,
-  }),
-});
-```
-
 ## Examples
 
 | Example     | Description                     | Command                                |
@@ -171,9 +141,9 @@ For LibSQL or Deno KV examples, see the
 [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) and
 [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) repositories.
 
-The [agent eval harness](https://github.com/wazootech/worlds-client-evals) lives
-in a separate repository and runs deterministic assertion checks against a
-seeded LibSQL world.
+Agent evaluation and memory benchmarking lives in the separate
+[wazoo-memorybench](https://github.com/wazootech/wazoo-memorybench) repository,
+successor to the archived worlds-client-evals eval harness.
 
 ## Advanced
 

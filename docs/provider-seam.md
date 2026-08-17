@@ -219,5 +219,5 @@ shared surface needed, and they are the seam this doc proposes.
 - No rename of `@worlds/libsql`; its identity is "LibSQL/Turso with LibSQL
   vector + FTS5 search".
 - No new `rdfjs-store-sqlite` repo that swallows both; that would drag
-  `@libsql/client`, Comunica, embeddings, and TF.js into a package that
+  `@libsql/client`, embeddings, and TF.js into a package that
   `SqliteStore`-style consumers must never depend on.

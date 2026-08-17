@@ -13,8 +13,8 @@ docs/api.json
 docs.json
 transcript.md
 
-# Local multi-repo workspace spillover belongs under
-# C:\Users\ethan\Documents\GitHub\wazootech, not inside this package repo.
+# Local multi-repo workspace spillover belongs under the workspace repos/ dir
+# (wazootech/workspace harness checkout), not inside this package repo.
 _console-worktrees/
 _wazoo-*/
 _worlds-*/

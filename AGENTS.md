@@ -9,19 +9,18 @@ all AI Agents writing code in this repository.
 ## Workspace boundary
 
 This repository is the lean `@worlds/sdk` package, not the Wazoo multi-repo
-workspace. Sibling Wazoo repositories MUST live under
-`C:\Users\ethan\Documents\GitHub\wazootech`.
+workspace. Sibling Wazoo repositories MUST live under `<workspace>/repos/` (the
+`wazootech/workspace` harness checkout; run `deno task workspace:check` from the
+workspace root).
 
 Before working across Wazoo repositories:
 
 1. Identify the exact repository in scope.
-2. Use the existing clone under
-   `C:\Users\ethan\Documents\GitHub\wazootech\<repo-name>`.
-3. If the clone is missing, create or restore it under the `wazootech` workspace
-   root, never inside this package repo.
-4. Run the parent workspace baseline checker from
-   `C:\Users\ethan\Documents\GitHub\wazootech`:
-   `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\check-repo-baselines.ps1`.
+2. Use the existing clone under `<workspace>/repos/<repo-name>`.
+3. If the clone is missing, create or restore it under `<workspace>/repos/`,
+   never inside this package repo.
+4. Run the parent workspace baseline checker from the workspace root:
+   `deno task workspace:check`.
 
 Do not clone, copy, scaffold, or create worktrees for sibling projects inside
 this repository. Local spillover folders such as `_wazoo-*`, `_worlds-*`,

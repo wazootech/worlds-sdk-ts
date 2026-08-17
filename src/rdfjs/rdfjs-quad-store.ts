@@ -11,7 +11,7 @@ import {
   importViaTransaction,
   Transaction,
 } from "@/client/quad-store/mod.ts";
-import * as N3 from "n3";
+import { MemoryStore } from "@wazoo/sparql-engine";
 
 /**
  * RdfjsQuadStoreOptions configures RdfjsQuadStore dependencies.
@@ -35,7 +35,7 @@ export class RdfjsQuadStore implements QuadStoreInterface {
   private readonly store: rdfjs.Store;
 
   public constructor(private readonly options?: RdfjsQuadStoreOptions) {
-    this.store = options?.store ?? new N3.Store();
+    this.store = options?.store ?? new MemoryStore();
   }
 
   public async import(request: ImportRequest): Promise<void> {

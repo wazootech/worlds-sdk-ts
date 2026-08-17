@@ -8,6 +8,21 @@
   `jsonld-context-parser`, and the `@comunica/query-sparql-rdfjs-lite`
   dependency. `@wazoo/sparql-engine` (`WazooSparqlEngine`) is now the only
   SPARQL engine; wire it into `Client` exactly as before.
+- Dropped the runtime `n3` dependency (resolves
+  [worlds-sdk-ts#165](https://github.com/wazootech/worlds-sdk-ts/issues/165),
+  option 1 — the client family now re-bases on `@wazoo/sparql-engine`
+  primitives). Term construction, the default in-memory store, and RDF
+  parsing/serialization all come from the engine (zero npm runtime deps):
+  - `DataFactory` from `@wazoo/sparql-engine` replaces `n3`'s in `quad-store`
+    (`term`, `quad`, `transaction`, `quad-row-reader`), search-result id
+    building, and the durable backends' row readers.
+  - `RdfjsQuadStore`'s default backend is the engine's `MemoryStore` instead of
+    `N3.Store`.
+  - RDF formats now use the engine's `parseTurtleQuads` / `serializeTurtle`
+    (Turtle/TriG/N-Quads/N-Triples). `RdfFormat.n3Format` is renamed to
+    `RdfFormat.engineFormat`; `text/n3` maps to the Turtle writer (the N3 subset
+    that is valid Turtle/TriG). Requires `@wazoo/sparql-engine@^0.4.0` (the new
+    parser/writer exports).
 
 ## 0.1.0
 

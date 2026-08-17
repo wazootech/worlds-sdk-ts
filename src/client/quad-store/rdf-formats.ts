@@ -1,6 +1,10 @@
 import type * as rdfjs from "@rdfjs/types";
-import { Readable } from "node:stream";
-import { Parser, Writer } from "n3";
+import {
+  MemoryStream,
+  parseTurtleQuads,
+  serializeTurtle,
+  type TurtleFormat,
+} from "@wazoo/sparql-engine";
 import type {
   ExportRequest,
   ExportResponse,
@@ -12,23 +16,27 @@ import type {
  */
 export interface RdfFormat {
   contentType: string;
-  n3Format: string;
+  engineFormat: TurtleFormat;
 }
 
 /**
- * FORMATS is a map of content types to supported RdfFormats.
+ * FORMATS is a map of content types to supported RdfFormats. The engine's
+ * TriG grammar is a Turtle/N-Triples/N-Quads superset, so parsing is uniform
+ * across formats; the dialect only constrains serialization. `text/n3` maps
+ * to the Turtle writer (the engine covers the N3 subset that is valid
+ * Turtle/TriG).
  */
 export const FORMATS: Record<string, RdfFormat> = {
-  "text/turtle": { contentType: "text/turtle", n3Format: "Turtle" },
+  "text/turtle": { contentType: "text/turtle", engineFormat: "turtle" },
   "application/n-quads": {
     contentType: "application/n-quads",
-    n3Format: "N-Quads",
+    engineFormat: "n-quads",
   },
   "application/n-triples": {
     contentType: "application/n-triples",
-    n3Format: "N-Triples",
+    engineFormat: "n-triples",
   },
-  "text/n3": { contentType: "text/n3", n3Format: "N3" },
+  "text/n3": { contentType: "text/n3", engineFormat: "turtle" },
 };
 
 /**
@@ -46,10 +54,8 @@ export function parseQuads(
   data: string,
   contentType?: string,
 ): rdfjs.Stream<rdfjs.Quad> {
-  const { n3Format } = getFormat(contentType);
-  const parser = new Parser({ format: n3Format });
-  const quads = parser.parse(data);
-  return Readable.from(quads) as unknown as rdfjs.Stream<rdfjs.Quad>;
+  getFormat(contentType);
+  return new MemoryStream(parseTurtleQuads(data));
 }
 
 /**
@@ -91,29 +97,19 @@ export async function materializeImportQuads(
 /**
  * exportQuadsResponse formats collected quads according to an export request.
  */
-export async function exportQuadsResponse(
+export function exportQuadsResponse(
   quads: rdfjs.Quad[],
   request: ExportRequest,
-): Promise<ExportResponse> {
+): ExportResponse {
   if (request.format.kind === "quads") {
     return { kind: "quads", quads };
   }
 
   if (request.format.kind === "serialized") {
     const contentType = request.format.contentType ?? "application/n-quads";
-    const { n3Format } = getFormat(contentType);
+    const { engineFormat } = getFormat(contentType);
 
-    const writer = new Writer({ format: n3Format });
-    for (const quad of quads) {
-      writer.addQuad(quad);
-    }
-
-    const data = await new Promise<string>((resolve, reject) => {
-      writer.end((error: Error | null, result?: string) => {
-        if (error) reject(error);
-        else resolve(result ?? "");
-      });
-    });
+    const data = serializeTurtle(quads, { format: engineFormat });
 
     return { kind: "serialized", data, contentType };
   }

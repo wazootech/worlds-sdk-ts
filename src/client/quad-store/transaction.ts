@@ -1,5 +1,5 @@
 import type * as rdfjs from "@rdfjs/types";
-import { DataFactory } from "n3";
+import { DataFactory } from "@wazoo/sparql-engine";
 import { EventEmitter } from "node:events";
 import type { TransactionContext } from "@/client/quad-store/mod.ts";
 import { deduplicateBuffers } from "@/client/quad-store/mod.ts";

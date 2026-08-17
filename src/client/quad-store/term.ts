@@ -1,5 +1,5 @@
 import type * as rdfjs from "@rdfjs/types";
-import { DataFactory } from "n3";
+import { DataFactory } from "@wazoo/sparql-engine";
 
 const { namedNode, blankNode, literal, defaultGraph } = DataFactory;
 

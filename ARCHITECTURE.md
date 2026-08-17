@@ -10,15 +10,15 @@ backend. Durable backends are published as separate packages.
 
 ### In this package
 
-| Export                                        | Role                                                                            |
-| --------------------------------------------- | ------------------------------------------------------------------------------- |
-| `@worlds/sdk`                                 | Root barrel: `Client`, interfaces, patch types, embedding-service, quad-chunker |
-| `@worlds/sdk/quad-store`                      | Quad import/export API, RDF formats, patch transactions                         |
-| `@worlds/sdk/search-index`                    | Search index interface and types                                                |
-| `@worlds/sdk/sparql-engine`                   | SPARQL engine interface                                                         |
-| `@worlds/sdk/rdfjs`                           | In-memory `RdfjsQuadStore` and `RdfjsSearchIndex` over `N3.Store`               |
-| `@worlds/sdk/ai-sdk`                          | Vercel AI SDK embedding service                                                 |
-| `@worlds/sdk/tfjs-universal-sentence-encoder` | Offline TF.js USE embedding service                                             |
+| Export                                        | Role                                                                              |
+| --------------------------------------------- | --------------------------------------------------------------------------------- |
+| `@worlds/sdk`                                 | Root barrel: `Client`, interfaces, patch types, embedding-service, quad-chunker   |
+| `@worlds/sdk/quad-store`                      | Quad import/export API, RDF formats, patch transactions                           |
+| `@worlds/sdk/search-index`                    | Search index interface and types                                                  |
+| `@worlds/sdk/sparql-engine`                   | SPARQL engine interface                                                           |
+| `@worlds/sdk/rdfjs`                           | In-memory `RdfjsQuadStore` and `RdfjsSearchIndex` over the engine's `MemoryStore` |
+| `@worlds/sdk/ai-sdk`                          | Vercel AI SDK embedding service                                                   |
+| `@worlds/sdk/tfjs-universal-sentence-encoder` | Offline TF.js USE embedding service                                               |
 
 ### External durable backends
 
@@ -60,11 +60,10 @@ interface ClientOptions {
 
 ```typescript
 import { Client } from "@worlds/sdk";
-import { WazooSparqlEngine } from "@wazoo/sparql-engine";
+import { MemoryStore, WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
-import { Store } from "n3";
 
-const store = new Store();
+const store = new MemoryStore();
 const client = new Client({
   quadStore: new RdfjsQuadStore({ store }),
   searchIndex: new RdfjsSearchIndex(store),
@@ -96,8 +95,9 @@ The system uses a two-hop discovery pattern.
 Call `client.search()` with a keyword to discover subject IRIs. Search blends
 keyword FTS5 and optional vector embeddings via Reciprocal Rank Fusion (RRF).
 The `search-index-interface.ts` defines the contract; the in-memory
-`RdfjsSearchIndex` provides a simple keyword filter over the N3 store. Durable
-backends support hybrid (FTS5 + vector), keyword-only, and semantic-only modes.
+`RdfjsSearchIndex` provides a simple keyword filter over the in-memory store.
+Durable backends support hybrid (FTS5 + vector), keyword-only, and semantic-only
+modes.
 
 ### Step 2: SPARQL
 
@@ -131,10 +131,10 @@ The single engine shipped today is:
 - **Wazoo** — [`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine) is
   the opinionated minimal default. It is a zero-runtime-dependency SPARQL 1.1 &
   1.2 engine that implements `SparqlEngineInterface`, drops into a `Client`
-  unchanged, and runs over any `rdfjs.Store` (N3 here; `LibsqlRdfjsStore` /
-  `DenokvRdfjsStore` in the durable backends). It covers SELECT / ASK /
-  CONSTRUCT / DESCRIBE plus UPDATE, enforces `timeoutMs`, and accepts a
-  request-level `baseIri`.
+  unchanged, and runs over any `rdfjs.Store` (the engine's `MemoryStore` here;
+  `LibsqlRdfjsStore` / `DenokvRdfjsStore` in the durable backends). It covers
+  SELECT / ASK / CONSTRUCT / DESCRIBE plus UPDATE, enforces `timeoutMs`, and
+  accepts a request-level `baseIri`.
 
 A custom engine remains feasible through `SparqlEngineInterface`.
 

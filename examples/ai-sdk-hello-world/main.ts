@@ -1,7 +1,7 @@
 import { Client } from "@worlds/sdk";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
 import { WazooSparqlEngine } from "@wazoo/sparql-engine";
-import { Store } from "n3";
+import { MemoryStore } from "@wazoo/sparql-engine";
 import { GRAPH_GROUNDED_AGENT_SYSTEM_PROMPT } from "./agent-prompts.ts";
 import { createTools } from "./tools.ts";
 import { generateText, stepCountIs } from "ai";
@@ -11,7 +11,7 @@ if (import.meta.main) {
   const google = createGoogleGenerativeAI();
 
   console.log("Initializing embedded in-memory knowledge base...");
-  const store = new Store();
+  const store = new MemoryStore();
 
   const client = new Client({
     quadStore: new RdfjsQuadStore({ store }),

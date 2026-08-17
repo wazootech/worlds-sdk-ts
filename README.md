@@ -16,8 +16,8 @@
 - **Search** — Hybrid retrieval combining keyword FTS5 and vector embeddings.
 - **Query** — The zero-dependency Wazoo SPARQL engine as the opinionated minimal
   default.
-- **In-memory RDF/JS** — Zero-setup N3-based graph store and search for dev,
-  tests, and demos.
+- **In-memory RDF/JS** — Zero-setup, zero-dependency graph store and search (the
+  engine's `MemoryStore`) for dev, tests, and demos.
 
 ## Install
 
@@ -29,11 +29,10 @@ deno add jsr:@worlds/sdk
 
 ```typescript
 import { Client } from "@worlds/sdk";
-import { WazooSparqlEngine } from "@wazoo/sparql-engine";
+import { MemoryStore, WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
-import { Store } from "n3";
 
-const store = new Store();
+const store = new MemoryStore();
 const client = new Client({
   quadStore: new RdfjsQuadStore({ store }),
   searchIndex: new RdfjsSearchIndex(store),
@@ -85,7 +84,7 @@ for structured traversal and reasoning, powered by the zero-dependency
 | `@worlds/sdk/quad-store`    | Quad import/export API, RDF formats, patch buffering |
 | `@worlds/sdk/search-index`  | Search index interface and types                     |
 | `@worlds/sdk/sparql-engine` | SPARQL engine interface                              |
-| `@worlds/sdk/rdfjs`         | In-memory N3 `RdfjsQuadStore` and `RdfjsSearchIndex` |
+| `@worlds/sdk/rdfjs`         | In-memory `RdfjsQuadStore` and `RdfjsSearchIndex`    |
 | `@worlds/sdk/ai-sdk`        | Vercel AI SDK tool bindings                          |
 
 The SPARQL engine is the external
@@ -102,11 +101,11 @@ conventions, see [AGENTS.md](AGENTS.md).
 This package provides the core in-memory RDF/JS backend. Durable backends live
 in separate packages:
 
-| Package                                                        | Persistence          | Search               | SPARQL                        |
-| -------------------------------------------------------------- | -------------------- | -------------------- | ----------------------------- |
-| `@worlds/sdk` (this package)                                   | In-memory (N3 Store) | RDF/JS keyword       | Wazoo                         |
-| [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) | SQLite / Turso Cloud | Hybrid FTS5 + vector | LibsqlRdfjsStore quad indexes |
-| [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) | Deno KV              | Keyword FTS          | DenokvRdfjsStore quad indexes |
+| Package                                                        | Persistence               | Search               | SPARQL                        |
+| -------------------------------------------------------------- | ------------------------- | -------------------- | ----------------------------- |
+| `@worlds/sdk` (this package)                                   | In-memory (`MemoryStore`) | RDF/JS keyword       | Wazoo                         |
+| [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) | SQLite / Turso Cloud      | Hybrid FTS5 + vector | LibsqlRdfjsStore quad indexes |
+| [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) | Deno KV                   | Keyword FTS          | DenokvRdfjsStore quad indexes |
 
 **Choosing LibSQL vs Deno KV:** LibSQL is the default for hybrid FTS/vector
 search and faster cold quad index preload at scale. Deno KV can be faster on
@@ -118,11 +117,10 @@ benchmark methodology.
 
 ```typescript
 import { Client } from "@worlds/sdk";
-import { WazooSparqlEngine } from "@wazoo/sparql-engine";
+import { MemoryStore, WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
-import { Store } from "n3";
 
-const store = new Store();
+const store = new MemoryStore();
 const client = new Client({
   quadStore: new RdfjsQuadStore({ store }),
   searchIndex: new RdfjsSearchIndex(store),

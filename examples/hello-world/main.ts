@@ -1,10 +1,10 @@
 import { Client } from "@worlds/sdk";
 import { WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
-import { Store } from "n3";
+import { MemoryStore } from "@wazoo/sparql-engine";
 
 if (import.meta.main) {
-  const store = new Store();
+  const store = new MemoryStore();
   const client = new Client({
     quadStore: new RdfjsQuadStore({ store }),
     searchIndex: new RdfjsSearchIndex(store),

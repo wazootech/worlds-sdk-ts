@@ -43,17 +43,18 @@ the client-side edge semantic environments:
 The in-memory RDF surface used by adapters and the SPARQL engine (the Wazoo
 engine). Durable backends (LibSQL/Turso, Deno KV) query **persistent hexastore**
 stores (`LibsqlRdfjsStore`, `DenokvRdfjsStore`) in their respective packages.
-This package provides `N3.Store` for local development and tests.
+This package provides the engine's zero-dependency `MemoryStore` for local
+development and tests.
 
-### Durable reads vs in-memory N3
+### Durable reads vs in-memory MemoryStore
 
-**In-memory RDF/JS** (`RdfjsQuadStore` over `N3.Store`) is the intentional
-local-dev and test topology in this package. Durable backends
+**In-memory RDF/JS** (`RdfjsQuadStore` over the engine's `MemoryStore`) is the
+intentional local-dev and test topology in this package. Durable backends
 ([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
 [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv)) wire hexastore
 `*RdfjsStore` implementations and read durable indexes directly with no
-per-query N3 mirror. Historical **libsql-n3** (hydrate durable quads into N3,
-then query) was removed; see [CHANGELOG.md](CHANGELOG.md) and
+per-query in-memory mirror. Historical **libsql-n3** (hydrate durable quads into
+an N3 store, then query) was removed; see [CHANGELOG.md](CHANGELOG.md) and
 [discussion #45](https://github.com/wazootech/worlds-sdk-ts/discussions/45) for
 crossover methodology only.
 
@@ -203,8 +204,8 @@ resolution:
 
 - **On-demand fetching**: Runtimes (like Deno) only resolve, download, and
   compile dependencies actually traversed in the imported path. Importing from
-  `@worlds/sdk/rdfjs` fetches `n3` and `@rdfjs/types` — but never downloads
-  `@libsql/client` or `@tensorflow/tfjs`.
+  `@worlds/sdk/rdfjs` fetches `@wazoo/sparql-engine` and `@rdfjs/types` — but
+  never downloads `@libsql/client` or `@tensorflow/tfjs`.
 
 ### No inline imports
 

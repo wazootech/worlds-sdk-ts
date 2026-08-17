@@ -153,7 +153,26 @@ export async function executeSparql(
         clearTimeout(timer);
         timer = undefined;
       }
+      // The caller's signal is only listened for while the request is in
+      // flight; once it settles, the listener is detached.
+      request.signal?.removeEventListener("abort", onAbort);
     };
+    // The caller's signal races the timeout (issue #122): abort rejects
+    // with the signal's reason when it is an Error, else a clear error.
+    const onAbort = () => {
+      clearTimer();
+      const reason = request.signal?.reason;
+      reject(
+        reason instanceof Error ? reason : new Error("SPARQL query aborted"),
+      );
+    };
+    if (request.signal !== undefined) {
+      if (request.signal.aborted) {
+        onAbort();
+        return;
+      }
+      request.signal.addEventListener("abort", onAbort, { once: true });
+    }
 
     timer = setTimeout(() => {
       clearTimer();

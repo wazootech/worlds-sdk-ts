@@ -247,6 +247,38 @@ Deno.test("executeSparql - rejects when the query times out", async () => {
   );
 });
 
+Deno.test("executeSparql - caller signal aborts an in-flight query", async () => {
+  const store = new Store();
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(new Error("caller cancelled")), 10);
+
+  await assertRejects(
+    () =>
+      executeSparql(createTimeoutEngine(), store, {
+        query: "SELECT ?s WHERE { ?s ?p ?o }",
+        signal: controller.signal,
+      }),
+    Error,
+    "caller cancelled",
+  );
+});
+
+Deno.test("executeSparql - pre-aborted signal rejects immediately", async () => {
+  const store = new Store();
+  const controller = new AbortController();
+  controller.abort(new Error("aborted before start"));
+
+  await assertRejects(
+    () =>
+      executeSparql(createTimeoutEngine(), store, {
+        query: "SELECT ?s WHERE { ?s ?p ?o }",
+        signal: controller.signal,
+      }),
+    Error,
+    "aborted before start",
+  );
+});
+
 Deno.test(
   "executeSparql - rejects unsupported Comunica result types",
   async () => {

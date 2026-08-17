@@ -1,19 +1,20 @@
 /**
  * MemoryStore / SqliteStore-backed worlds client.
  *
- * Proves that the in-house @wazoo/sparql-engine stores (MemoryStore,
- * SqliteStore) are truly interchangeable with the client's own stores
- * (N3.Store, LibsqlStore) end to end: the same Client facade, wired with
- * RdfjsQuadStore + RdfjsSearchIndex + a sparql engine over one shared
- * RDF/JS store, works identically whether the engine is the in-house
- * WazooSparqlEngine or Comunica's adapter — and returns identical results
- * on identical data (differential parity).
+ * Proves that the in-house stores — the engine's MemoryStore and
+ * @worlds/sqlite's SqliteStore (the durable node:sqlite store, moved out of
+ * @wazoo/sparql-engine/sqlite on 2026-08-17) — are truly interchangeable
+ * with the client's own stores (N3.Store, LibsqlStore) end to end: the same
+ * Client facade, wired with RdfjsQuadStore + RdfjsSearchIndex + a sparql
+ * engine over one shared RDF/JS store, works identically whether the engine
+ * is the in-house WazooSparqlEngine or Comunica's adapter — and returns
+ * identical results on identical data (differential parity).
  */
 import type * as rdfjs from "@rdfjs/types";
 import { assertEquals } from "@std/assert";
 import { DataFactory as N3, Store as N3Store } from "n3";
 import { MemoryStore, WazooSparqlEngine } from "@wazoo/sparql-engine";
-import { SqliteStore } from "@wazoo/sparql-engine/sqlite";
+import { SqliteStore } from "@worlds/sqlite";
 import { Client } from "./client.ts";
 import type { SparqlBinding, SparqlResponse } from "./sparql-engine/mod.ts";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "../rdfjs/mod.ts";

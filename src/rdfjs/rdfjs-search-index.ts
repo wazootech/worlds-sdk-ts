@@ -16,8 +16,9 @@ import { filterQuads, isTextualLiteral } from "@/client/quad-store/mod.ts";
 export class RdfjsSearchIndex implements SearchIndexInterface {
   /**
    * The search index only reads via match() and size, so any RDF/JS store
-   * exposing those (N3.Store, @wazoo/sparql-engine MemoryStore/SqliteStore,
-   * LibsqlStore) is interchangeable here — no N3-specific surface needed.
+   * exposing those (N3.Store, @wazoo/sparql-engine MemoryStore,
+   * @worlds/sqlite SqliteStore, LibsqlStore) is interchangeable here — no
+   * N3-specific surface needed.
    */
   public constructor(
     private readonly store: rdfjs.Store & { size: number },

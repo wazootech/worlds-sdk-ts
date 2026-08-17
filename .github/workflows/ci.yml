@@ -16,7 +16,6 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           cache: true
-          deno-version-file: .tool-versions
       - name: Install dependencies
         run: deno ci
       - name: Run CI checks
@@ -33,6 +32,5 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           cache: true
-          deno-version-file: .tool-versions
       - name: Check SparqlEngineInterface parity
         run: deno task interface-parity

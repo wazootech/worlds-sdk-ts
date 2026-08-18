@@ -1,4 +1,4 @@
-import { DataFactory } from "@wazoo/sparql-engine";
+import { DataFactory } from "@wazoo/sparql-engine/data-model";
 import { hashQuad } from "@/client/quad-store/mod.ts";
 
 const { literal, namedNode, quad: createQuad, defaultGraph } = DataFactory;

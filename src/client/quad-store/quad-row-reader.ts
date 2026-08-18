@@ -1,5 +1,5 @@
 import type * as rdfjs from "@rdfjs/types";
-import { DataFactory } from "@wazoo/sparql-engine";
+import { DataFactory } from "@wazoo/sparql-engine/data-model";
 import { toRdfjsTerm } from "@/client/quad-store/term.ts";
 
 const { quad } = DataFactory;

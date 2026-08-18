@@ -12,7 +12,7 @@ backend. Durable backends are published as separate packages.
 
 | Export                                        | Role                                                                              |
 | --------------------------------------------- | --------------------------------------------------------------------------------- |
-| `@worlds/sdk`                                 | Root barrel: `Client`, interfaces, patch types, embedding-service, quad-chunker   |
+| `@worlds/sdk`                                 | Root barrel: `Sdk`, interfaces, patch types, embedding-service, quad-chunker   |
 | `@worlds/sdk/quad-store`                      | Quad import/export API, RDF formats, patch transactions                           |
 | `@worlds/sdk/search-index`                    | Search index interface and types                                                  |
 | `@worlds/sdk/sparql-engine`                   | SPARQL engine interface                                                           |
@@ -29,26 +29,26 @@ backend. Durable backends are published as separate packages.
 
 Durable backends implement the same quad store, search index, and SPARQL
 interfaces. Each backend ships its own factory (`createLibsqlClient`,
-`createDenokvClient`) that assembles a `Client` internally.
+`createDenokvClient`) that assembles a `Sdk` internally.
 
 ## Runtime model
 
 ### Dependency injection
 
-`Client` (in `src/client/client.ts`) is a portable facade. All storage and query
+`Sdk` (in `src/client/client.ts`) is a portable facade. All storage and query
 behavior is provided through injected dependencies:
 
 ```typescript
-interface ClientOptions {
+interface SdkOptions {
   quadStore?: QuadStoreInterface;
   sparqlEngine?: SparqlEngineInterface;
   searchIndex?: SearchIndexInterface;
 }
 ```
 
-`Client` delegates each operation to the injected layer:
+`Sdk` delegates each operation to the injected layer:
 
-| Client method | Delegates to             |
+| Sdk method | Delegates to             |
 | ------------- | ------------------------ |
 | `import`      | `quadStore.import()`     |
 | `export`      | `quadStore.export()`     |
@@ -59,12 +59,12 @@ interface ClientOptions {
 ### In-memory topology (dev, tests, demos)
 
 ```typescript
-import { Client } from "@worlds/sdk";
+import { Sdk } from "@worlds/sdk";
 import { MemoryStore, WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
 
 const store = new MemoryStore();
-const client = new Client({
+const client = new Sdk({
   quadStore: new RdfjsQuadStore({ store }),
   searchIndex: new RdfjsSearchIndex(store),
   sparqlEngine: new WazooSparqlEngine({ store }),
@@ -82,7 +82,7 @@ import { createLibsqlClient } from "@worlds/libsql";
 import { createDenokvClient } from "@worlds/denokv";
 ```
 
-The factory returns the same `ClientInterface` contract. Application code never
+The factory returns the same `SdkInterface` contract. Application code never
 needs to import the concrete store implementations directly unless doing custom
 assembly.
 
@@ -130,7 +130,7 @@ The single engine shipped today is:
 
 - **Wazoo** — [`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine) is
   the opinionated minimal default. It is a zero-runtime-dependency SPARQL 1.1 &
-  1.2 engine that implements `SparqlEngineInterface`, drops into a `Client`
+  1.2 engine that implements `SparqlEngineInterface`, drops into a `Sdk`
   unchanged, and runs over any `rdfjs.Store` (the engine's `MemoryStore` here;
   `LibsqlRdfjsStore` / `DenokvRdfjsStore` in the durable backends). It covers
   SELECT / ASK / CONSTRUCT / DESCRIBE plus UPDATE, enforces `timeoutMs`, and
@@ -158,7 +158,7 @@ for the original SPARQL engine rationale.
 
 ## Agent integration
 
-For AI agents consuming the `Client` API via tools:
+For AI agents consuming the `Sdk` API via tools:
 
 1. Call `client.search()` with a keyword. Use the returned `subject` IRI (not
    `text` alone) as the binding for SPARQL.

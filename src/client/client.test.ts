@@ -1,14 +1,14 @@
 import { assertEquals, assertRejects } from "@std/assert";
 import { DataFactory, Store } from "n3";
-import { Client } from "./client.ts";
+import { Sdk } from "./client.ts";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "../rdfjs/mod.ts";
 import { WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { hashQuad, type Patch, Transaction } from "./quad-store/mod.ts";
 
 const { quad, namedNode, literal } = DataFactory;
 
-function createTestClient(store: Store): Client {
-  return new Client({
+function createTestClient(store: Store): Sdk {
+  return new Sdk({
     quadStore: new RdfjsQuadStore({ store }),
     sparqlEngine: new WazooSparqlEngine({
       store: store,
@@ -26,7 +26,7 @@ function createTestClient(store: Store): Client {
   });
 }
 
-Deno.test("Client.import delegates to quadStore.import", async () => {
+Deno.test("Sdk.import delegates to quadStore.import", async () => {
   const store = new Store();
   const client = createTestClient(store);
 
@@ -43,11 +43,11 @@ Deno.test("Client.import delegates to quadStore.import", async () => {
   assertEquals(
     store.size,
     1,
-    "Client should have successfully invoked quadStore import",
+    "Sdk should have successfully invoked quadStore import",
   );
 });
 
-Deno.test("Client.export delegates to quadStore.export", async () => {
+Deno.test("Sdk.export delegates to quadStore.export", async () => {
   const store = new Store();
   const client = createTestClient(store);
 
@@ -57,7 +57,7 @@ Deno.test("Client.export delegates to quadStore.export", async () => {
   assertEquals(response.quads.length, 0);
 });
 
-Deno.test("Client.sparql delegates to sparqlEngine.execute", async () => {
+Deno.test("Sdk.sparql delegates to sparqlEngine.execute", async () => {
   const store = new Store();
   const client = createTestClient(store);
 
@@ -69,9 +69,9 @@ Deno.test("Client.sparql delegates to sparqlEngine.execute", async () => {
   assertEquals(response.data.boolean, false);
 });
 
-Deno.test("Client.sparql rejects when sparqlEngine is not configured", async () => {
+Deno.test("Sdk.sparql rejects when sparqlEngine is not configured", async () => {
   const store = new Store();
-  const client = new Client({
+  const client = new Sdk({
     quadStore: new RdfjsQuadStore({ store }),
     searchIndex: new RdfjsSearchIndex(store),
   });
@@ -83,8 +83,8 @@ Deno.test("Client.sparql rejects when sparqlEngine is not configured", async () 
   );
 });
 
-Deno.test("Client.import rejects when quadStore is not configured", async () => {
-  const client = new Client({
+Deno.test("Sdk.import rejects when quadStore is not configured", async () => {
+  const client = new Sdk({
     searchIndex: new RdfjsSearchIndex(new Store()),
   });
 
@@ -104,8 +104,8 @@ Deno.test("Client.import rejects when quadStore is not configured", async () => 
   );
 });
 
-Deno.test("Client.search rejects when searchIndex is not configured", async () => {
-  const client = new Client({
+Deno.test("Sdk.search rejects when searchIndex is not configured", async () => {
+  const client = new Sdk({
     quadStore: new RdfjsQuadStore({ store: new Store() }),
   });
 
@@ -118,7 +118,7 @@ Deno.test("Client.search rejects when searchIndex is not configured", async () =
   );
 });
 
-Deno.test("Client.search delegates to searchIndex.search", async () => {
+Deno.test("Sdk.search delegates to searchIndex.search", async () => {
   const store = new Store();
   store.addQuad(
     namedNode("http://example.com/sub"),
@@ -133,7 +133,7 @@ Deno.test("Client.search delegates to searchIndex.search", async () => {
   assertEquals(response.results?.[0].text, "Integrate all systems.");
 });
 
-Deno.test("Client.search returns stable hashQuad-based search result ids", async () => {
+Deno.test("Sdk.search returns stable hashQuad-based search result ids", async () => {
   const store = new Store();
   const indexedQuad = quad(
     namedNode("http://example.com/sub"),
@@ -152,7 +152,7 @@ Deno.test("Client.search returns stable hashQuad-based search result ids", async
   assertEquals(secondResponse.results?.[0].id, expectedId);
 });
 
-Deno.test("Client.reindex delegates to searchIndex.reindex", async () => {
+Deno.test("Sdk.reindex delegates to searchIndex.reindex", async () => {
   const store = new Store();
   store.addQuad(
     namedNode("http://example.com/sub"),
@@ -167,9 +167,9 @@ Deno.test("Client.reindex delegates to searchIndex.reindex", async () => {
   assertEquals(response.chunkRowCount, 0);
 });
 
-Deno.test("Client - import delivers immediate search hits", async () => {
+Deno.test("Sdk - import delivers immediate search hits", async () => {
   const store = new Store();
-  const client = new Client({
+  const client = new Sdk({
     quadStore: new RdfjsQuadStore({ store }),
     searchIndex: new RdfjsSearchIndex(store),
   });
@@ -189,7 +189,7 @@ Deno.test("Client - import delivers immediate search hits", async () => {
   assertEquals(response.results?.[0].text, "Factory wiring works.");
 });
 
-Deno.test("Client - preloaded store is shared with the client", async () => {
+Deno.test("Sdk - preloaded store is shared with the client", async () => {
   const store = new Store();
   store.addQuad(
     namedNode("http://example.com/existing"),
@@ -197,7 +197,7 @@ Deno.test("Client - preloaded store is shared with the client", async () => {
     literal("Preloaded fact."),
   );
 
-  const client = new Client({
+  const client = new Sdk({
     quadStore: new RdfjsQuadStore({ store }),
     searchIndex: new RdfjsSearchIndex(store),
   });
@@ -207,9 +207,9 @@ Deno.test("Client - preloaded store is shared with the client", async () => {
   assertEquals(store.size, 1);
 });
 
-Deno.test("Client - queryEngine enables SELECT queries", async () => {
+Deno.test("Sdk - queryEngine enables SELECT queries", async () => {
   const store = new Store();
-  const client = new Client({
+  const client = new Sdk({
     quadStore: new RdfjsQuadStore({ store }),
     searchIndex: new RdfjsSearchIndex(store),
     sparqlEngine: new WazooSparqlEngine({

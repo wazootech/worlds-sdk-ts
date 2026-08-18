@@ -1,4 +1,4 @@
-import { Client } from "@worlds/sdk";
+import { Sdk } from "@worlds/sdk";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
 import { WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { MemoryStore } from "@wazoo/sparql-engine";
@@ -13,7 +13,7 @@ if (import.meta.main) {
   console.log("Initializing embedded in-memory knowledge base...");
   const store = new MemoryStore();
 
-  const client = new Client({
+  const client = new Sdk({
     quadStore: new RdfjsQuadStore({ store }),
     searchIndex: new RdfjsSearchIndex(store),
     sparqlEngine: new WazooSparqlEngine({ store: store }),

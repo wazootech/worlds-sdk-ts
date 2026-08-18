@@ -5,19 +5,16 @@
  * @worlds/sqlite's SqliteStore (the durable node:sqlite store, moved out of
  * @wazoo/sparql-engine/sqlite on 2026-08-17) — are truly interchangeable
  * with the client's own stores (MemoryStore, LibsqlStore) end to end: the same
- * Client facade, wired with RdfjsQuadStore + RdfjsSearchIndex + a sparql
+ * Sdk facade, wired with RdfjsQuadStore + RdfjsSearchIndex + a sparql
  * engine over one shared RDF/JS store, works identically across engines and
  * stores.
  */
 import type * as rdfjs from "@rdfjs/types";
 import { assertEquals } from "@std/assert";
-import {
-  DataFactory,
-  MemoryStore,
-  WazooSparqlEngine,
-} from "@wazoo/sparql-engine";
+import { DataFactory } from "@wazoo/sparql-engine/data-model";
+import { MemoryStore, WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { SqliteStore } from "@worlds/sqlite";
-import { Client } from "./client.ts";
+import { Sdk } from "./client.ts";
 import type { SparqlBinding, SparqlResponse } from "./sparql-engine/mod.ts";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "../rdfjs/mod.ts";
 
@@ -53,9 +50,9 @@ function normalizeBindings(bindings: SparqlBinding[]): unknown {
   );
 }
 
-/** Wires the full Client facade over one shared RDF/JS store + WazooSparqlEngine. */
-function createWazooClient(store: rdfjs.Store & { size: number }): Client {
-  return new Client({
+/* * Wires the full Sdk facade over one shared RDF/JS store + WazooSparqlEngine. */
+function createWazooClient(store: rdfjs.Store & { size: number }): Sdk {
+  return new Sdk({
     quadStore: new RdfjsQuadStore({ store }),
     sparqlEngine: new WazooSparqlEngine({ store }),
     searchIndex: new RdfjsSearchIndex(store),

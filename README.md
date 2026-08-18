@@ -11,7 +11,7 @@
   <a href="https://deepwiki.com/wazootech/worlds-sdk-ts"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
 </p>
 
-- **Portable facade** — Unified `Client` API that works across in-memory,
+- **Portable facade** — Unified `Sdk` API that works across in-memory,
   LibSQL/Turso, and Deno KV backends.
 - **Search** — Hybrid retrieval combining keyword FTS5 and vector embeddings.
 - **Query** — The zero-dependency Wazoo SPARQL engine as the opinionated minimal
@@ -28,12 +28,12 @@ deno add jsr:@worlds/sdk
 ## Quickstart
 
 ```typescript
-import { Client } from "@worlds/sdk";
+import { Sdk } from "@worlds/sdk";
 import { MemoryStore, WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
 
 const store = new MemoryStore();
-const client = new Client({
+const client = new Sdk({
   quadStore: new RdfjsQuadStore({ store }),
   searchIndex: new RdfjsSearchIndex(store),
   sparqlEngine: new WazooSparqlEngine({ store }),
@@ -76,11 +76,11 @@ for structured traversal and reasoning, powered by the zero-dependency
 
 ## Module layout
 
-`Client` is the portable facade. Shared modules sit under `src/client/`:
+`Sdk` is the portable facade. Shared modules sit under `src/client/`:
 
 | Export                      | Role                                                 |
 | --------------------------- | ---------------------------------------------------- |
-| `@worlds/sdk`               | Root barrel: `Client`, interfaces, patch types       |
+| `@worlds/sdk`               | Root barrel: `Sdk`, interfaces, patch types       |
 | `@worlds/sdk/quad-store`    | Quad import/export API, RDF formats, patch buffering |
 | `@worlds/sdk/search-index`  | Search index interface and types                     |
 | `@worlds/sdk/sparql-engine` | SPARQL engine interface                              |
@@ -116,12 +116,12 @@ benchmark methodology.
 ### In-memory (dev, tests, demos)
 
 ```typescript
-import { Client } from "@worlds/sdk";
+import { Sdk } from "@worlds/sdk";
 import { MemoryStore, WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
 
 const store = new MemoryStore();
-const client = new Client({
+const client = new Sdk({
   quadStore: new RdfjsQuadStore({ store }),
   searchIndex: new RdfjsSearchIndex(store),
   sparqlEngine: new WazooSparqlEngine({ store }),

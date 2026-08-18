@@ -1,6 +1,6 @@
 {
   "name": "@worlds/sdk",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "nodeModulesDir": "auto",
   "exports": {
     ".": "./src/mod.ts",
@@ -18,7 +18,7 @@
     "ai": "npm:ai@^6.0.195",
     "@ai-sdk/google": "npm:@ai-sdk/google@^3.0.80",
     "@rdfjs/types": "npm:@rdfjs/types@^2.0.1",
-    "@wazoo/sparql-engine": "jsr:@wazoo/sparql-engine@^0.4.0",
+    "@wazoo/sparql-engine": "jsr:@wazoo/sparql-engine@^0.4.1",
     "@worlds/sqlite": "jsr:@worlds/sqlite@^0.1.0",
     "@std/assert": "jsr:@std/assert@^1.0.19",
     "@std/async": "jsr:@std/async@^1.4.0",

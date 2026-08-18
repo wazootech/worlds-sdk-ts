@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Added
+
+- New `@worlds/sdk/durable-backend` subpath: the four provider-seam strategy
+  interfaces (`ConnectionDriver`, `SchemaBuilder`, `QuadStoreBackend`,
+  `SearchQueryBuilder`) plus the `DurableBackendParts` composite (resolves
+  [worlds-sdk-ts#168](https://github.com/wazootech/worlds-sdk-ts/issues/168),
+  migration step 1 of the seam from
+  [worlds-sdk-ts#164](https://github.com/wazootech/worlds-sdk-ts/issues/164)).
+  Types-only — no behavior moves; existing backends are untouched.
+
 ### Breaking
 
 - Renamed the public facade symbols to match the `@worlds/sdk` package (resolves

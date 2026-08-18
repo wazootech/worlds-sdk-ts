@@ -23,10 +23,10 @@ backend. Durable backends are published as separate packages.
 
 ### External durable backends
 
-| Package                                                        | Persistence          | Search               |
-| -------------------------------------------------------------- | -------------------- | -------------------- |
-| [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) | SQLite / Turso Cloud | Hybrid FTS5 + vector |
-| [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) | Deno KV              | Keyword FTS          |
+| Package                                                                                                | Persistence          | Search               |
+| ------------------------------------------------------------------------------------------------------ | -------------------- | -------------------- |
+| [`@worlds/libsql`](https://jsr.io/@worlds/libsql) ([repo](https://github.com/wazootech/worlds-libsql)) | SQLite / Turso Cloud | Hybrid FTS5 + vector |
+| [`@worlds/denokv`](https://jsr.io/@worlds/denokv) ([repo](https://github.com/wazootech/worlds-denokv)) | Deno KV              | Keyword FTS          |
 
 Durable backends implement the same quad store, search index, and SPARQL
 interfaces. Each backend ships its own factory (`createLibsqlClient`,

@@ -101,11 +101,11 @@ conventions, see [AGENTS.md](AGENTS.md).
 This package provides the core in-memory RDF/JS backend. Durable backends live
 in separate packages:
 
-| Package                                                        | Persistence               | Search               | SPARQL                        |
-| -------------------------------------------------------------- | ------------------------- | -------------------- | ----------------------------- |
-| `@worlds/sdk` (this package)                                   | In-memory (`MemoryStore`) | RDF/JS keyword       | Wazoo                         |
-| [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) | SQLite / Turso Cloud      | Hybrid FTS5 + vector | LibsqlRdfjsStore quad indexes |
-| [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) | Deno KV                   | Keyword FTS          | DenokvRdfjsStore quad indexes |
+| Package                                                                                                | Persistence               | Search               | SPARQL                        |
+| ------------------------------------------------------------------------------------------------------ | ------------------------- | -------------------- | ----------------------------- |
+| `@worlds/sdk` (this package)                                                                           | In-memory (`MemoryStore`) | RDF/JS keyword       | Wazoo                         |
+| [`@worlds/libsql`](https://jsr.io/@worlds/libsql) ([repo](https://github.com/wazootech/worlds-libsql)) | SQLite / Turso Cloud      | Hybrid FTS5 + vector | LibsqlRdfjsStore quad indexes |
+| [`@worlds/denokv`](https://jsr.io/@worlds/denokv) ([repo](https://github.com/wazootech/worlds-denokv)) | Deno KV                   | Keyword FTS          | DenokvRdfjsStore quad indexes |
 
 **Choosing LibSQL vs Deno KV:** LibSQL is the default for hybrid FTS/vector
 search and faster cold quad index preload at scale. Deno KV can be faster on

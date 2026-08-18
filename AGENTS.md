@@ -388,7 +388,7 @@ Built-in label predicates (`rdfs:label`, `skos:prefLabel`, `schema:name`) are
 always indexed. Extend with `labelPredicates` on adapter options:
 
 ```typescript
-await createLibsqlClient({
+await createLibsqlSdk({
   client: db,
   labelPredicates: ["http://example.org/customLabel"],
 });

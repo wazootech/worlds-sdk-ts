@@ -17,14 +17,18 @@ import type {
  */
 function buildStubParts(): DurableBackendParts {
   const connection: ConnectionDriver = {
-    async execute() {
-      return { rows: [] };
+    execute() {
+      return Promise.resolve({ rows: [] });
     },
-    async batch() {},
+    batch() {
+      return Promise.resolve();
+    },
     async transaction(fn) {
       return await fn(this);
     },
-    async close() {},
+    close() {
+      return Promise.resolve();
+    },
   };
 
   const schema: SchemaBuilder = {
@@ -68,9 +72,11 @@ function buildStubParts(): DurableBackendParts {
     createTransaction() {
       return new Transaction({});
     },
-    async import() {},
-    async export() {
-      return { kind: "quads", quads: [] };
+    import() {
+      return Promise.resolve();
+    },
+    export() {
+      return Promise.resolve({ kind: "quads", quads: [] });
     },
   };
 

@@ -1,22 +1,22 @@
 import { assertEquals } from "@std/assert";
-import { Transaction } from "@/client/quad-store/mod.ts";
 import type {
   ConnectionDriver,
-  DurableBackendParts,
-  QuadStoreBackend,
   SchemaBuilder,
   SearchQueryBuilder,
 } from "./mod.ts";
 
 /**
- * This test is a compile-time contract check for the provider-seam
- * interfaces (worlds-sdk-ts#168): it builds a minimal stub DurableBackendParts
- * and proves the four strategy interfaces are coherent and implementable
- * without moving any behavior. If the interfaces drift out of implementable
- * shape, this file stops compiling.
+ * This test is a compile-time contract check for the provider-seam design
+ * (worlds-sdk-ts#170): a durable backend factory takes the three strategy
+ * objects as parameters and assembles its own quad store and search index
+ * internally. The test builds a minimal stub of each strategy interface and
+ * passes them to a factory call shaped like the live factories
+ * (`createLibsqlClient`, `createDenokvClient`, future `createSqliteSdk`).
+ * If the interfaces drift out of implementable shape, this file stops
+ * compiling.
  */
-function buildStubParts(): DurableBackendParts {
-  const connection: ConnectionDriver = {
+function buildStubConnection(): ConnectionDriver {
+  return {
     execute() {
       return Promise.resolve({ rows: [] });
     },
@@ -30,8 +30,10 @@ function buildStubParts(): DurableBackendParts {
       return Promise.resolve();
     },
   };
+}
 
-  const schema: SchemaBuilder = {
+function buildStubSchema(): SchemaBuilder {
+  return {
     vectorDimensions: 32,
     buildTables() {
       return ["CREATE TABLE IF NOT EXISTS quads (id TEXT PRIMARY KEY)"];
@@ -43,8 +45,10 @@ function buildStubParts(): DurableBackendParts {
       return [];
     },
   };
+}
 
-  const searchQuery: SearchQueryBuilder = {
+function buildStubSearchQuery(): SearchQueryBuilder {
+  return {
     buildSearchQuery(_request, options) {
       return {
         sql:
@@ -67,35 +71,44 @@ function buildStubParts(): DurableBackendParts {
       };
     },
   };
-
-  const quadStore: QuadStoreBackend = {
-    createTransaction() {
-      return new Transaction({});
-    },
-    import() {
-      return Promise.resolve();
-    },
-    export() {
-      return Promise.resolve({ kind: "quads", quads: [] });
-    },
-  };
-
-  return { connection, schema, quadStore, searchQuery };
 }
 
-Deno.test("DurableBackendParts - the four strategy interfaces compose into one backend", () => {
-  const parts = buildStubParts();
+/**
+ * The factory shape every durable backend follows (see ARCHITECTURE.md
+ * "Durable-backend seam"): the three strategy objects are the parameters, and
+ * the factory owns the quad store and search index it assembles from them.
+ */
+async function createDurableBackendSdk(options: {
+  connection: ConnectionDriver;
+  schema: SchemaBuilder;
+  searchQuery: SearchQueryBuilder;
+}) {
+  // The factory consumes the three strategy objects to build the backend's
+  // quad store and search index; nothing here is a caller-supplied composite.
+  const { connection, schema, searchQuery } = options;
+  const ddl = schema.buildTables();
+  await connection.execute({ sql: "SELECT 1" });
+  const compiled = searchQuery.buildSearchQuery({ query: "hello" }, {
+    limit: 10,
+  });
+  return { ddl, compiled };
+}
 
-  // All four parts are wired and named per the seam design.
-  assertEquals(typeof parts.connection.execute, "function");
-  assertEquals(typeof parts.schema.buildTables, "function");
-  assertEquals(typeof parts.quadStore.createTransaction, "function");
-  assertEquals(typeof parts.searchQuery.buildSearchQuery, "function");
+Deno.test("provider seam - the three strategy objects satisfy a factory call", async () => {
+  const sdk = await createDurableBackendSdk({
+    connection: buildStubConnection(),
+    schema: buildStubSchema(),
+    searchQuery: buildStubSearchQuery(),
+  });
+
+  // The factory consumed all three parameters to assemble the backend.
+  assertEquals(Array.isArray(sdk.ddl), true);
+  assertEquals(typeof sdk.compiled.sql, "string");
 });
 
 Deno.test("SearchQueryBuilder - compiled statements carry sql + positional args", () => {
-  const parts = buildStubParts();
-  const compiled = parts.searchQuery.buildSearchQuery(
+  const searchQuery = buildStubSearchQuery();
+  const compiled = searchQuery.buildSearchQuery(
     { query: "hello" },
     { limit: 10 },
   );

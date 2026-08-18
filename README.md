@@ -103,14 +103,19 @@ conventions, see [AGENTS.md](AGENTS.md).
 This package provides the core in-memory RDF/JS backend. Durable backends live
 in separate packages:
 
-| Package                                                                                                | Persistence               | Search               | SPARQL                        |
-| ------------------------------------------------------------------------------------------------------ | ------------------------- | -------------------- | ----------------------------- |
-| `@worlds/sdk` (this package)                                                                           | In-memory (`MemoryStore`) | RDF/JS keyword       | Wazoo                         |
-| [`@worlds/libsql`](https://jsr.io/@worlds/libsql) ([repo](https://github.com/wazootech/worlds-libsql)) | SQLite / Turso Cloud      | Hybrid FTS5 + vector | LibsqlRdfjsStore quad indexes |
+| Package                                                                                                      | Persistence                | Search                       | Status                                            |
+| ------------------------------------------------------------------------------------------------------------ | -------------------------- | ---------------------------- | ------------------------------------------------- |
+| `@worlds/sdk` (this package)                                                                                 | In-memory (`MemoryStore`)  | RDF/JS keyword               | Core client + in-memory backend                   |
+| [`@worlds/libsql`](https://jsr.io/@worlds/libsql) ([repo](https://github.com/wazootech/worlds-libsql))       | SQLite / Turso Cloud       | Hybrid FTS5 + vector         | **Beta — full SDK factory** (`createLibsqlSdk`)   |
+| [`@worlds/sqlite`](https://jsr.io/@worlds/sqlite) ([repo](https://github.com/wazootech/worlds-sqlite))       | Local file (`node:sqlite`) | — (Layer 2 parked)           | Parked post-beta — `SqliteStore` only, no factory |
+| [`@worlds/postgres`](https://jsr.io/@worlds/postgres) ([repo](https://github.com/wazootech/worlds-postgres)) | PostgreSQL + pgvector      | Hybrid FTS5 + vector (store) | Parked post-beta — raw stores only, no factory    |
+| [`worlds-cloudflare`](https://github.com/wazootech/worlds-cloudflare) (no package yet)                       | — (D1 planned)             | — (Vectorize planned)        | Scaffold only — nothing shipped                   |
 
-The Deno KV backend (`@worlds/denokv`) is
-[archived](https://github.com/wazootech/worlds-denokv); LibSQL is the supported
-durable backend.
+**Backend maturity:** Of the durable backend packages, only `@worlds/libsql`
+ships a full SDK factory today; `@worlds/sqlite`, `@worlds/postgres`, and
+`@worlds/cloudflare` are parked post-beta. The Deno KV backend
+(`@worlds/denokv`) is [archived](https://github.com/wazootech/worlds-denokv);
+use `@worlds/libsql`.
 
 **Choosing persistence:** LibSQL is the default for hybrid FTS/vector search and
 faster cold quad index preload at scale. See

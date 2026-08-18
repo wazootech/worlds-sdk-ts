@@ -25,11 +25,14 @@ backend. Durable backends are published as separate packages.
 | Package                                                                                                | Persistence          | Search               |
 | ------------------------------------------------------------------------------------------------------ | -------------------- | -------------------- |
 | [`@worlds/libsql`](https://jsr.io/@worlds/libsql) ([repo](https://github.com/wazootech/worlds-libsql)) | SQLite / Turso Cloud | Hybrid FTS5 + vector |
-| [`@worlds/denokv`](https://jsr.io/@worlds/denokv) ([repo](https://github.com/wazootech/worlds-denokv)) | Deno KV              | Keyword FTS          |
+
+The Deno KV backend (`@worlds/denokv`) is
+[archived](https://github.com/wazootech/worlds-denokv); `@worlds/libsql` is the
+supported durable backend.
 
 Durable backends implement the same quad store, search index, and SPARQL
-interfaces. Each backend ships its own factory (`createLibsqlClient`,
-`createDenokvClient`) that assembles a `Sdk` internally.
+interfaces. The LibSQL backend ships its own factory (`createLibsqlClient`) that
+assembles a `Sdk` internally.
 
 ## Runtime model
 
@@ -78,8 +81,6 @@ implementations inside the factory:
 
 ```typescript
 import { createLibsqlClient } from "@worlds/libsql";
-// or
-import { createDenokvClient } from "@worlds/denokv";
 ```
 
 The factory returns the same `SdkInterface` contract. Application code never
@@ -132,9 +133,9 @@ The single engine shipped today is:
   the opinionated minimal default. It is a zero-runtime-dependency SPARQL 1.1 &
   1.2 engine that implements `SparqlEngineInterface`, drops into a `Sdk`
   unchanged, and runs over any `rdfjs.Store` (the engine's `MemoryStore` here;
-  `LibsqlRdfjsStore` / `DenokvRdfjsStore` in the durable backends). It covers
-  SELECT / ASK / CONSTRUCT / DESCRIBE plus UPDATE, enforces `timeoutMs`, and
-  accepts a request-level `baseIri`.
+  `LibsqlRdfjsStore` in the LibSQL backend). It covers SELECT / ASK / CONSTRUCT
+  / DESCRIBE plus UPDATE, enforces `timeoutMs`, and accepts a request-level
+  `baseIri`.
 
 A custom engine remains feasible through `SparqlEngineInterface`.
 
@@ -162,12 +163,12 @@ review live here, indexed by the wayfinder map
 shape of a durable backend**, types-only. Review (2026-08-18) concluded the seam
 is premature public abstraction (YAGNI):
 
-- **Zero published consumers.** The only JSR dependents of `@worlds/sdk` are
-  `@worlds/denokv` and `@worlds/libsql`, and neither imports the subpath. The
-  seam's only planned consumer was the in-flight worlds-libsql#17.
+- **Zero published consumers.** The only JSR dependent of `@worlds/sdk` is
+  `@worlds/libsql`, and it does not import the subpath. The seam's only planned
+  consumer was the in-flight worlds-libsql#17.
 - **No evidence-backed future adoption.** The parked backends (`@worlds/sqlite`,
-  `@worlds/postgres`, `@worlds/denokv`) are built and shipping on raw provider
-  clients; conforming later would be a rewrite.
+  `@worlds/postgres`) are built and shipping on raw provider clients; conforming
+  later would be a rewrite. `@worlds/denokv` is archived.
 - **The sdk ships zero SQL.** A published vocabulary contract with one consumer
   is premature public abstraction.
 
@@ -183,9 +184,9 @@ subpath to `@worlds/sdk` in review. Supersedes the seam decisions recorded in
 ## Non-goals
 
 - `@worlds/sdk` does not include a hosted Wazoo API client.
-- Durable/immediate persistent backends (LibSQL, Deno KV) are not implemented
-  inside this package. They ship in separate JSR packages with different
-  lifecycle and dependency profiles.
+- Durable/immediate persistent backends (LibSQL) are not implemented inside this
+  package. They ship in separate JSR packages with different lifecycle and
+  dependency profiles.
 - Provider-specific embedding implementations (e.g. OpenAI, Anthropic,
   Gemini-specific embedding code) should not be added to the core package unless
   they are intentionally exported abstractions.

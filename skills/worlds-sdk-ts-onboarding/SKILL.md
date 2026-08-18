@@ -46,9 +46,10 @@ they are ready to proceed.
 
 ### Durable edge persistence
 
-- Explain that durable backends (LibSQL, Deno KV) live in separate packages:
-  [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) and
-  [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv).
+- Explain that the durable LibSQL backend lives in a separate package:
+  [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql). The Deno KV
+  backend (`@worlds/denokv`) is
+  [archived](https://github.com/wazootech/worlds-denokv).
 - Explain selective/grounded SPARQL query shapes vs full-scan queries.
 
 ### Environment verification

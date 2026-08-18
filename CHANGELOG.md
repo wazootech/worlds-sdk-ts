@@ -2,18 +2,18 @@
 
 ## Unreleased
 
-### Added
-
-- New `@worlds/sdk/durable-backend` subpath: the four provider-seam strategy
-  interfaces (`ConnectionDriver`, `SchemaBuilder`, `QuadStoreBackend`,
-  `SearchQueryBuilder`) plus the `DurableBackendParts` composite (resolves
-  [worlds-sdk-ts#168](https://github.com/wazootech/worlds-sdk-ts/issues/168),
-  migration step 1 of the seam from
-  [worlds-sdk-ts#164](https://github.com/wazootech/worlds-sdk-ts/issues/164)).
-  Types-only — no behavior moves; existing backends are untouched.
-
 ### Breaking
 
+- Removed the `@worlds/sdk/durable-backend` subpath (the provider-seam strategy
+  interfaces `ConnectionDriver`, `SchemaBuilder`, `SearchQueryBuilder`) — the
+  seam was de-escalated after review: types-only vocabulary with zero published
+  consumers and no evidence-backed future adoption (see
+  [worlds-sdk-ts#170](https://github.com/wazootech/worlds-sdk-ts/issues/170)
+  reopened, executed in
+  [worlds-sdk-ts#172](https://github.com/wazootech/worlds-sdk-ts/issues/172)).
+  The concrete classes live on as private worlds-libsql vocabulary
+  (`LibsqlConnectionDriver` / `LibsqlSchemaBuilder` /
+  `LibsqlSearchQueryBuilder`).
 - Renamed the public facade symbols to match the `@worlds/sdk` package (resolves
   [worlds-sdk-ts#169](https://github.com/wazootech/worlds-sdk-ts/issues/169)):
   `Client` → `Sdk`, `ClientInterface` → `SdkInterface`, `ClientOptions` →

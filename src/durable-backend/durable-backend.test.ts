@@ -93,7 +93,7 @@ Deno.test("DurableBackendParts - the four strategy interfaces compose into one b
   assertEquals(typeof parts.searchQuery.buildSearchQuery, "function");
 });
 
-Deno.test("SearchQueryBuilder - compiled statements carry sql + positional args", async () => {
+Deno.test("SearchQueryBuilder - compiled statements carry sql + positional args", () => {
   const parts = buildStubParts();
   const compiled = parts.searchQuery.buildSearchQuery(
     { query: "hello" },

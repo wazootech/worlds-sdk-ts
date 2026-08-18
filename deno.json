@@ -4,7 +4,6 @@
   "nodeModulesDir": "auto",
   "exports": {
     ".": "./src/mod.ts",
-    "./durable-backend": "./src/durable-backend/mod.ts",
     "./quad-store": "./src/client/quad-store/mod.ts",
     "./search-index": "./src/client/search-index/mod.ts",
     "./search-index/embedding-service": "./src/client/search-index/embedding-service/mod.ts",

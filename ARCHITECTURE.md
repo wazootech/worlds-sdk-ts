@@ -10,16 +10,15 @@ backend. Durable backends are published as separate packages.
 
 ### In this package
 
-| Export                                        | Role                                                                                                    |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `@worlds/sdk`                                 | Root barrel: `Sdk`, interfaces, patch types, embedding-service, quad-chunker                            |
-| `@worlds/sdk/durable-backend`                 | Provider-seam strategy interfaces (`ConnectionDriver`/`SchemaBuilder`/`SearchQueryBuilder`), types-only |
-| `@worlds/sdk/quad-store`                      | Quad import/export API, RDF formats, patch transactions                                                 |
-| `@worlds/sdk/search-index`                    | Search index interface and types                                                                        |
-| `@worlds/sdk/sparql-engine`                   | SPARQL engine interface                                                                                 |
-| `@worlds/sdk/rdfjs`                           | In-memory `RdfjsQuadStore` and `RdfjsSearchIndex` over the engine's `MemoryStore`                       |
-| `@worlds/sdk/ai-sdk`                          | Vercel AI SDK embedding service                                                                         |
-| `@worlds/sdk/tfjs-universal-sentence-encoder` | Offline TF.js USE embedding service                                                                     |
+| Export                                        | Role                                                                              |
+| --------------------------------------------- | --------------------------------------------------------------------------------- |
+| `@worlds/sdk`                                 | Root barrel: `Sdk`, interfaces, patch types, embedding-service, quad-chunker      |
+| `@worlds/sdk/quad-store`                      | Quad import/export API, RDF formats, patch transactions                           |
+| `@worlds/sdk/search-index`                    | Search index interface and types                                                  |
+| `@worlds/sdk/sparql-engine`                   | SPARQL engine interface                                                           |
+| `@worlds/sdk/rdfjs`                           | In-memory `RdfjsQuadStore` and `RdfjsSearchIndex` over the engine's `MemoryStore` |
+| `@worlds/sdk/ai-sdk`                          | Vercel AI SDK embedding service                                                   |
+| `@worlds/sdk/tfjs-universal-sentence-encoder` | Offline TF.js USE embedding service                                               |
 
 ### External durable backends
 
@@ -151,47 +150,35 @@ Decisions that shape the package's architecture and must not be re-litigated in
 review live here, indexed by the wayfinder map
 ([workspace#8](https://github.com/wazootech/workspace/issues/8)).
 
-### Durable-backend seam: three documented strategy types, assembled inside the factory
+### Durable-backend seam: removed from `@worlds/sdk` (de-escalated)
 
-**Date:** 2026-08-17 · **Status:** Accepted · **Canonical ticket:**
+**Date:** 2026-08-18 · **Status:** Accepted · **Canonical tickets:**
 [worlds-sdk-ts#170](https://github.com/wazootech/worlds-sdk-ts/issues/170)
+(reopened),
+[worlds-sdk-ts#172](https://github.com/wazootech/worlds-sdk-ts/issues/172)
 
-`@worlds/sdk/durable-backend` ships exactly three strategy interfaces —
-`ConnectionDriver` (transport), `SchemaBuilder` (dialect), `SearchQueryBuilder`
-(search SQL) — as the **documented shape of a durable backend**, types-only
-(zero runtime). Each backend's factory constructs its own strategy objects
-internally from the plain backend client, assembling its own quad store and
-search index (see [Durable topologies](#durable-topologies)):
+`@worlds/sdk/durable-backend` shipped the provider-seam strategy interfaces
+(`ConnectionDriver`, `SchemaBuilder`, `SearchQueryBuilder`) as the **documented
+shape of a durable backend**, types-only. Review (2026-08-18) concluded the seam
+is premature public abstraction (YAGNI):
 
-```typescript
-const client = await createLibsqlClient({ client: databaseClient });
-```
+- **Zero published consumers.** The only JSR dependents of `@worlds/sdk` are
+  `@worlds/denokv` and `@worlds/libsql`, and neither imports the subpath. The
+  seam's only planned consumer was the in-flight worlds-libsql#17.
+- **No evidence-backed future adoption.** The parked backends (`@worlds/sqlite`,
+  `@worlds/postgres`, `@worlds/denokv`) are built and shipping on raw provider
+  clients; conforming later would be a rewrite.
+- **The sdk ships zero SQL.** A published vocabulary contract with one consumer
+  is premature public abstraction.
 
-There is **no `DurableBackendParts` composite and no `QuadStoreBackend` provider
-contract**, and the three strategy objects are **not factory parameters** — do
-not re-suggest any of these in review. Rationale:
-
-- **Not factory parameters.** The strategy objects are backend-specific
-  dialects, not interchangeable units: `LibsqlSearchQueryBuilder` emits
-  FTS5/`vector_top_k` SQL that only LibSQL understands. Accepting them as
-  parameters would export an internal seam as a public contract without enabling
-  cross-backend composition — that already happens at the `Sdk` seam
-  (`QuadStoreInterface` / `SearchIndexInterface` / `SparqlEngineInterface`),
-  which is where any backend can be swapped. It would only buy within-backend
-  part-swapping no live consumer needs, and charge every caller three objects to
-  construct. The interfaces remain as the conformance contract underneath
-  (`implements SchemaBuilder` etc.) and the vocabulary that keeps future
-  factories structurally consistent.
-- **No composite.** The factory is the single composition point; a composite
-  type adds an indirection no consumer needs.
-- **No provider contract.** The quad store's shared contract already exists —
-  `QuadStoreInterface`, which `Sdk` consumes directly. `QuadStoreBackend` added
-  only a backend-specific `createTransaction`, an implementation detail of each
-  provider, not a seam.
-
-Supersedes the composite shipped with the initial seam
-([worlds-sdk-ts#168](https://github.com/wazootech/worlds-sdk-ts/issues/168));
-the parameterized-factory variant of this decision was rejected after review.
+The three concrete strategy classes live on as **private worlds-libsql
+vocabulary** (`LibsqlConnectionDriver`, `LibsqlSchemaBuilder`,
+`LibsqlSearchQueryBuilder`) — backend-internal, not a published sdk contract.
+Cross-backend composition remains at the `Sdk` seam (`QuadStoreInterface` /
+`SearchIndexInterface` / `SparqlEngineInterface`). Do not re-add a provider-seam
+subpath to `@worlds/sdk` in review. Supersedes the seam decisions recorded in
+[worlds-sdk-ts#168](https://github.com/wazootech/worlds-sdk-ts/issues/168) and
+[worlds-sdk-ts#170](https://github.com/wazootech/worlds-sdk-ts/issues/170).
 
 ## Non-goals
 

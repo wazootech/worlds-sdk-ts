@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
 
 ### Breaking
 
@@ -14,6 +14,18 @@
   The concrete classes live on as private worlds-libsql vocabulary
   (`LibsqlConnectionDriver` / `LibsqlSchemaBuilder` /
   `LibsqlSearchQueryBuilder`).
+
+## 0.2.1
+
+### Added
+
+- Added the `@worlds/sdk/durable-backend` subpath (types-only provider-seam
+  strategy interfaces). Shipped briefly, then de-escalated and removed in 0.3.0.
+
+## 0.2.0
+
+### Breaking
+
 - Renamed the public facade symbols to match the `@worlds/sdk` package (resolves
   [worlds-sdk-ts#169](https://github.com/wazootech/worlds-sdk-ts/issues/169)):
   `Client` → `Sdk`, `ClientInterface` → `SdkInterface`, `ClientOptions` →

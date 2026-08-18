@@ -6,11 +6,15 @@
 
 - New `@worlds/sdk/durable-backend` subpath: the three provider-seam strategy
   interfaces (`ConnectionDriver`, `SchemaBuilder`, `SearchQueryBuilder`) that
-  each durable backend factory takes as parameters (resolves
+  document a durable backend's shape (resolves
   [worlds-sdk-ts#168](https://github.com/wazootech/worlds-sdk-ts/issues/168),
   migration step 1 of the seam from
   [worlds-sdk-ts#164](https://github.com/wazootech/worlds-sdk-ts/issues/164)).
-  Types-only — no behavior moves; existing backends are untouched. The
+  Types-only — no behavior moves; existing backends are untouched. Each backend
+  factory assembles its own strategy objects internally from the plain client
+  (`createLibsqlClient({ client })`); accepting them as factory parameters was
+  considered and rejected — the strategy objects are backend-specific dialects,
+  and cross-backend composition already happens at the `Sdk` seam. The
   `DurableBackendParts` composite and `QuadStoreBackend` provider contract were
   dropped from the seam before it stabilized (decision recorded in
   ARCHITECTURE.md; see

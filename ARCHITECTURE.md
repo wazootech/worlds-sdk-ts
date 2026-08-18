@@ -151,30 +151,47 @@ Decisions that shape the package's architecture and must not be re-litigated in
 review live here, indexed by the wayfinder map
 ([workspace#8](https://github.com/wazootech/workspace/issues/8)).
 
-### Durable-backend seam: three factory-parameter types, no composite
+### Durable-backend seam: three documented strategy types, assembled inside the factory
 
 **Date:** 2026-08-17 · **Status:** Accepted · **Canonical ticket:**
 [worlds-sdk-ts#170](https://github.com/wazootech/worlds-sdk-ts/issues/170)
 
 `@worlds/sdk/durable-backend` ships exactly three strategy interfaces —
-`ConnectionDriver`, `SchemaBuilder`, `SearchQueryBuilder` — and each durable
-backend's factory takes them as parameters, assembling its own quad store and
-search index internally (see [Durable topologies](#durable-topologies)).
+`ConnectionDriver` (transport), `SchemaBuilder` (dialect), `SearchQueryBuilder`
+(search SQL) — as the **documented shape of a durable backend**, types-only
+(zero runtime). Each backend's factory constructs its own strategy objects
+internally from the plain backend client, assembling its own quad store and
+search index (see [Durable topologies](#durable-topologies)):
+
+```typescript
+const client = await createLibsqlClient({ client: databaseClient });
+```
 
 There is **no `DurableBackendParts` composite and no `QuadStoreBackend` provider
-contract** — do not re-suggest either in review. Rationale:
+contract**, and the three strategy objects are **not factory parameters** — do
+not re-suggest any of these in review. Rationale:
 
-- The factory is the single composition point; a composite type adds an
-  indirection no consumer needs.
-- The quad store's shared contract already exists — `QuadStoreInterface`, which
-  `Sdk` consumes directly. `QuadStoreBackend` added only a backend-specific
-  `createTransaction`, an implementation detail of each provider, not a seam.
-- Three parameters — transport, dialect, search SQL — are the minimal seam that
-  lets a new backend (sqlite, postgres, cloudflare) plug into the shared Worlds
-  layer without moving shared behavior.
+- **Not factory parameters.** The strategy objects are backend-specific
+  dialects, not interchangeable units: `LibsqlSearchQueryBuilder` emits
+  FTS5/`vector_top_k` SQL that only LibSQL understands. Accepting them as
+  parameters would export an internal seam as a public contract without enabling
+  cross-backend composition — that already happens at the `Sdk` seam
+  (`QuadStoreInterface` / `SearchIndexInterface` / `SparqlEngineInterface`),
+  which is where any backend can be swapped. It would only buy within-backend
+  part-swapping no live consumer needs, and charge every caller three objects to
+  construct. The interfaces remain as the conformance contract underneath
+  (`implements SchemaBuilder` etc.) and the vocabulary that keeps future
+  factories structurally consistent.
+- **No composite.** The factory is the single composition point; a composite
+  type adds an indirection no consumer needs.
+- **No provider contract.** The quad store's shared contract already exists —
+  `QuadStoreInterface`, which `Sdk` consumes directly. `QuadStoreBackend` added
+  only a backend-specific `createTransaction`, an implementation detail of each
+  provider, not a seam.
 
 Supersedes the composite shipped with the initial seam
-([worlds-sdk-ts#168](https://github.com/wazootech/worlds-sdk-ts/issues/168)).
+([worlds-sdk-ts#168](https://github.com/wazootech/worlds-sdk-ts/issues/168));
+the parameterized-factory variant of this decision was rejected after review.
 
 ## Non-goals
 

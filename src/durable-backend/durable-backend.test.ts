@@ -7,13 +7,13 @@ import type {
 
 /**
  * This test is a compile-time contract check for the provider-seam design
- * (worlds-sdk-ts#170): a durable backend factory takes the three strategy
- * objects as parameters and assembles its own quad store and search index
- * internally. The test builds a minimal stub of each strategy interface and
- * passes them to a factory call shaped like the live factories
- * (`createLibsqlClient`, `createDenokvClient`, future `createSqliteSdk`).
- * If the interfaces drift out of implementable shape, this file stops
- * compiling.
+ * (worlds-sdk-ts#170): `@worlds/sdk/durable-backend` ships three strategy
+ * interfaces — transport (`ConnectionDriver`), dialect (`SchemaBuilder`),
+ * search SQL (`SearchQueryBuilder`) — that document the shape of a durable
+ * backend. Each backend's factory constructs its own strategy objects
+ * internally from the plain backend client; the interfaces are the contract
+ * underneath the factory, not factory parameters. If the interfaces drift out
+ * of implementable shape, this file stops compiling.
  */
 function buildStubConnection(): ConnectionDriver {
   return {
@@ -75,17 +75,17 @@ function buildStubSearchQuery(): SearchQueryBuilder {
 
 /**
  * The factory shape every durable backend follows (see ARCHITECTURE.md
- * "Durable-backend seam"): the three strategy objects are the parameters, and
- * the factory owns the quad store and search index it assembles from them.
+ * "Durable-backend seam"): the caller supplies the backend's plain client, and
+ * the factory assembles the three strategy objects internally before wiring
+ * the quad store and search index it returns — like `createLibsqlClient` and
+ * `createDenokvClient` do today.
  */
-async function createDurableBackendSdk(options: {
-  connection: ConnectionDriver;
-  schema: SchemaBuilder;
-  searchQuery: SearchQueryBuilder;
-}) {
-  // The factory consumes the three strategy objects to build the backend's
-  // quad store and search index; nothing here is a caller-supplied composite.
-  const { connection, schema, searchQuery } = options;
+async function createDurableBackendSdk(_options: { client: unknown }) {
+  // Constructed internally, never caller-supplied parameters.
+  const connection = buildStubConnection();
+  const schema = buildStubSchema();
+  const searchQuery = buildStubSearchQuery();
+
   const ddl = schema.buildTables();
   await connection.execute({ sql: "SELECT 1" });
   const compiled = searchQuery.buildSearchQuery({ query: "hello" }, {
@@ -94,14 +94,9 @@ async function createDurableBackendSdk(options: {
   return { ddl, compiled };
 }
 
-Deno.test("provider seam - the three strategy objects satisfy a factory call", async () => {
-  const sdk = await createDurableBackendSdk({
-    connection: buildStubConnection(),
-    schema: buildStubSchema(),
-    searchQuery: buildStubSearchQuery(),
-  });
+Deno.test("provider seam - the three strategy objects assemble inside the factory", async () => {
+  const sdk = await createDurableBackendSdk({ client: {} });
 
-  // The factory consumed all three parameters to assemble the backend.
   assertEquals(Array.isArray(sdk.ddl), true);
   assertEquals(typeof sdk.compiled.sql, "string");
 });

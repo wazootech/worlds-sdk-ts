@@ -41,17 +41,17 @@ the client-side edge semantic environments:
 ### Graph store
 
 The in-memory RDF surface used by adapters and the SPARQL engine (the Wazoo
-engine). Durable backends (LibSQL/Turso, Deno KV) query **persistent hexastore**
-stores (`LibsqlRdfjsStore`, `DenokvRdfjsStore`) in their respective packages.
-This package provides the engine's zero-dependency `MemoryStore` for local
-development and tests.
+engine). Durable backends (LibSQL/Turso) query **persistent hexastore** stores
+(`LibsqlRdfjsStore`) in their respective packages. The Deno KV backend
+(`@worlds/denokv`, `DenokvRdfjsStore`) is
+[archived](https://github.com/wazootech/worlds-denokv). This package provides
+the engine's zero-dependency `MemoryStore` for local development and tests.
 
 ### Durable reads vs in-memory MemoryStore
 
 **In-memory RDF/JS** (`RdfjsQuadStore` over the engine's `MemoryStore`) is the
 intentional local-dev and test topology in this package. Durable backends
-([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
-[`@worlds/denokv`](https://github.com/wazootech/worlds-denokv)) wire hexastore
+([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql)) wire hexastore
 `*RdfjsStore` implementations and read durable indexes directly with no
 per-query in-memory mirror. Historical **libsql-n3** (hydrate durable quads into
 an N3 store, then query) was removed; see [CHANGELOG.md](CHANGELOG.md) and
@@ -189,15 +189,16 @@ When adding a new importable subpath, add it to `exports` in `deno.json` for
 in-repo imports (no duplicate `@worlds/sdk/*` entries in `imports`). Shared
 topology-agnostic patch buffering lives in `rdfjs-buffer/` (export
 `@worlds/sdk/quad-store`). Durable adapter `*RdfjsStore` implementations live in
-the external [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) and
-[`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) repositories.
+the external [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql)
+repository.
 
 ### Packaging and dependency resolution rationale
 
 This package ships only the core client abstractions and the in-memory RDF/JS
-backend. Durable backends (LibSQL/Turso, Deno KV) are published as separate JSR
-packages: [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) and
-[`@worlds/denokv`](https://github.com/wazootech/worlds-denokv).
+backend. Durable backends (LibSQL/Turso) are published as separate JSR packages:
+[`@worlds/libsql`](https://github.com/wazootech/worlds-libsql). The Deno KV
+backend (`@worlds/denokv`) is
+[archived](https://github.com/wazootech/worlds-denokv).
 
 This package relies on Deno/JSR's source-based publishing and dynamic runtime
 resolution:
@@ -289,9 +290,8 @@ green-passing integration pipeline runs:
   formats, and passes operational invariants without errors prior to opening
   pull requests.
 
-- **Local benchmarks only:** Benchmark suites live in the adapter repos
-  ([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
-  [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv)) and in
+- **Local benchmarks only:** Benchmark suites live in the adapter repo
+  ([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql)) and in
   [discussion #69](https://github.com/wazootech/worlds-sdk-ts/discussions/69).
   There is no CI benchmark regression gate in this repo.
 
@@ -320,22 +320,18 @@ green-passing integration pipeline runs:
 
 Public graph persistence facades must use explicit suffixes:
 
-- **`*RdfjsStore`** — implements `rdfjs.Store` (e.g. `LibsqlRdfjsStore`,
-  `DenokvRdfjsStore`). File name: `rdfjs-store/libsql-rdfjs-store.ts`.
+- **`*RdfjsStore`** — implements `rdfjs.Store` (e.g. `LibsqlRdfjsStore`). File
+  name: `rdfjs-store/libsql-rdfjs-store.ts`.
 - **`*QuadStore`** — implements `QuadStoreInterface` (e.g. `LibsqlQuadStore`,
-  `DenokvQuadStore`, in-memory `RdfjsQuadStore`). File name:
-  `quad-store/libsql-quad-store.ts`.
-- **No bare `*Store`** names on public graph classes (`LibsqlStore`,
-  `DenokvStore`).
+  in-memory `RdfjsQuadStore`). File name: `quad-store/libsql-quad-store.ts`.
+- **No bare `*Store`** names on public graph classes (`LibsqlStore`).
 
-LibSQL: `client.import` → `LibsqlQuadStore` → `LibsqlRdfjsStore.commit()`. Deno
-KV: `client.import` → `DenokvQuadStore` (native KV bulk path). Both use
-`*RdfjsStore` for the SPARQL engine (Wazoo). Advanced assembly uses explicit
+LibSQL: `client.import` → `LibsqlQuadStore` → `LibsqlRdfjsStore.commit()`.
+Advanced assembly uses explicit
 `new Sdk({ quadStore, searchIndex, sparqlEngine? })` with the suffixed stores.
 
-> These conventions apply to the durable adapter repos
-> ([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
-> [`@worlds/denokv`](https://github.com/wazootech/worlds-denokv)). This package
+> These conventions apply to the durable adapter repo
+> ([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql)). This package
 > only ships the in-memory `RdfjsQuadStore` and `RdfjsSearchIndex`.
 
 ## Architecture

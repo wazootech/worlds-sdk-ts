@@ -11,8 +11,8 @@
   <a href="https://deepwiki.com/wazootech/worlds-sdk-ts"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
 </p>
 
-- **Portable facade** — Unified `Sdk` API that works across in-memory,
-  LibSQL/Turso, and Deno KV backends.
+- **Portable facade** — Unified `Sdk` API that works across in-memory and
+  LibSQL/Turso backends.
 - **Search** — Hybrid retrieval combining keyword FTS5 and vector embeddings.
 - **Query** — The zero-dependency Wazoo SPARQL engine as the opinionated minimal
   default.
@@ -59,8 +59,10 @@ console.log(sparqlResponse);
 ```
 
 > [!TIP]
-> For production search and scale, use the durable LibSQL (`@worlds/libsql`) or
-> Deno KV (`@worlds/denokv`) backends.
+> For production search and scale, use the durable LibSQL backend
+> (`@worlds/libsql`). The Deno KV backend (`@worlds/denokv`) is
+> [archived](https://github.com/wazootech/worlds-denokv); use `@worlds/libsql`
+> instead.
 
 ## Core concepts
 
@@ -105,11 +107,13 @@ in separate packages:
 | ------------------------------------------------------------------------------------------------------ | ------------------------- | -------------------- | ----------------------------- |
 | `@worlds/sdk` (this package)                                                                           | In-memory (`MemoryStore`) | RDF/JS keyword       | Wazoo                         |
 | [`@worlds/libsql`](https://jsr.io/@worlds/libsql) ([repo](https://github.com/wazootech/worlds-libsql)) | SQLite / Turso Cloud      | Hybrid FTS5 + vector | LibsqlRdfjsStore quad indexes |
-| [`@worlds/denokv`](https://jsr.io/@worlds/denokv) ([repo](https://github.com/wazootech/worlds-denokv)) | Deno KV                   | Keyword FTS          | DenokvRdfjsStore quad indexes |
 
-**Choosing LibSQL vs Deno KV:** LibSQL is the default for hybrid FTS/vector
-search and faster cold quad index preload at scale. Deno KV can be faster on
-selective SPARQL execute after preload in long-lived or cached processes. See
+The Deno KV backend (`@worlds/denokv`) is
+[archived](https://github.com/wazootech/worlds-denokv); LibSQL is the supported
+durable backend.
+
+**Choosing persistence:** LibSQL is the default for hybrid FTS/vector search and
+faster cold quad index preload at scale. See
 [discussion #69](https://github.com/wazootech/worlds-sdk-ts/discussions/69) for
 benchmark methodology.
 
@@ -135,9 +139,8 @@ const client = new Sdk({
 | Hello world | In-memory graph with search     | `deno task example:hello-world`        |
 | AI SDK      | Vercel AI SDK tools with Gemini | `deno task example:ai-sdk-hello-world` |
 
-For LibSQL or Deno KV examples, see the
-[`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) and
-[`@worlds/denokv`](https://github.com/wazootech/worlds-denokv) repositories.
+For LibSQL examples, see the
+[`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) repository.
 
 Agent evaluation and memory benchmarking lives in the separate
 [wazoo-memorybench](https://github.com/wazootech/wazoo-memorybench) repository,
@@ -149,10 +152,9 @@ successor to the archived worlds-client-evals eval harness.
 hybrid retrieval. See [AGENTS.md](AGENTS.md) and
 [ARCHITECTURE.md](ARCHITECTURE.md).
 
-**LibSQL/Deno KV benchmarks**: Quad index performance methodology, regression
-policy, and comparison tables live in the adapter repos
-([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
-[`@worlds/denokv`](https://github.com/wazootech/worlds-denokv)).
+**LibSQL benchmarks**: Quad index performance methodology, regression policy,
+and comparison tables live in the
+[`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) adapter repo.
 
 ## Development workflow
 

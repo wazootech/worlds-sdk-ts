@@ -31,7 +31,7 @@ The Deno KV backend (`@worlds/denokv`) is
 supported durable backend.
 
 Durable backends implement the same quad store, search index, and SPARQL
-interfaces. The LibSQL backend ships its own factory (`createLibsqlClient`) that
+interfaces. The LibSQL backend ships its own factory (`createLibsqlSdk`) that
 assembles a `Sdk` internally.
 
 ## Runtime model
@@ -80,7 +80,7 @@ Durable backends wrap their own `*QuadStore`, `*SearchIndex`, and `*RdfjsStore`
 implementations inside the factory:
 
 ```typescript
-import { createLibsqlClient } from "@worlds/libsql";
+import { createLibsqlSdk } from "@worlds/libsql";
 ```
 
 The factory returns the same `SdkInterface` contract. Application code never

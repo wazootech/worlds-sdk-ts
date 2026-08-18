@@ -80,7 +80,7 @@ for structured traversal and reasoning, powered by the zero-dependency
 
 | Export                      | Role                                                 |
 | --------------------------- | ---------------------------------------------------- |
-| `@worlds/sdk`               | Root barrel: `Sdk`, interfaces, patch types       |
+| `@worlds/sdk`               | Root barrel: `Sdk`, interfaces, patch types          |
 | `@worlds/sdk/quad-store`    | Quad import/export API, RDF formats, patch buffering |
 | `@worlds/sdk/search-index`  | Search index interface and types                     |
 | `@worlds/sdk/sparql-engine` | SPARQL engine interface                              |

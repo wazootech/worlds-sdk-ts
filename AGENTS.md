@@ -331,8 +331,7 @@ Public graph persistence facades must use explicit suffixes:
 LibSQL: `client.import` → `LibsqlQuadStore` → `LibsqlRdfjsStore.commit()`. Deno
 KV: `client.import` → `DenokvQuadStore` (native KV bulk path). Both use
 `*RdfjsStore` for the SPARQL engine (Wazoo). Advanced assembly uses explicit
-`new Sdk({ quadStore, searchIndex, sparqlEngine? })` with the suffixed
-stores.
+`new Sdk({ quadStore, searchIndex, sparqlEngine? })` with the suffixed stores.
 
 > These conventions apply to the durable adapter repos
 > ([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql),
@@ -347,8 +346,8 @@ query pattern, and non-goals), see [ARCHITECTURE.md](ARCHITECTURE.md).
 ## Agent prompt contract
 
 This section defines the canonical interaction pattern for AI agents consuming
-the `Sdk` API via tools. Agents use **hybrid search** to discover subject
-IRIs, then **SPARQL** to traverse and reason over the graph.
+the `Sdk` API via tools. Agents use **hybrid search** to discover subject IRIs,
+then **SPARQL** to traverse and reason over the graph.
 
 ### Hybrid search retrieval modes
 

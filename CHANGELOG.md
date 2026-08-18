@@ -4,13 +4,13 @@
 
 ### Breaking
 
-- Renamed the public facade symbols to match the `@worlds/sdk` package
-  (resolves [worlds-sdk-ts#169](https://github.com/wazootech/worlds-sdk-ts/issues/169)):
+- Renamed the public facade symbols to match the `@worlds/sdk` package (resolves
+  [worlds-sdk-ts#169](https://github.com/wazootech/worlds-sdk-ts/issues/169)):
   `Client` → `Sdk`, `ClientInterface` → `SdkInterface`, `ClientOptions` →
   `SdkOptions` (root barrel). The backend factory names (`createLibsqlClient`,
-  `createDenokvClient`, `createSqliteClient`) are intentionally unchanged —
-  they live in separately published backend packages and describe the backend
-  they wire.
+  `createDenokvClient`, `createSqliteClient`) are intentionally unchanged — they
+  live in separately published backend packages and describe the backend they
+  wire.
 - Removed the Comunica adapter (`@worlds/sdk/comunica`), its vendored
   `jsonld-context-parser`, and the `@comunica/query-sparql-rdfjs-lite`
   dependency. `@wazoo/sparql-engine` (`WazooSparqlEngine`) is now the only

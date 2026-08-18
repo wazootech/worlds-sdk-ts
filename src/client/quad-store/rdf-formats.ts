@@ -120,7 +120,7 @@ export function exportQuadsResponse(
 /**
  * awaitDrainRemoveMatches waits for removeMatches(null, null, null, null) to finish.
  * Used by createRdfjsStoreCommitHandler for replace import commits; durable backends
- * honor isReplaceImportCommit in commitPatchToLibsql and commitPatchToDenokv.
+ * honor isReplaceImportCommit in their commit patch handlers.
  */
 export function awaitDrainRemoveMatches(
   store: rdfjs.Store,

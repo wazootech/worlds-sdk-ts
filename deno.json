@@ -1,6 +1,6 @@
 {
   "name": "@worlds/sdk",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "nodeModulesDir": "auto",
   "exports": {
     ".": "./src/mod.ts",
@@ -11,7 +11,9 @@
     "./sparql-engine": "./src/client/sparql-engine/mod.ts",
     "./tfjs-universal-sentence-encoder": "./src/tfjs-universal-sentence-encoder/mod.ts",
     "./rdfjs": "./src/rdfjs/mod.ts",
-    "./ai-sdk": "./src/ai-sdk/mod.ts"
+    "./memory": "./src/memory/mod.ts",
+    "./ai-sdk": "./src/ai-sdk/mod.ts",
+    "./testing": "./src/testing/mod.ts"
   },
   "imports": {
     "@/": "./src/",

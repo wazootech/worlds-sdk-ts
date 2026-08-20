@@ -64,13 +64,8 @@ export async function chunkQuads(
     }
   } else {
     idByQuad = new Map();
-    const hashPromises = candidates.map(async (quad) => ({
-      quad: quad,
-      id: hashQuad(quad),
-    }));
-    const resolved = await Promise.all(hashPromises);
-    for (const { quad, id } of resolved) {
-      idByQuad.set(quad, id);
+    for (const quad of candidates) {
+      idByQuad.set(quad, hashQuad(quad));
     }
   }
 

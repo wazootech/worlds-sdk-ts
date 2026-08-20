@@ -4,7 +4,7 @@ import { hashQuad } from "./hash-quad.ts";
 
 const { namedNode, quad, literal } = DataFactory;
 
-Deno.test("hashQuad produces consistent hash for identical quads", async () => {
+Deno.test("hashQuad produces consistent hash for identical quads", () => {
   const fixtureQuad1 = quad(
     namedNode("http://example.org/s"),
     namedNode("http://example.org/p"),
@@ -22,7 +22,7 @@ Deno.test("hashQuad produces consistent hash for identical quads", async () => {
   assertEquals(hash1, hash2);
 });
 
-Deno.test("hashQuad produces different hashes for different quads", async () => {
+Deno.test("hashQuad produces different hashes for different quads", () => {
   const fixtureQuad1 = quad(
     namedNode("http://example.org/s"),
     namedNode("http://example.org/p"),
@@ -40,7 +40,7 @@ Deno.test("hashQuad produces different hashes for different quads", async () => 
   assertNotEquals(hash1, hash2);
 });
 
-Deno.test("hashQuad is valid URL-safe base64", async () => {
+Deno.test("hashQuad is valid URL-safe base64", () => {
   const fixtureQuad1 = quad(
     namedNode("http://example.org/s"),
     namedNode("http://example.org/p"),

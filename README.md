@@ -152,6 +152,29 @@ Agent evaluation and memory benchmarking lives in the separate
 [wazoo-memorybench](https://github.com/wazootech/wazoo-memorybench) repository,
 successor to the archived worlds-client-evals eval harness.
 
+## Agent skill
+
+The [onboarding skill](skills/worlds-sdk-ts-onboarding/SKILL.md) walks new
+contributors through the codebase in a pair-programming style — environment
+setup, running examples, understanding the client architecture, and
+troubleshooting common gotchas. It is not a README in disguise: it enforces
+an opinionated sequence (verify before proceeding, run tests before claiming
+done) that catches the "it works on my machine" class of onboarding failures.
+
+The skill adopts a named persona (Ethan, the lead developer) and validates each
+stage before moving on — Deno version, dependency install, model file presence,
+example execution, full test suite. If anything fails, it cross-references the
+[TROUBLESHOOTING.md](skills/worlds-sdk-ts-onboarding/TROUBLESHOOTING.md) instead
+of guessing.
+
+```bash
+# Load the skill in your agent workspace
+cp -r skills/worlds-sdk-ts-onboarding .agents/skills/
+```
+
+Ask your coding assistant: *"Load the onboarding skill and guide me through the
+Worlds client."*
+
 ## Advanced
 
 **Agent integration**: search-then-SPARQL two-hop pattern for LLM tool use with

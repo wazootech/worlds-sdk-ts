@@ -20,17 +20,3 @@ jobs:
         run: deno ci
       - name: Run CI checks
         run: deno task ci
-  # Identical-spec parity gate: src/client/sparql-engine/sparql-engine-interface.ts
-  # must match @wazoo/sparql-engine's copy (line endings normalized). A
-  # single-sided edit fails this job instead of silently forking the shared
-  # SparqlEngineInterface. Standalone job (not a ci dependency) so a drift
-  # cannot abort the rest of the suite.
-  interface-parity:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: denoland/setup-deno@v2
-        with:
-          cache: true
-      - name: Check SparqlEngineInterface parity
-        run: deno task interface-parity

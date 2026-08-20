@@ -140,10 +140,11 @@ const client = new Sdk({
 
 ## Examples
 
-| Example     | Description                     | Command                                |
-| ----------- | ------------------------------- | -------------------------------------- |
-| Hello world | In-memory graph with search     | `deno task example:hello-world`        |
-| AI SDK      | Vercel AI SDK tools with Gemini | `deno task example:ai-sdk-hello-world` |
+| Example                          | Description                         | Command                                             |
+| -------------------------------- | ----------------------------------- | --------------------------------------------------- |
+| Hello world                      | In-memory graph with search         | `deno task example:hello-world`                     |
+| AI SDK                           | Vercel AI SDK tools with Gemini     | `deno task example:ai-sdk-hello-world`              |
+| TF.js Universal Sentence Encoder | Offline TF.js USE embedding service | `deno task example:tfjs-universal-sentence-encoder` |
 
 For LibSQL examples, see the
 [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) repository.
@@ -157,9 +158,9 @@ successor to the archived worlds-client-evals eval harness.
 The [onboarding skill](skills/worlds-sdk-ts-onboarding/SKILL.md) walks new
 contributors through the codebase in a pair-programming style — environment
 setup, running examples, understanding the client architecture, and
-troubleshooting common gotchas. It is not a README in disguise: it enforces
-an opinionated sequence (verify before proceeding, run tests before claiming
-done) that catches the "it works on my machine" class of onboarding failures.
+troubleshooting common gotchas. It is not a README in disguise: it enforces an
+opinionated sequence (verify before proceeding, run tests before claiming done)
+that catches the "it works on my machine" class of onboarding failures.
 
 The skill adopts a named persona (Ethan, the lead developer) and validates each
 stage before moving on — Deno version, dependency install, model file presence,
@@ -172,8 +173,8 @@ of guessing.
 cp -r skills/worlds-sdk-ts-onboarding .agents/skills/
 ```
 
-Ask your coding assistant: *"Load the onboarding skill and guide me through the
-Worlds client."*
+Ask your coding assistant: _"Load the onboarding skill and guide me through the
+Worlds client."_
 
 ## Advanced
 

@@ -10,15 +10,14 @@ backend. Durable backends are published as separate packages.
 
 ### In this package
 
-| Export                                        | Role                                                                              |
-| --------------------------------------------- | --------------------------------------------------------------------------------- |
-| `@worlds/sdk`                                 | Root barrel: `Sdk`, interfaces, patch types, embedding-service, quad-chunker      |
-| `@worlds/sdk/quad-store`                      | Quad import/export API, RDF formats, patch transactions                           |
-| `@worlds/sdk/search-index`                    | Search index interface and types                                                  |
-| `@worlds/sdk/sparql-engine`                   | SPARQL engine interface                                                           |
-| `@worlds/sdk/rdfjs`                           | In-memory `RdfjsQuadStore` and `RdfjsSearchIndex` over the engine's `MemoryStore` |
-| `@worlds/sdk/ai-sdk`                          | Vercel AI SDK embedding service                                                   |
-| `@worlds/sdk/tfjs-universal-sentence-encoder` | Offline TF.js USE embedding service                                               |
+| Export                      | Role                                                                              |
+| --------------------------- | --------------------------------------------------------------------------------- |
+| `@worlds/sdk`               | Root barrel: `Sdk`, interfaces, patch types, embedding-service, quad-chunker      |
+| `@worlds/sdk/quad-store`    | Quad import/export API, RDF formats, patch transactions                           |
+| `@worlds/sdk/search-index`  | Search index interface and types                                                  |
+| `@worlds/sdk/sparql-engine` | SPARQL engine interface                                                           |
+| `@worlds/sdk/rdfjs`         | In-memory `RdfjsQuadStore` and `RdfjsSearchIndex` over the engine's `MemoryStore` |
+| `@worlds/sdk/ai-sdk`        | Vercel AI SDK embedding service                                                   |
 
 ### External durable backends
 

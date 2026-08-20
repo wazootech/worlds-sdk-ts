@@ -146,7 +146,7 @@ Deno.test("Sdk.search returns stable hashQuad-based search result ids", async ()
 
   const firstResponse = await client.search({ query: "integrate" });
   const secondResponse = await client.search({ query: "integrate" });
-  const expectedId = await hashQuad(indexedQuad);
+  const expectedId = hashQuad(indexedQuad);
 
   assertEquals(firstResponse.results?.[0].id, expectedId);
   assertEquals(secondResponse.results?.[0].id, expectedId);

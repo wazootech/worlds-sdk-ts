@@ -31,5 +31,5 @@ export async function buildSearchResultId(
     options.graph ? namedNode(options.graph) : defaultGraph(),
   );
 
-  return await hashQuad(searchQuad);
+  return hashQuad(searchQuad);
 }

@@ -28,8 +28,8 @@ they are ready to proceed.
 - Proactively run `deno task download:tfjs-use` to download the offline search
   model files.
 - **Validation**: From the workspace root, check whether
-  `src/tfjs-universal-sentence-encoder/model/` exists and contains `.bin` files.
-  If missing, diagnose using
+  `examples/tfjs-universal-sentence-encoder/models/` exists and contains `.bin`
+  files. If missing, diagnose using
   [TROUBLESHOOTING.md](TROUBLESHOOTING.md#tensorflowjs-use-offline-models-missing).
 
 ### In-memory hello world execution

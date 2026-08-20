@@ -16,8 +16,8 @@ Deno.test("hashQuad produces consistent hash for identical quads", async () => {
     literal("hello"),
   );
 
-  const hash1 = await hashQuad(fixtureQuad1);
-  const hash2 = await hashQuad(fixtureQuad2);
+  const hash1 = hashQuad(fixtureQuad1);
+  const hash2 = hashQuad(fixtureQuad2);
 
   assertEquals(hash1, hash2);
 });
@@ -34,8 +34,8 @@ Deno.test("hashQuad produces different hashes for different quads", async () => 
     literal("world"),
   );
 
-  const hash1 = await hashQuad(fixtureQuad1);
-  const hash2 = await hashQuad(fixtureQuad2);
+  const hash1 = hashQuad(fixtureQuad1);
+  const hash2 = hashQuad(fixtureQuad2);
 
   assertNotEquals(hash1, hash2);
 });
@@ -46,7 +46,7 @@ Deno.test("hashQuad is valid URL-safe base64", async () => {
     namedNode("http://example.org/p"),
     literal("hello"),
   );
-  const hash = await hashQuad(fixtureQuad1);
+  const hash = hashQuad(fixtureQuad1);
 
   // Verify no slashes or plus signs that are illegal in base64url
   assertEquals(hash.includes("/"), false);

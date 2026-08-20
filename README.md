@@ -152,7 +152,7 @@ Agent evaluation and memory benchmarking lives in the separate
 [wazoo-memorybench](https://github.com/wazootech/wazoo-memorybench) repository,
 successor to the archived worlds-client-evals eval harness.
 
-## Agent skill
+## Agent skills
 
 The [onboarding skill](skills/worlds-sdk-ts-onboarding/SKILL.md) walks new
 contributors through the codebase in a pair-programming style — environment

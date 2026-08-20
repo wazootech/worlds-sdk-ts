@@ -275,15 +275,11 @@ green-passing integration pipeline runs:
     API tokens must be executed with the `--env` flag to cleanly load `.env`
     variables into the process.
 
-- **Local embedding model caching:** The system relies on offline model
-  execution via pre-cached TFJS Universal Sentence Encoder artifacts. The
-  download script lives at
-  `src/tfjs-universal-sentence-encoder/download-tfjs-use.ts`. USE lite loading
-  and tokenization are vendored in that adapter (not
-  `@tensorflow-models/universal-sentence-encoder`) so TF.js 4.x peers stay
-  aligned. If changes are made to the embedding or search layers, developers
-  must ensure the offline cache is warmed up by running the
-  `deno task download:tfjs-use` command.
+- **Local embedding model caching:** The TFJS Universal Sentence Encoder example
+  at `examples/tfjs-universal-sentence-encoder/` vendors USE lite loading and
+  tokenization (not `@tensorflow-models/universal-sentence-encoder`) so TF.js
+  4.x peers stay aligned. To run the example offline, warm up the model cache
+  with `deno task download:tfjs-use`.
 
 - **Test-driven execution boundaries:** Always run local tests with
   `deno task ci` or `deno test --allow-all` to verify that all code compiles,

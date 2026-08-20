@@ -21,9 +21,9 @@ export interface BuildSearchResultIdOptions {
 /**
  * buildSearchResultId computes a stable id from the discovery-facing literal text.
  */
-export async function buildSearchResultId(
+export function buildSearchResultId(
   options: BuildSearchResultIdOptions,
-): Promise<string> {
+): string {
   const searchQuad = createQuad(
     namedNode(options.subject),
     namedNode(options.predicate),
@@ -31,5 +31,5 @@ export async function buildSearchResultId(
     options.graph ? namedNode(options.graph) : defaultGraph(),
   );
 
-  return await hashQuad(searchQuad);
+  return hashQuad(searchQuad);
 }

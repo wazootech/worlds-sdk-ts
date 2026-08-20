@@ -25,7 +25,7 @@ Is Deno installed globally on your machine?
 Are you running Semantic Search and getting file loading errors?
   ├── [Yes] ──> Did you run the TFJS-USE download task?
   │               ├── [No]  ──> Run: deno task download:tfjs-use
-  │               └── [Yes] ──> From the workspace root, check if 'src/tfjs-universal-sentence-encoder/model/' contains .bin and .json files.
+  │               └── [Yes] ──> From the workspace root, check if 'examples/tfjs-universal-sentence-encoder/models/' contains .bin and .json files.
   └── [No]  ──> Continue setup.
 ```
 

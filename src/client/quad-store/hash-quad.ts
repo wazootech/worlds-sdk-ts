@@ -1,28 +1,38 @@
 import type * as rdfjs from "@rdfjs/types";
-import { canonize } from "rdf-canonize";
+import { sha256Hex } from "@wazoo/sparql-engine/term";
+import { decodeHex } from "@std/encoding/hex";
 import { encodeBase64Url } from "@std/encoding/base64url";
+import { serializeQuadToCanonicalNQuads } from "./canonical-nquads.ts";
 
 /**
- * hashQuad computes a deterministic, canonical ID for a single Quad
- * using RDFC-1.0 and base64url encoding.
- *
- * This is functionally equivalent to "Skolemizing" the statement into a stable primary key.
+ * SCHEME_TAG identifies the quad ID scheme so old and new IDs are
+ * distinguishable at a glance and mixed-scheme data is detectable.
  */
-export async function hashQuad(quad: rdfjs.Quad): Promise<string> {
-  const canonical = await canonize([quad], {
-    algorithm: "RDFC-1.0",
-    format: "application/n-quads",
-  });
-  const encoded = new TextEncoder().encode(canonical);
-  return encodeBase64Url(encoded);
+const SCHEME_TAG = "q2.";
+
+/**
+ * hashQuad computes a content-addressed ID for a single quad: the SHA-256
+ * digest of the quad's canonical N-Quads serialization, base64url-encoded
+ * and prefixed with the scheme tag (2 + 43 = 46 chars total).
+ *
+ * For blank-node-free quads the serialization is byte-identical to the
+ * RDFC-1.0 canonical form (rdf-canonize), so IDs are interoperable with
+ * RDFC-1.0-based content-addressed systems. Blank nodes are label-based
+ * (dataset-local), per the Statement Hash convention — see
+ * serializeQuadToCanonicalNQuads.
+ */
+export function hashQuad(quad: rdfjs.Quad): string {
+  const canonical = serializeQuadToCanonicalNQuads(quad);
+  const digest = decodeHex(sha256Hex(canonical));
+  return SCHEME_TAG + encodeBase64Url(digest);
 }
 
 /**
- * hashQuads computes deterministic canonical IDs for multiple quads in parallel.
+ * hashQuads computes deterministic content-addressed IDs for multiple quads.
  */
-export async function hashQuads(quads: rdfjs.Quad[]): Promise<string[]> {
+export function hashQuads(quads: rdfjs.Quad[]): string[] {
   try {
-    return await Promise.all(quads.map((quad) => hashQuad(quad)));
+    return quads.map((quad) => hashQuad(quad));
   } catch (cause) {
     throw new Error("failed to compute content hashes for incoming quads", {
       cause,

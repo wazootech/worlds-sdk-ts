@@ -1,19 +1,19 @@
 import { assertEquals, assertFalse } from "@std/assert";
 import { DataFactory } from "n3";
 import type * as rdfjs from "@rdfjs/types";
-import { createMemorySdk } from "@/memory/mod.ts";
+import { createMemoryWorldsSdk } from "@/memory/mod.ts";
 import { multiGraphWorld, parityCorpus } from "./parity-fixtures.ts";
-import { runParitySuite, type SdkFactory } from "./run-parity-suite.ts";
+import { runParitySuite, type WorldsSdkFactory } from "./run-parity-suite.ts";
 
 const { quad, namedNode, literal } = DataFactory;
 
 /**
  * The harness proves itself against the engine's MemoryStore via
- * createMemorySdk (@worlds/sdk/memory) — the family's portable in-memory
+ * createMemoryWorldsSdk (@worlds/sdk/memory) — the family's portable in-memory
  * reference (wazootech/workspace#74). The n3.Store topology lives in
  * run-parity-suite.n3.test.ts as a cross-store differential check.
  */
-const memoryFactory: SdkFactory = () => createMemorySdk();
+const memoryFactory: WorldsSdkFactory = () => createMemoryWorldsSdk();
 
 Deno.test("runParitySuite - passes the full corpus on identical in-memory Sdks", async () => {
   const report = await runParitySuite({
@@ -46,8 +46,8 @@ Deno.test("runParitySuite - passes the full corpus on identical in-memory Sdks",
 });
 
 Deno.test("runParitySuite - fails when the candidate reorders search results", async () => {
-  const brokenCandidate: SdkFactory = () => {
-    const sdk = createMemorySdk();
+  const brokenCandidate: WorldsSdkFactory = () => {
+    const sdk = createMemoryWorldsSdk();
     const originalSearch = sdk.search.bind(sdk);
     // Deliberately invert top-K ordering to violate the parity contract.
     sdk.search = async (request) => {
@@ -79,8 +79,8 @@ Deno.test("runParitySuite - fails when the candidate's quad counts differ", asyn
     namedNode("urn:p"),
     literal("stray"),
   );
-  const bloatedCandidate: SdkFactory = () => {
-    const sdk = createMemorySdk();
+  const bloatedCandidate: WorldsSdkFactory = () => {
+    const sdk = createMemoryWorldsSdk();
     const originalImport = sdk.import.bind(sdk);
     // Deliberately add a stray quad after every import to break the count contract.
     sdk.import = async (request) => {
@@ -110,8 +110,8 @@ Deno.test("runParitySuite - fails when the candidate's quad counts differ", asyn
 });
 
 Deno.test("runParitySuite - reports declared-gate notes without failing the suite", async () => {
-  const throwingReference: SdkFactory = () => {
-    const sdk = createMemorySdk();
+  const throwingReference: WorldsSdkFactory = () => {
+    const sdk = createMemoryWorldsSdk();
     const originalImport = sdk.import.bind(sdk);
     // Simulate a durable reference that cannot store RDF-star (throws on import).
     sdk.import = async (request) => {

@@ -40,7 +40,7 @@ export interface ParitySparqlCase {
 
 /**
  * gate controls corpus strictness:
- * - "reference" (default): the case must pass on the reference Sdk (libsql)
+ * - "reference" (default): the case must pass on the reference WorldsSdk (libsql)
  *   and on the candidate. New fixtures default here.
  * - "declared": the corpus category is declared but the durable reference does
  *   not support it yet (e.g. RDF-star storage — the backend-neutral Term

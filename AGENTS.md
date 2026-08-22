@@ -168,7 +168,8 @@ Never use parent-relative `../` to reach another domain. Never import
   `import type { SparqlEngineInterface } from "@/client/sparql-engine/mod.ts"`
 - ✅ `@/client/quad-store/mod.ts`, `@/client/sparql-engine/mod.ts`,
   `@/client/search-index/mod.ts`
-- ✅ `import { Sdk } from "@/client/client.ts"` (avoids root barrel cycles)
+- ✅ `import { WorldsSdk } from "@/client/client.ts"` (avoids root barrel
+  cycles)
 - ✅ `./string-to-chars.ts` (from `tokenizer/tokenizer.ts`)
 - ✅ `./client.ts`, `../rdfjs/mod.ts` (from `src/client/client.test.ts`)
 - ❌ `@worlds/sdk/sparql-engine` inside `src/`
@@ -324,7 +325,8 @@ Public graph persistence facades must use explicit suffixes:
 
 LibSQL: `client.import` → `LibsqlQuadStore` → `LibsqlRdfjsStore.commit()`.
 Advanced assembly uses explicit
-`new Sdk({ quadStore, searchIndex, sparqlEngine? })` with the suffixed stores.
+`new WorldsSdk({ quadStore, searchIndex, sparqlEngine? })` with the suffixed
+stores.
 
 > These conventions apply to the durable adapter repo
 > ([`@worlds/libsql`](https://github.com/wazootech/worlds-libsql)). This package
@@ -338,8 +340,8 @@ query pattern, and non-goals), see [ARCHITECTURE.md](ARCHITECTURE.md).
 ## Agent prompt contract
 
 This section defines the canonical interaction pattern for AI agents consuming
-the `Sdk` API via tools. Agents use **hybrid search** to discover subject IRIs,
-then **SPARQL** to traverse and reason over the graph.
+the `WorldsSdk` API via tools. Agents use **hybrid search** to discover subject
+IRIs, then **SPARQL** to traverse and reason over the graph.
 
 ### Hybrid search retrieval modes
 
@@ -417,7 +419,7 @@ await refreshSearchChunksForSubjects(["http://example.org/Aurelia"], {
 ```
 
 Advanced: `rebuildLibsqlSearchIndexFromQuads` in `@worlds/libsql` remains
-available without a `Sdk` instance.
+available without a `WorldsSdk` instance.
 
 ### Alignment with eval harness
 

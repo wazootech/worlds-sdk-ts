@@ -56,5 +56,9 @@ Deno.test("createMemoryWorldsSdk — each call returns an independent fresh topo
 
   const secondExport = await second.export({ format: { kind: "quads" } });
   if (secondExport.kind !== "quads") throw new Error("Expected quads");
-  assertEquals(secondExport.quads.length, 0, "second WorldsSdk must start empty");
+  assertEquals(
+    secondExport.quads.length,
+    0,
+    "second WorldsSdk must start empty",
+  );
 });

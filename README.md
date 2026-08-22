@@ -118,7 +118,7 @@ for structured traversal and reasoning, powered by the zero-dependency
 
 | Export                      | Role                                                 |
 | --------------------------- | ---------------------------------------------------- |
-| `@worlds/sdk`               | Root barrel: `WorldsSdk`, interfaces, patch types   |
+| `@worlds/sdk`               | Root barrel: `WorldsSdk`, interfaces, patch types    |
 | `@worlds/sdk/quad-store`    | Quad import/export API, RDF formats, patch buffering |
 | `@worlds/sdk/search-index`  | Search index interface and types                     |
 | `@worlds/sdk/sparql-engine` | SPARQL engine interface                              |
@@ -139,9 +139,9 @@ conventions, see [AGENTS.md](AGENTS.md).
 This package provides the core in-memory RDF/JS backend. Durable backends live
 in separate packages:
 
-| Package                                                                                                            | Persistence                | Search                           | Status                                                   |
-| ------------------------------------------------------------------------------------------------------------------ | -------------------------- | -------------------------------- | -------------------------------------------------------- |
-| `@worlds/sdk` (this package)                                                                                       | In-memory (`MemoryStore`)  | RDF/JS keyword                   | Core client + in-memory backend                          |
+| Package                                                                                                            | Persistence                | Search                           | Status                                                         |
+| ------------------------------------------------------------------------------------------------------------------ | -------------------------- | -------------------------------- | -------------------------------------------------------------- |
+| `@worlds/sdk` (this package)                                                                                       | In-memory (`MemoryStore`)  | RDF/JS keyword                   | Core client + in-memory backend                                |
 | [`@worlds/libsql`](https://jsr.io/@worlds/libsql) ([repo](https://github.com/wazootech/worlds-libsql))             | SQLite / Turso Cloud       | Hybrid FTS5 + vector             | **Available** — full SDK factory (`createLibsqlWorldsSdk`)     |
 | [`@worlds/sqlite`](https://jsr.io/@worlds/sqlite) ([repo](https://github.com/wazootech/worlds-sqlite))             | Local file (`node:sqlite`) | Hybrid FTS5 + sqlite-vec         | **Available** — full SDK factory (`createSqliteWorldsSdk`)     |
 | [`@worlds/postgres`](https://jsr.io/@worlds/postgres) ([repo](https://github.com/wazootech/worlds-postgres))       | PostgreSQL + pgvector      | Hybrid tsvector + pgvector       | **Available** — full SDK factory (`createPostgresWorldsSdk`)   |
@@ -150,9 +150,9 @@ in separate packages:
 
 **Backend maturity:** All five durable backends now ship full SDK factories and
 parity-green CI suites. Each assembles a quad store, hybrid search index, and
-SPARQL engine through the standard `create*WorldsSdk` factory. The Deno KV backend
-(`@worlds/denokv`) is [archived](https://github.com/wazootech/worlds-denokv);
-use `@worlds/libsql`.
+SPARQL engine through the standard `create*WorldsSdk` factory. The Deno KV
+backend (`@worlds/denokv`) is
+[archived](https://github.com/wazootech/worlds-denokv); use `@worlds/libsql`.
 
 **Choosing persistence:** LibSQL is the default for hybrid FTS/vector search and
 faster cold quad index preload at scale. See

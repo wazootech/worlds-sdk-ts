@@ -22,7 +22,9 @@ const NQUADS = "application/n-quads";
 const XSD_STRING = "http://www.w3.org/2001/XMLSchema#string";
 
 /** WorldsSdkFactory constructs a fresh WorldsSdk (quad store + search + SPARQL wired) for one case. */
-export type WorldsSdkFactory = () => Promise<WorldsSdkInterface> | WorldsSdkInterface;
+export type WorldsSdkFactory = () =>
+  | Promise<WorldsSdkInterface>
+  | WorldsSdkInterface;
 
 /** ParitySuiteOptions configures a parity run: the reference, the candidate, and the corpus. */
 export interface ParitySuiteOptions {

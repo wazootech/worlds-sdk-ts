@@ -11,7 +11,7 @@
   <a href="https://deepwiki.com/wazootech/worlds-sdk-ts"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
 </p>
 
-- **Portable facade** — Unified `Sdk` API that works across in-memory and
+- **Portable facade** — Unified `WorldsSdk` API that works across in-memory and
   LibSQL/Turso backends.
 - **Search** — Hybrid retrieval combining keyword FTS5 and vector embeddings.
 - **Query** — The zero-dependency Wazoo SPARQL engine as the opinionated minimal
@@ -37,7 +37,7 @@ npx jsr add @worlds/sdk
 bundler needed.
 
 ```js
-import { Sdk } from "https://esm.sh/jsr/@worlds/sdk@0.5.0";
+import { WorldsSdk } from "https://esm.sh/jsr/@worlds/sdk@0.5.0";
 ```
 
 With an import map:
@@ -51,25 +51,25 @@ With an import map:
 }
 </script>
 <script type="module">
-import { Sdk } from "@worlds/sdk";
+import { WorldsSdk } from "@worlds/sdk";
 </script>
 ```
 
 Pin to an exact build for deterministic caching:
 
 ```js
-import { Sdk } from "https://esm.sh/jsr/@worlds/sdk@0.5.0?pin=v1724100000";
+import { WorldsSdk } from "https://esm.sh/jsr/@worlds/sdk@0.5.0?pin=v1724100000";
 ```
 
 ## Quickstart
 
 ```typescript
-import { Sdk } from "@worlds/sdk";
+import { WorldsSdk } from "@worlds/sdk";
 import { MemoryStore, WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
 
 const store = new MemoryStore();
-const client = new Sdk({
+const client = new WorldsSdk({
   quadStore: new RdfjsQuadStore({ store }),
   searchIndex: new RdfjsSearchIndex(store),
   sparqlEngine: new WazooSparqlEngine({ store }),
@@ -114,11 +114,11 @@ for structured traversal and reasoning, powered by the zero-dependency
 
 ## Module layout
 
-`Sdk` is the portable facade. Shared modules sit under `src/client/`:
+`WorldsSdk` is the portable facade. Shared modules sit under `src/client/`:
 
 | Export                      | Role                                                 |
 | --------------------------- | ---------------------------------------------------- |
-| `@worlds/sdk`               | Root barrel: `Sdk`, interfaces, patch types          |
+| `@worlds/sdk`               | Root barrel: `WorldsSdk`, interfaces, patch types   |
 | `@worlds/sdk/quad-store`    | Quad import/export API, RDF formats, patch buffering |
 | `@worlds/sdk/search-index`  | Search index interface and types                     |
 | `@worlds/sdk/sparql-engine` | SPARQL engine interface                              |
@@ -142,15 +142,15 @@ in separate packages:
 | Package                                                                                                            | Persistence                | Search                           | Status                                                   |
 | ------------------------------------------------------------------------------------------------------------------ | -------------------------- | -------------------------------- | -------------------------------------------------------- |
 | `@worlds/sdk` (this package)                                                                                       | In-memory (`MemoryStore`)  | RDF/JS keyword                   | Core client + in-memory backend                          |
-| [`@worlds/libsql`](https://jsr.io/@worlds/libsql) ([repo](https://github.com/wazootech/worlds-libsql))             | SQLite / Turso Cloud       | Hybrid FTS5 + vector             | **Available** — full SDK factory (`createLibsqlSdk`)     |
-| [`@worlds/sqlite`](https://jsr.io/@worlds/sqlite) ([repo](https://github.com/wazootech/worlds-sqlite))             | Local file (`node:sqlite`) | Hybrid FTS5 + sqlite-vec         | **Available** — full SDK factory (`createSqliteSdk`)     |
-| [`@worlds/postgres`](https://jsr.io/@worlds/postgres) ([repo](https://github.com/wazootech/worlds-postgres))       | PostgreSQL + pgvector      | Hybrid tsvector + pgvector       | **Available** — full SDK factory (`createPostgresSdk`)   |
-| [`@worlds/cloudflare`](https://jsr.io/@worlds/cloudflare) ([repo](https://github.com/wazootech/worlds-cloudflare)) | D1 (miniflare)             | FTS5 keyword (Vectorize planned) | **Available** — full SDK factory (`createCloudflareSdk`) |
-| [`@worlds/indexeddb`](https://jsr.io/@worlds/indexeddb) ([repo](https://github.com/wazootech/worlds-indexeddb))    | Browser IndexedDB          | JS hybrid TF-IDF + cosine        | **Available** — full SDK factory (`createIndexeddbSdk`)  |
+| [`@worlds/libsql`](https://jsr.io/@worlds/libsql) ([repo](https://github.com/wazootech/worlds-libsql))             | SQLite / Turso Cloud       | Hybrid FTS5 + vector             | **Available** — full SDK factory (`createLibsqlWorldsSdk`)     |
+| [`@worlds/sqlite`](https://jsr.io/@worlds/sqlite) ([repo](https://github.com/wazootech/worlds-sqlite))             | Local file (`node:sqlite`) | Hybrid FTS5 + sqlite-vec         | **Available** — full SDK factory (`createSqliteWorldsSdk`)     |
+| [`@worlds/postgres`](https://jsr.io/@worlds/postgres) ([repo](https://github.com/wazootech/worlds-postgres))       | PostgreSQL + pgvector      | Hybrid tsvector + pgvector       | **Available** — full SDK factory (`createPostgresWorldsSdk`)   |
+| [`@worlds/cloudflare`](https://jsr.io/@worlds/cloudflare) ([repo](https://github.com/wazootech/worlds-cloudflare)) | D1 (miniflare)             | FTS5 keyword (Vectorize planned) | **Available** — full SDK factory (`createCloudflareWorldsSdk`) |
+| [`@worlds/indexeddb`](https://jsr.io/@worlds/indexeddb) ([repo](https://github.com/wazootech/worlds-indexeddb))    | Browser IndexedDB          | JS hybrid TF-IDF + cosine        | **Available** — full SDK factory (`createIndexeddbWorldsSdk`)  |
 
 **Backend maturity:** All five durable backends now ship full SDK factories and
 parity-green CI suites. Each assembles a quad store, hybrid search index, and
-SPARQL engine through the standard `create*Sdk` factory. The Deno KV backend
+SPARQL engine through the standard `create*WorldsSdk` factory. The Deno KV backend
 (`@worlds/denokv`) is [archived](https://github.com/wazootech/worlds-denokv);
 use `@worlds/libsql`.
 
@@ -162,12 +162,12 @@ benchmark methodology.
 ### In-memory (dev, tests, demos)
 
 ```typescript
-import { Sdk } from "@worlds/sdk";
+import { WorldsSdk } from "@worlds/sdk";
 import { MemoryStore, WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
 
 const store = new MemoryStore();
-const client = new Sdk({
+const client = new WorldsSdk({
   quadStore: new RdfjsQuadStore({ store }),
   searchIndex: new RdfjsSearchIndex(store),
   sparqlEngine: new WazooSparqlEngine({ store }),

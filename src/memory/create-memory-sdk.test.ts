@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { createMemorySdk } from "./create-memory-sdk.ts";
+import { createMemoryWorldsSdk } from "./create-memory-sdk.ts";
 
 const SEED = [
   '<urn:alice> <urn:likes> "sailing"@en .',
@@ -7,8 +7,8 @@ const SEED = [
   '<urn:alice> <urn:posts> "a public note" <urn:graph:public> .',
 ].join("\n");
 
-Deno.test("createMemorySdk — import → search → SELECT → ASK → reindex end to end", async () => {
-  const sdk = createMemorySdk();
+Deno.test("createMemoryWorldsSdk — import → search → SELECT → ASK → reindex end to end", async () => {
+  const sdk = createMemoryWorldsSdk();
 
   await sdk.import({
     source: {
@@ -42,9 +42,9 @@ Deno.test("createMemorySdk — import → search → SELECT → ASK → reindex 
   assertEquals(reindex.processedQuadCount, 3);
 });
 
-Deno.test("createMemorySdk — each call returns an independent fresh topology", async () => {
-  const first = createMemorySdk();
-  const second = createMemorySdk();
+Deno.test("createMemoryWorldsSdk — each call returns an independent fresh topology", async () => {
+  const first = createMemoryWorldsSdk();
+  const second = createMemoryWorldsSdk();
 
   await first.import({
     source: {
@@ -56,5 +56,5 @@ Deno.test("createMemorySdk — each call returns an independent fresh topology",
 
   const secondExport = await second.export({ format: { kind: "quads" } });
   if (secondExport.kind !== "quads") throw new Error("Expected quads");
-  assertEquals(secondExport.quads.length, 0, "second Sdk must start empty");
+  assertEquals(secondExport.quads.length, 0, "second WorldsSdk must start empty");
 });

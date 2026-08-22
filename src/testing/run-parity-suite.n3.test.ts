@@ -1,9 +1,9 @@
 import { assertEquals } from "@std/assert";
 import { Store } from "n3";
-import { Sdk } from "@/client/client.ts";
+import { WorldsSdk } from "@/client/client.ts";
 import { type Patch, Transaction } from "@/client/quad-store/mod.ts";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@/rdfjs/mod.ts";
-import { createMemorySdk } from "@/memory/mod.ts";
+import { createMemoryWorldsSdk } from "@/memory/mod.ts";
 import { WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { parityCorpus } from "./parity-fixtures.ts";
 import { runParitySuite } from "./run-parity-suite.ts";
@@ -19,9 +19,9 @@ import { runParitySuite } from "./run-parity-suite.ts";
  * implementation detail — the parity contract that matters is that the same
  * worlds yield the same result sets on both stores.
  */
-function createN3Sdk(): Sdk {
+function createN3WorldsSdk(): WorldsSdk {
   const store = new Store();
-  return new Sdk({
+  return new WorldsSdk({
     quadStore: new RdfjsQuadStore({ store }),
     sparqlEngine: new WazooSparqlEngine({
       store,
@@ -43,8 +43,8 @@ Deno.test(
   "runParitySuite - engine MemoryStore and n3.Store agree on the full corpus",
   async () => {
     const report = await runParitySuite({
-      reference: () => createMemorySdk(),
-      candidate: () => createN3Sdk(),
+      reference: () => createMemoryWorldsSdk(),
+      candidate: () => createN3WorldsSdk(),
       strictSearchOrder: false,
     });
 

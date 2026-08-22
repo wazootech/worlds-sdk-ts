@@ -1,5 +1,5 @@
 import type * as rdfjs from "@rdfjs/types";
-import type { SdkInterface } from "@/client/client.ts";
+import type { WorldsSdkInterface } from "@/client/client.ts";
 import {
   type ImportRequest,
   materializeImportQuads,
@@ -21,19 +21,19 @@ import {
 const NQUADS = "application/n-quads";
 const XSD_STRING = "http://www.w3.org/2001/XMLSchema#string";
 
-/** SdkFactory constructs a fresh Sdk (quad store + search + SPARQL wired) for one case. */
-export type SdkFactory = () => Promise<SdkInterface> | SdkInterface;
+/** WorldsSdkFactory constructs a fresh WorldsSdk (quad store + search + SPARQL wired) for one case. */
+export type WorldsSdkFactory = () => Promise<WorldsSdkInterface> | WorldsSdkInterface;
 
 /** ParitySuiteOptions configures a parity run: the reference, the candidate, and the corpus. */
 export interface ParitySuiteOptions {
   /**
-   * reference is the known-good Sdk (libsql-backed) that candidates must
+   * reference is the known-good WorldsSdk (libsql-backed) that candidates must
    * match — the "parity vs libsql" baseline per the shared suite definition.
    */
-  reference: SdkFactory;
+  reference: WorldsSdkFactory;
 
   /** candidate is the backend under test. */
-  candidate: SdkFactory;
+  candidate: WorldsSdkFactory;
 
   /** fixtures overrides the corpus fixtures (defaults to parityCorpus.fixtures). */
   fixtures?: ParityFixture[];
@@ -71,10 +71,10 @@ export interface ParityReport {
 
 /**
  * runParitySuite verifies a candidate durable backend against a reference
- * Sdk on the shared fixture corpus. Every fixture is imported into a fresh
- * pair of Sdks, then checked for: exact quad counts, per-graph counts,
+ * WorldsSdk on the shared fixture corpus. Every fixture is imported into a fresh
+ * pair of WorldsSdks, then checked for: exact quad counts, per-graph counts,
  * idempotent serialized export round-trips, SPARQL results against
- * hand-authored expectations (both Sdks), and search results compared to the
+ * hand-authored expectations (both WorldsSdks), and search results compared to the
  * reference (order-sensitive by default). See the shared parity/benchmark
  * suite definition (wazootech/workspace#72).
  */
@@ -206,8 +206,8 @@ async function runReplaceCase(
 
 async function checkQuadCounts(
   fixtureName: string,
-  ref: SdkInterface,
-  cand: SdkInterface,
+  ref: WorldsSdkInterface,
+  cand: WorldsSdkInterface,
   expected: number,
   failures: string[],
 ): Promise<void> {
@@ -228,7 +228,7 @@ async function checkQuadCounts(
 
 async function checkGraphSizes(
   fixtureName: string,
-  sdk: SdkInterface,
+  sdk: WorldsSdkInterface,
   expected: Record<string, number> | undefined,
   failures: string[],
 ): Promise<void> {
@@ -256,7 +256,7 @@ async function checkGraphSizes(
  */
 async function checkRoundTrip(
   fixtureName: string,
-  candidateFactory: SdkFactory,
+  candidateFactory: WorldsSdkFactory,
   nquads: string,
   failures: string[],
 ): Promise<void> {
@@ -426,7 +426,7 @@ function checkSparqlEquivalence(
   }
 }
 
-async function exportQuads(sdk: SdkInterface): Promise<rdfjs.Quad[]> {
+async function exportQuads(sdk: WorldsSdkInterface): Promise<rdfjs.Quad[]> {
   const response = await sdk.export({ format: { kind: "quads" } });
   if (response.kind !== "quads") {
     throw new Error("export did not return quads");
@@ -435,7 +435,7 @@ async function exportQuads(sdk: SdkInterface): Promise<rdfjs.Quad[]> {
 }
 
 async function exportSerialized(
-  sdk: SdkInterface,
+  sdk: WorldsSdkInterface,
 ): Promise<{ data: string; contentType: string }> {
   const response = await sdk.export({
     format: { kind: "serialized", contentType: NQUADS },
@@ -447,7 +447,7 @@ async function exportSerialized(
 }
 
 async function importNquads(
-  sdk: SdkInterface,
+  sdk: WorldsSdkInterface,
   nquads: string,
   mode: ImportRequest["mode"] = "merge",
 ): Promise<void> {

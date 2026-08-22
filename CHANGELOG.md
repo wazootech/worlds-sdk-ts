@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.6.0
+
+### Breaking
+
+- Renamed public SDK symbols to `Worlds*` prefix for consistency across the org
+  ([workspace#86](https://github.com/wazootech/workspace/issues/86)):
+  `Sdk` → `WorldsSdk`, `SdkInterface` → `WorldsSdkInterface`, `SdkOptions` →
+  `WorldsSdkOptions`, `SdkFactory` → `WorldsSdkFactory` (root barrel and
+  `@worlds/sdk/testing`). The in-memory factory is renamed
+  `createMemorySdk` → `createMemoryWorldsSdk` (`@worlds/sdk/memory`).
+
+### Migration
+
+```typescript
+// Before
+import { Sdk, type SdkInterface, type SdkOptions } from "@worlds/sdk";
+import { createMemorySdk } from "@worlds/sdk/memory";
+import { type SdkFactory } from "@worlds/sdk/testing";
+const client = new Sdk({ quadStore, searchIndex, sparqlEngine });
+
+// After
+import { WorldsSdk, type WorldsSdkInterface, type WorldsSdkOptions } from "@worlds/sdk";
+import { createMemoryWorldsSdk } from "@worlds/sdk/memory";
+import { type WorldsSdkFactory } from "@worlds/sdk/testing";
+const client = new WorldsSdk({ quadStore, searchIndex, sparqlEngine });
+```
+
+Backend factory renames are published simultaneously in their respective packages
+(see workspace#86 for the full mapping).
+
 ## 0.5.0
 
 ### Breaking

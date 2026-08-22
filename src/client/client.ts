@@ -18,9 +18,9 @@ import type {
 } from "./search-index/mod.ts";
 
 /**
- * SdkInterface is the public contract for the Worlds SDK.
+ * WorldsSdkInterface is the public contract for the Worlds SDK.
  */
-export interface SdkInterface {
+export interface WorldsSdkInterface {
   /**
    * import imports data into the Worlds API.
    * @param request The import request body.
@@ -59,9 +59,9 @@ export interface SdkInterface {
 }
 
 /**
- * SdkOptions wires quad, SPARQL, and search facades for custom assembly and tests.
+ * WorldsSdkOptions wires quad, SPARQL, and search facades for custom assembly and tests.
  */
-export interface SdkOptions {
+export interface WorldsSdkOptions {
   /** quadStore manages the ingestion and extraction of triple/quad data. */
   quadStore?: QuadStoreInterface;
 
@@ -73,11 +73,11 @@ export interface SdkOptions {
 }
 
 /**
- * Sdk synthesizes a Worlds SDK facade from wired quad, SPARQL, and search subsystems.
+ * WorldsSdk synthesizes a Worlds SDK facade from wired quad, SPARQL, and search subsystems.
  */
-export class Sdk implements SdkInterface {
+export class WorldsSdk implements WorldsSdkInterface {
   public constructor(
-    private readonly options: SdkOptions,
+    private readonly options: WorldsSdkOptions,
   ) {}
 
   public import(request: ImportRequest): Promise<void> {

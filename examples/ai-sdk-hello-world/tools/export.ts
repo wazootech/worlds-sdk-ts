@@ -1,5 +1,5 @@
 import { tool } from "ai";
-import type { SdkInterface } from "@worlds/sdk";
+import type { WorldsSdkInterface } from "@worlds/sdk";
 import type { ExportRequest } from "@worlds/sdk/quad-store";
 import { z } from "zod";
 
@@ -16,7 +16,7 @@ export type SerializedExportRequest = Omit<ExportRequest, "format"> & {
  * @param client The Worlds Client instance.
  * @returns An AI SDK tool for exporting data from the knowledge base.
  */
-export function createExportRdfTool(client: SdkInterface) {
+export function createExportRdfTool(client: WorldsSdkInterface) {
   return tool({
     description:
       "Export the entire knowledge base graph as serialized RDF data (like Turtle or N-Triples). Use this as a safety hatch or when a full system dump is explicitly requested.",

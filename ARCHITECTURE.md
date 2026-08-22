@@ -12,7 +12,7 @@ backend. Durable backends are published as separate packages.
 
 | Export                      | Role                                                                              |
 | --------------------------- | --------------------------------------------------------------------------------- |
-| `@worlds/sdk`               | Root barrel: `Sdk`, interfaces, patch types, embedding-service, quad-chunker      |
+| `@worlds/sdk`               | Root barrel: `WorldsSdk`, interfaces, patch types, embedding-service, quad-chunker |
 | `@worlds/sdk/quad-store`    | Quad import/export API, RDF formats, patch transactions                           |
 | `@worlds/sdk/search-index`  | Search index interface and types                                                  |
 | `@worlds/sdk/sparql-engine` | SPARQL engine interface                                                           |
@@ -23,7 +23,7 @@ backend. Durable backends are published as separate packages.
 
 | Package                                                                                                      | Persistence                | Search                       | Status                                            |
 | ------------------------------------------------------------------------------------------------------------ | -------------------------- | ---------------------------- | ------------------------------------------------- |
-| [`@worlds/libsql`](https://jsr.io/@worlds/libsql) ([repo](https://github.com/wazootech/worlds-libsql))       | SQLite / Turso Cloud       | Hybrid FTS5 + vector         | **Beta — full SDK factory** (`createLibsqlSdk`)   |
+| [`@worlds/libsql`](https://jsr.io/@worlds/libsql) ([repo](https://github.com/wazootech/worlds-libsql))       | SQLite / Turso Cloud       | Hybrid FTS5 + vector         | **Beta — full SDK factory** (`createLibsqlWorldsSdk`) |
 | [`@worlds/sqlite`](https://jsr.io/@worlds/sqlite) ([repo](https://github.com/wazootech/worlds-sqlite))       | Local file (`node:sqlite`) | — (Layer 2 parked)           | Parked post-beta — `SqliteStore` only, no factory |
 | [`@worlds/postgres`](https://jsr.io/@worlds/postgres) ([repo](https://github.com/wazootech/worlds-postgres)) | PostgreSQL + pgvector      | Hybrid FTS5 + vector (store) | Parked post-beta — raw stores only, no factory    |
 | [`worlds-cloudflare`](https://github.com/wazootech/worlds-cloudflare) (no package yet)                       | — (D1 planned)             | — (Vectorize planned)        | Scaffold only — nothing shipped                   |
@@ -37,27 +37,27 @@ only `@worlds/libsql` ships a full SDK factory today; `@worlds/sqlite`,
 below).
 
 Durable backends implement the same quad store, search index, and SPARQL
-interfaces. The LibSQL backend ships its own factory (`createLibsqlSdk`) that
-assembles a `Sdk` internally.
+interfaces. The LibSQL backend ships its own factory (`createLibsqlWorldsSdk`) that
+assembles a `WorldsSdk` internally.
 
 ## Runtime model
 
 ### Dependency injection
 
-`Sdk` (in `src/client/client.ts`) is a portable facade. All storage and query
+`WorldsSdk` (in `src/client/client.ts`) is a portable facade. All storage and query
 behavior is provided through injected dependencies:
 
 ```typescript
-interface SdkOptions {
+interface WorldsSdkOptions {
   quadStore?: QuadStoreInterface;
   sparqlEngine?: SparqlEngineInterface;
   searchIndex?: SearchIndexInterface;
 }
 ```
 
-`Sdk` delegates each operation to the injected layer:
+`WorldsSdk` delegates each operation to the injected layer:
 
-| Sdk method | Delegates to             |
+| WorldsSdk method | Delegates to         |
 | ---------- | ------------------------ |
 | `import`   | `quadStore.import()`     |
 | `export`   | `quadStore.export()`     |
@@ -68,12 +68,12 @@ interface SdkOptions {
 ### In-memory topology (dev, tests, demos)
 
 ```typescript
-import { Sdk } from "@worlds/sdk";
+import { WorldsSdk } from "@worlds/sdk";
 import { MemoryStore, WazooSparqlEngine } from "@wazoo/sparql-engine";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "@worlds/sdk/rdfjs";
 
 const store = new MemoryStore();
-const client = new Sdk({
+const client = new WorldsSdk({
   quadStore: new RdfjsQuadStore({ store }),
   searchIndex: new RdfjsSearchIndex(store),
   sparqlEngine: new WazooSparqlEngine({ store }),
@@ -86,10 +86,10 @@ Durable backends wrap their own `*QuadStore`, `*SearchIndex`, and `*RdfjsStore`
 implementations inside the factory:
 
 ```typescript
-import { createLibsqlSdk } from "@worlds/libsql";
+import { createLibsqlWorldsSdk } from "@worlds/libsql";
 ```
 
-The factory returns the same `SdkInterface` contract. Application code never
+The factory returns the same `WorldsSdkInterface` contract. Application code never
 needs to import the concrete store implementations directly unless doing custom
 assembly.
 
@@ -137,7 +137,7 @@ The single engine shipped today is:
 
 - **Wazoo** — [`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine) is
   the opinionated minimal default. It is a zero-runtime-dependency SPARQL 1.1 &
-  1.2 engine that implements `SparqlEngineInterface`, drops into a `Sdk`
+  1.2 engine that implements `SparqlEngineInterface`, drops into a `WorldsSdk`
   unchanged, and runs over any `rdfjs.Store` (the engine's `MemoryStore` here;
   `LibsqlRdfjsStore` in the LibSQL backend). It covers SELECT / ASK / CONSTRUCT
   / DESCRIBE plus UPDATE, enforces `timeoutMs`, and accepts a request-level
@@ -181,7 +181,7 @@ is premature public abstraction (YAGNI):
 The three concrete strategy classes live on as **private worlds-libsql
 vocabulary** (`LibsqlConnectionDriver`, `LibsqlSchemaBuilder`,
 `LibsqlSearchQueryBuilder`) — backend-internal, not a published sdk contract.
-Cross-backend composition remains at the `Sdk` seam (`QuadStoreInterface` /
+Cross-backend composition remains at the `WorldsSdk` seam (`QuadStoreInterface` /
 `SearchIndexInterface` / `SparqlEngineInterface`). Do not re-add a provider-seam
 subpath to `@worlds/sdk` in review. Supersedes the seam decisions recorded in
 [worlds-sdk-ts#168](https://github.com/wazootech/worlds-sdk-ts/issues/168) and
@@ -201,7 +201,7 @@ subpath to `@worlds/sdk` in review. Supersedes the seam decisions recorded in
 
 ## Agent integration
 
-For AI agents consuming the `Sdk` API via tools:
+For AI agents consuming the `WorldsSdk` API via tools:
 
 1. Call `client.search()` with a keyword. Use the returned `subject` IRI (not
    `text` alone) as the binding for SPARQL.

@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.5.0
+
+### Breaking
+
+- Quad IDs changed to `q2.` + base64url(sha256(canonical N-Quads)) — a sync
+  canonical N-Quads serializer (`src/client/quad-store/canonical-nquads.ts`)
+  replaces the async `rdf-canonize` dependency
+  ([worlds-sdk-ts#187](https://github.com/wazootech/worlds-sdk-ts/issues/187)).
+  Existing persisted stores are incompatible and must be recreated or reindexed;
+  no migration path is provided.
+- Removed the `@worlds/sdk/tfjs-universal-sentence-encoder` export. The
+  Universal Sentence Encoder embedding service is example code now — copy it
+  from
+  [`examples/tfjs-universal-sentence-encoder/`](examples/tfjs-universal-sentence-encoder/)
+  into your project if you want local, key-free embeddings.
+
+### Changed
+
+- `hashQuads` is synchronous again (no pending-cleanup commit step); callers
+  that awaited the old promise shape can drop the `await`.
+
 ## 0.3.0
 
 ### Breaking

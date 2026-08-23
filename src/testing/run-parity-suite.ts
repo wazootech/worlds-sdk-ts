@@ -29,8 +29,10 @@ export type WorldsSdkFactory = () =>
 /** ParitySuiteOptions configures a parity run: the reference, the candidate, and the corpus. */
 export interface ParitySuiteOptions {
   /**
-   * reference is the known-good WorldsSdk (libsql-backed) that candidates must
-   * match — the "parity vs libsql" baseline per the shared suite definition.
+   * reference is the known-good WorldsSdk that candidates must match — the
+   * parity baseline per the shared suite definition. Backend suites pin
+   * `createMemoryWorldsSdk` (the portable in-memory reference); durable
+   * source-of-truth status lives in ARCHITECTURE.md, not in this option.
    */
   reference: WorldsSdkFactory;
 
@@ -152,7 +154,7 @@ async function runFixtureCase(
 
   if (fixture.gate === "declared") {
     // Declared corpus categories are reported but never fail the suite until
-    // the reference (libsql) supports them (e.g. RDF-star storage).
+    // the durable reference supports them (e.g. RDF-star storage).
     if (failures.length > 0) {
       notes.push(...failures);
       failures.length = 0;

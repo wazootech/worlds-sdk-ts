@@ -21,18 +21,23 @@ backend. Durable backends are published as separate packages.
 
 ### External durable backends
 
-| Package                                                                                                      | Persistence                | Search                       | Status                                                |
-| ------------------------------------------------------------------------------------------------------------ | -------------------------- | ---------------------------- | ----------------------------------------------------- |
-| [`@worlds/libsql`](https://jsr.io/@worlds/libsql) ([repo](https://github.com/wazootech/worlds-libsql))       | SQLite / Turso Cloud       | Hybrid FTS5 + vector         | **Beta — full SDK factory** (`createLibsqlWorldsSdk`) |
-| [`@worlds/sqlite`](https://jsr.io/@worlds/sqlite) ([repo](https://github.com/wazootech/worlds-sqlite))       | Local file (`node:sqlite`) | — (Layer 2 parked)           | Parked post-beta — `SqliteStore` only, no factory     |
-| [`@worlds/postgres`](https://jsr.io/@worlds/postgres) ([repo](https://github.com/wazootech/worlds-postgres)) | PostgreSQL + pgvector      | Hybrid FTS5 + vector (store) | Parked post-beta — raw stores only, no factory        |
-| [`worlds-cloudflare`](https://github.com/wazootech/worlds-cloudflare) (no package yet)                       | — (D1 planned)             | — (Vectorize planned)        | Scaffold only — nothing shipped                       |
+| Package                                                                                                      | Persistence                | Search                       | Status                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------------------ | -------------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`@worlds/libsql`](https://jsr.io/@worlds/libsql) ([repo](https://github.com/wazootech/worlds-libsql))       | SQLite / Turso Cloud       | Hybrid FTS5 + vector         | **Beta — full SDK factory** (`createLibsqlWorldsSdk`)                                                                                           |
+| [`@worlds/sqlite`](https://jsr.io/@worlds/sqlite) ([repo](https://github.com/wazootech/worlds-sqlite))       | Local file (`node:sqlite`) | Hybrid FTS5 + sqlite-vec     | **Available** — full SDK factory (`createSqliteWorldsSdk`); canonical SQLite-family source of truth via its driver-free `./sql-core` plan layer |
+| [`@worlds/postgres`](https://jsr.io/@worlds/postgres) ([repo](https://github.com/wazootech/worlds-postgres)) | PostgreSQL + pgvector      | Hybrid FTS5 + vector (store) | Parked post-beta — raw stores only, no factory                                                                                                  |
+| [`worlds-cloudflare`](https://github.com/wazootech/worlds-cloudflare) (no package yet)                       | — (D1 planned)             | — (Vectorize planned)        | Scaffold only — nothing shipped                                                                                                                 |
 
 The Deno KV backend (`@worlds/denokv`) is
-[archived](https://github.com/wazootech/worlds-denokv); `@worlds/libsql` is the
-supported durable backend. Backend maturity: of the durable backend packages,
-only `@worlds/libsql` ships a full SDK factory today; `@worlds/sqlite`,
-`@worlds/postgres`, and `@worlds/cloudflare` are parked post-beta (see the
+[archived](https://github.com/wazootech/worlds-denokv); `@worlds/libsql` (Turso)
+is the supported cloud durable backend. Backend maturity: `@worlds/libsql` and
+`@worlds/sqlite` both ship full SDK factories; `@worlds/sqlite` is additionally
+the **source of truth for SQLite-family SQL logic** — it is the easiest backend
+to test locally (synchronous `node:sqlite`) and publishes the shared,
+driver-free `./sql-core` plan layer that `@worlds/libsql` consumes for FTS
+sanitization, chunk DDL, keyword branch plans, and search-result identity. Quad
+storage layout and each vector-search dialect intentionally stay backend-local.
+`@worlds/postgres` and `@worlds/cloudflare` remain parked post-beta (see the
 [de-escalated durable-backend seam decision](#durable-backend-seam-removed-from-worldssdk-de-escalated)
 below).
 

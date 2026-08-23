@@ -1,0 +1,5 @@
+#!/bin/sh
+# fmt-check staged files via the repo's Deno toolchain
+staged=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx|md)$')
+[ -z "$staged" ] && exit 0
+exec deno fmt --check $staged

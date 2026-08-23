@@ -9,7 +9,9 @@
  *   typed literals, RDF-star [declared], chunk-boundary texts, empty world,
  *   replace-mode) as plain N-Quads data.
  * - `run-parity-suite.ts` — `runParitySuite`, comparing a candidate backend
- *   against a reference WorldsSdk (libsql) on the corpus.
+ *   against a reference WorldsSdk on the corpus. Backend suites pin
+ *   `createMemoryWorldsSdk` as the portable reference; `@worlds/sqlite` is the
+ *   durable source of truth for SQLite-family behavior.
  */
 export * from "./parity-fixtures.ts";
 export * from "./run-parity-suite.ts";

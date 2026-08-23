@@ -21,5 +21,12 @@ jobs:
         run: deno task ci
       - name: Publish dry run (smoke)
         run: deno task publish:dry
+      - name: Guard duplicate-version no-op publish
+        run: |
+          V=$(grep -m1 '"version"' deno.json | sed 's/.*"\([^"]*\)".*/\1/')
+          if curl -sf "https://jsr.io/@worlds/sdk/meta.json" | grep -q "\"$V\""; then
+            echo "::error::Version $V of @worlds/sdk is already published - bump the version in deno.json or this job ships nothing."
+            exit 1
+          fi
       - name: Publish package
         run: deno publish

@@ -74,6 +74,12 @@ interface WorldsSdkOptions {
 | `search`         | `searchIndex.search()`   |
 | `reindex`        | `searchIndex.reindex()`  |
 
+**Graph-agnostic guarantee (workspace#71, #179):** A world's quads may span the
+default graph and any number of named graphs (unbounded). No backend or SDK code
+constrains a world to a single graph — search scopes by graph via
+`QuadFilter.graphs`, SPARQL queries across graphs, and import/export preserves
+all graph membership.
+
 ### In-memory topology (dev, tests, demos)
 
 ```typescript

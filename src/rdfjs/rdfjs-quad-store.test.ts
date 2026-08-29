@@ -271,3 +271,78 @@ Deno.test("RdfjsQuadStore.export - returns serialized dump", async () => {
   assertEquals(response.contentType, "text/turtle");
   assertEquals(response.data.includes("value1"), true);
 });
+
+/**
+ * Verifies one-world-many-graphs guarantee (workspace#71, #179): a single
+ * world can hold the default graph plus multiple named graphs, and an
+ * export round-trip preserves every graph membership.
+ */
+Deno.test("RdfjsQuadStore - multi-graph import and export round-trip preserves all graphs", async () => {
+  const defaultGraphQuad = quad(
+    namedNode("urn:alice"),
+    namedNode("urn:likes"),
+    literal("sailing"),
+  );
+  const publicGraphQuad = quad(
+    namedNode("urn:alice"),
+    namedNode("urn:posted"),
+    literal("alice wrote a public note"),
+    namedNode("urn:graph:public"),
+  );
+  const privateGraphQuad = quad(
+    namedNode("urn:alice"),
+    namedNode("urn:stores"),
+    literal("confidential key material"),
+    namedNode("urn:graph:private"),
+  );
+
+  const store = new Store();
+  const rdfjsStore = new RdfjsQuadStore({ store });
+
+  await rdfjsStore.import({
+    source: {
+      kind: "quads",
+      quads: [defaultGraphQuad, publicGraphQuad, privateGraphQuad],
+    },
+  });
+
+  // All three quads imported across three distinct graphs
+  assertEquals(store.size, 3);
+
+  // Export and verify every graph survives the round-trip
+  const response = await rdfjsStore.export({ format: { kind: "quads" } });
+  if (response.kind !== "quads") throw new Error("Expected kind quads");
+
+  const graphValues = response.quads.map((q) => q.graph.value).sort();
+  assertEquals(
+    graphValues,
+    ["", "urn:graph:private", "urn:graph:public"],
+    "default graph + two named graphs preserved after round-trip",
+  );
+
+  // Verify each specific quad survived
+  assertEquals(
+    response.quads.some((q) =>
+      q.graph.value === "" && q.subject.value === "urn:alice" &&
+      q.object.value === "sailing"
+    ),
+    true,
+    "default-graph quad survived",
+  );
+  assertEquals(
+    response.quads.some((q) =>
+      q.graph.value === "urn:graph:public" &&
+      q.object.value === "alice wrote a public note"
+    ),
+    true,
+    "public-graph quad survived",
+  );
+  assertEquals(
+    response.quads.some((q) =>
+      q.graph.value === "urn:graph:private" &&
+      q.object.value === "confidential key material"
+    ),
+    true,
+    "private-graph quad survived",
+  );
+});

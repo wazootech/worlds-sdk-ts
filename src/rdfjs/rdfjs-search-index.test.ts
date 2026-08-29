@@ -73,6 +73,79 @@ Deno.test("RdfjsSearchIndex.search - exclusion filters correctly strip matching 
   );
 });
 
+Deno.test("RdfjsSearchIndex.search - graph-scoped include limits results to the named graph", async () => {
+  const store = new Store();
+  // Default graph: alice writes a public note
+  store.addQuad(
+    DataFactory.namedNode("urn:alice"),
+    DataFactory.namedNode("urn:posted"),
+    DataFactory.literal("alice wrote a public note"),
+    DataFactory.namedNode("urn:graph:public"),
+  );
+  // Default graph: bob writes a public note
+  store.addQuad(
+    DataFactory.namedNode("urn:bob"),
+    DataFactory.namedNode("urn:posted"),
+    DataFactory.literal("bob is public too"),
+    DataFactory.namedNode("urn:graph:public"),
+  );
+  // Private graph: alice stores confidential material
+  store.addQuad(
+    DataFactory.namedNode("urn:alice"),
+    DataFactory.namedNode("urn:stores"),
+    DataFactory.literal("confidential key material for alice"),
+    DataFactory.namedNode("urn:graph:private"),
+  );
+
+  const searchIndex = new RdfjsSearchIndex(store);
+
+  // Scoping to public graph should return only public-graph results
+  const publicResults = await searchIndex.search({
+    query: "alice",
+    include: { graphs: ["urn:graph:public"] },
+  });
+  const publicHits = publicResults.results ?? [];
+  assertEquals(publicHits.length, 1);
+  assertEquals(publicHits[0].graph, "urn:graph:public");
+  assertEquals(publicHits[0].text, "alice wrote a public note");
+
+  // Scoping to private graph should return only private-graph results
+  const privateResults = await searchIndex.search({
+    query: "confidential",
+    include: { graphs: ["urn:graph:private"] },
+  });
+  const privateHits = privateResults.results ?? [];
+  assertEquals(privateHits.length, 1);
+  assertEquals(privateHits[0].graph, "urn:graph:private");
+});
+
+Deno.test("RdfjsSearchIndex.search - graph-scoped exclude strips results from the named graph", async () => {
+  const store = new Store();
+  store.addQuad(
+    DataFactory.namedNode("urn:alice"),
+    DataFactory.namedNode("urn:posted"),
+    DataFactory.literal("public note"),
+    DataFactory.namedNode("urn:graph:public"),
+  );
+  store.addQuad(
+    DataFactory.namedNode("urn:alice"),
+    DataFactory.namedNode("urn:stores"),
+    DataFactory.literal("private note"),
+    DataFactory.namedNode("urn:graph:private"),
+  );
+
+  const searchIndex = new RdfjsSearchIndex(store);
+
+  // Excluding the private graph should hide private-graph results
+  const response = await searchIndex.search({
+    query: "note",
+    exclude: { graphs: ["urn:graph:private"] },
+  });
+  const hits = response.results ?? [];
+  assertEquals(hits.length, 1);
+  assertEquals(hits[0].graph, "urn:graph:public");
+});
+
 Deno.test("RdfjsSearchIndex.search - ignores structured primitives to suppress search space noise", async () => {
   const store = new Store();
 

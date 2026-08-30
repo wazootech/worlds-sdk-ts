@@ -56,6 +56,7 @@
         "check",
         "test"
       ]
-    }
+    },
+    "example:wazoo-hello-world": "deno -A --env ./examples/wazoo-hello-world/main.ts"
   }
 }

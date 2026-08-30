@@ -5,6 +5,7 @@ import type {
   SparqlRequest,
   SparqlResponse,
 } from "@/client/sparql-engine/mod.ts";
+import { parseNQuadsTerm } from "./term-parser.ts";
 
 /**
  * RemoteSparqlEngine implements SparqlEngineInterface by delegating to the
@@ -155,11 +156,11 @@ function quadFromApi(q: Record<string, unknown>): rdfjs.Quad {
   return {
     termType: "Quad",
     value: "",
-    subject: rdfTermFromApi(q.subject as string),
-    predicate: rdfTermFromApi(q.predicate as string),
-    object: rdfTermFromApi(q.object as string),
+    subject: parseNQuadsTerm(q.subject as string),
+    predicate: parseNQuadsTerm(q.predicate as string),
+    object: parseNQuadsTerm(q.object as string),
     graph: q.graph
-      ? rdfTermFromApi(q.graph as string)
+      ? parseNQuadsTerm(q.graph as string)
       : { termType: "DefaultGraph", value: "" },
     equals(other: rdfjs.Term): boolean {
       if (other.termType !== "Quad") return false;
@@ -168,11 +169,4 @@ function quadFromApi(q: Record<string, unknown>): rdfjs.Quad {
         this.object.equals(other.object);
     },
   } as rdfjs.Quad;
-}
-
-function rdfTermFromApi(value: string): rdfjs.Term {
-  if (value.startsWith("_:")) {
-    return { termType: "BlankNode", value: value.slice(2) } as rdfjs.Term;
-  }
-  return { termType: "NamedNode", value } as rdfjs.Term;
 }

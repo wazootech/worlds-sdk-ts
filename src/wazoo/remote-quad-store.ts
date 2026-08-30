@@ -8,6 +8,7 @@ import type {
   ImportRequest,
   QuadStoreInterface,
 } from "@/client/quad-store/mod.ts";
+import { parseNQuadsTerm } from "./term-parser.ts";
 
 /**
  * RemoteQuadStore implements QuadStoreInterface by delegating to the Worlds
@@ -89,11 +90,11 @@ function apiQuadToRdfjs(
   return {
     termType: "Quad" as const,
     value: "",
-    subject: termFromApi(q.subject) as rdfjs.Quad_Subject,
-    predicate: termFromApi(q.predicate) as rdfjs.Quad_Predicate,
-    object: termFromApi(q.object) as rdfjs.Quad_Object,
+    subject: parseNQuadsTerm(q.subject) as rdfjs.Quad_Subject,
+    predicate: parseNQuadsTerm(q.predicate) as rdfjs.Quad_Predicate,
+    object: parseNQuadsTerm(q.object) as rdfjs.Quad_Object,
     graph: q.graph
-      ? termFromApi(q.graph) as rdfjs.Quad_Graph
+      ? parseNQuadsTerm(q.graph) as rdfjs.Quad_Graph
       : { termType: "DefaultGraph" as const, value: "" } as rdfjs.DefaultGraph,
     equals(other: rdfjs.Term): boolean {
       if (other.termType !== "Quad") return false;
@@ -102,57 +103,4 @@ function apiQuadToRdfjs(
         this.object.equals(other.object);
     },
   };
-}
-
-/**
- * termFromApi converts a string IRI/bnode/literal from the Worlds API
- * into an RDF/JS term.
- */
-function termFromApi(value: string): rdfjs.Term {
-  if (value.startsWith("_:")) {
-    return { termType: "BlankNode", value: value.slice(2) } as rdfjs.Term;
-  }
-
-  if (value.startsWith('"')) {
-    // Simple literal: "value" or "value"^^<datatype> or "value"@lang
-    const match = value.match(
-      /^"(.*)"(?:\^\^(<.*>))?(@.*)?$/,
-    );
-    if (match) {
-      const [, lexical, datatype, lang] = match;
-      if (lang) {
-        return {
-          termType: "Literal",
-          value: lexical,
-          language: lang.slice(1),
-          datatype: {
-            termType: "NamedNode",
-            value: "http://www.w3.org/2001/XMLSchema#string",
-          },
-        } as rdfjs.Term;
-      }
-      if (datatype) {
-        return {
-          termType: "Literal",
-          value: lexical,
-          language: "",
-          datatype: {
-            termType: "NamedNode",
-            value: datatype,
-          },
-        } as rdfjs.Term;
-      }
-      return {
-        termType: "Literal",
-        value: lexical,
-        language: "",
-        datatype: {
-          termType: "NamedNode",
-          value: "http://www.w3.org/2001/XMLSchema#string",
-        },
-      } as rdfjs.Term;
-    }
-  }
-
-  return { termType: "NamedNode", value } as rdfjs.Term;
 }

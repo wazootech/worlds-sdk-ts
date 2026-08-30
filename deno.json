@@ -13,7 +13,8 @@
     "./memory": "./src/memory/mod.ts",
     "./ai-sdk": "./src/ai-sdk/mod.ts",
     "./tfjs-use": "./src/tfjs-use/mod.ts",
-    "./testing": "./src/testing/mod.ts"
+    "./testing": "./src/testing/mod.ts",
+    "./wazoo": "./src/wazoo/mod.ts"
   },
   "imports": {
     "@/": "./src/",
@@ -32,7 +33,8 @@
     "n3": "npm:n3@^2.0.3",
     "@langchain/core": "npm:@langchain/core@^1.1.48",
     "@langchain/textsplitters": "npm:@langchain/textsplitters@^1.0.1",
-    "zod": "npm:zod@^4.4.3"
+    "zod": "npm:zod@^4.4.3",
+    "@worlds/client": "jsr:@worlds/client@^0.1.0"
   },
   "tasks": {
     "download:tfjs-use": "deno -A ./scripts/download-tfjs-use.ts",
@@ -54,6 +56,7 @@
         "check",
         "test"
       ]
-    }
+    },
+    "example:wazoo-hello-world": "deno -A --env ./examples/wazoo-hello-world/main.ts"
   }
 }

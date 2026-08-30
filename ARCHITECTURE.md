@@ -205,7 +205,8 @@ recorded in
 
 ## Non-goals
 
-- `@worlds/sdk` does not include a hosted Wazoo API client.
+- The hosted Worlds API client (`@worlds/sdk/wazoo`) is available via
+  `createWazooSdk`, backed by `@worlds/client` (peer dependency).
 - Durable/immediate persistent backends (LibSQL) are not implemented inside this
   package. They ship in separate JSR packages with different lifecycle and
   dependency profiles.

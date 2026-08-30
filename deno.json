@@ -12,6 +12,7 @@
     "./rdfjs": "./src/rdfjs/mod.ts",
     "./memory": "./src/memory/mod.ts",
     "./ai-sdk": "./src/ai-sdk/mod.ts",
+    "./tfjs-use": "./src/tfjs-use/mod.ts",
     "./testing": "./src/testing/mod.ts"
   },
   "imports": {
@@ -34,7 +35,7 @@
     "zod": "npm:zod@^4.4.3"
   },
   "tasks": {
-    "download:tfjs-use": "deno -A ./examples/tfjs-universal-sentence-encoder/download-tfjs-use.ts",
+    "download:tfjs-use": "deno -A ./scripts/download-tfjs-use.ts",
     "example:hello-world": "deno -A ./examples/hello-world/main.ts",
     "example:ai-sdk-hello-world": "deno -A --env ./examples/ai-sdk-hello-world/main.ts",
     "example:tfjs-universal-sentence-encoder": "deno -A ./examples/tfjs-universal-sentence-encoder/main.ts",

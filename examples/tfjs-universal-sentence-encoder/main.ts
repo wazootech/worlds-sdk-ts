@@ -1,4 +1,4 @@
-import { UniversalSentenceEncoderEmbeddingService } from "./universal-sentence-encoder-embedding-service.ts";
+import { UniversalSentenceEncoderEmbeddingService } from "@worlds/sdk/tfjs-use";
 
 if (import.meta.main) {
   const service = new UniversalSentenceEncoderEmbeddingService();

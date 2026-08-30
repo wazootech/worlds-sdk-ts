@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.7.0
+
+### Added
+
+- Re-added `@worlds/sdk/tfjs-use` export subpath
+  ([worlds-sdk-ts#188](https://github.com/wazootech/worlds-sdk-ts/issues/188)):
+  `UniversalSentenceEncoderEmbeddingService` provides 512-dimensional text
+  embeddings using the TF.js Universal Sentence Encoder lite graph model. The
+  service implements `EmbeddingService` and uses a unified `Options` constructor
+  pattern (`UniversalSentenceEncoderEmbeddingServiceOptions`). USE tokenizer
+  (SentencePiece-style vocabulary + trie) is included under
+  `src/tfjs-use/tokenizer/`. The download script moved from
+  `examples/tfjs-universal-sentence-encoder/download-tfjs-use.ts` to
+  `scripts/download-tfjs-use.ts`; run `deno task download:tfjs-use` to cache
+  model artifacts for offline use.
+
+### Added (test)
+
+- `src/client/quad-store/rdf-formats.test.ts`: first test suite for
+  `rdf-formats.ts` covering FORMATS mapping, getFormat defaults, TriG
+  named-graph block parsing, N-Quads graph term parsing, Turtle export
+  round-trip with named-graph syntax assertions, exportQuadsResponse serialized
+  round-trip, and materializeImportQuads from serialized TriG and dataset
+  sources
+  ([worlds-sdk-ts#167](https://github.com/wazootech/worlds-sdk-ts/issues/167)).
+
+# Changelog
+
 ## 0.6.0
 
 ### Breaking

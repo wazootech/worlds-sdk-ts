@@ -9,6 +9,7 @@
     "jsr:@std/internal@^1.0.12": "1.0.14",
     "jsr:@std/internal@^1.0.14": "1.0.14",
     "jsr:@std/path@^1.1.5": "1.1.5",
+    "jsr:@wazoo/sparql-engine@*": "0.4.1",
     "jsr:@wazoo/sparql-engine@~0.4.1": "0.4.1",
     "npm:@ai-sdk/google@^3.0.80": "3.0.80_zod@4.4.3",
     "npm:@langchain/core@^1.1.48": "1.1.48",

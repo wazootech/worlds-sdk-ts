@@ -12,6 +12,11 @@ import type {
 /**
  * RemoteQuadStore implements QuadStoreInterface by delegating to the Worlds
  * data-plane API via @worlds/client.
+ *
+ * Limitations vs local backends:
+ * - `import.mode` is ignored (the API always merges). Replace semantics are
+ *   not supported by the data-plane API.
+ * - `export` does not support QuadFilter (include/exclude) scoping.
  */
 export class RemoteQuadStore implements QuadStoreInterface {
   constructor(
@@ -91,9 +96,10 @@ function apiQuadToRdfjs(
       ? termFromApi(q.graph) as rdfjs.Quad_Graph
       : { termType: "DefaultGraph" as const, value: "" } as rdfjs.DefaultGraph,
     equals(other: rdfjs.Term): boolean {
-      return this.subject.equals(other) &&
-        this.predicate.equals(other) &&
-        this.object.equals(other);
+      if (other.termType !== "Quad") return false;
+      return this.subject.equals(other.subject) &&
+        this.predicate.equals(other.predicate) &&
+        this.object.equals(other.object);
     },
   };
 }

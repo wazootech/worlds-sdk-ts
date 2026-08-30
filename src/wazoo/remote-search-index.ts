@@ -10,6 +10,13 @@ import type {
 /**
  * RemoteSearchIndex implements SearchIndexInterface by delegating to the Worlds
  * data-plane API via @worlds/client.
+ *
+ * Limitations vs local backends:
+ * - `search` QuadFilter (include/exclude) is ignored. The API does not support
+ *   graph-scoped search filtering.
+ * - `reindex` QuadFilter and readPageSize are ignored. The server-side reindex
+ *   is opaque; the response always reports 0 for processedQuadCount and
+ *   chunkRowCount.
  */
 export class RemoteSearchIndex implements SearchIndexInterface {
   constructor(

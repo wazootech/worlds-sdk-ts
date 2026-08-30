@@ -9,6 +9,10 @@ import type {
 /**
  * RemoteSparqlEngine implements SparqlEngineInterface by delegating to the
  * Worlds data-plane API via @worlds/client.
+ *
+ * Limitations vs local engines:
+ * - `baseIri`, `timeoutMs`, and `signal` are ignored. The API determines
+ *   timeout and does not support abort signals.
  */
 export class RemoteSparqlEngine implements SparqlEngineInterface {
   constructor(
@@ -158,9 +162,10 @@ function quadFromApi(q: Record<string, unknown>): rdfjs.Quad {
       ? rdfTermFromApi(q.graph as string)
       : { termType: "DefaultGraph", value: "" },
     equals(other: rdfjs.Term): boolean {
-      return this.subject.equals(other) &&
-        this.predicate.equals(other) &&
-        this.object.equals(other);
+      if (other.termType !== "Quad") return false;
+      return this.subject.equals(other.subject) &&
+        this.predicate.equals(other.predicate) &&
+        this.object.equals(other.object);
     },
   } as rdfjs.Quad;
 }

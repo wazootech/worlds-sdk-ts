@@ -473,7 +473,7 @@ Deno.test("RemoteSparqlEngine.execute throws on API error", async () => {
 
 Deno.test("createWazooSdk returns a WorldsSdkInterface", () => {
   const sdk = createWazooSdk({
-    baseUrl: "https://worlds-api.wazoo.dev",
+    baseUrl: "https://data.wazoo.dev",
     token: "test-token",
     worldId: "w_test",
   });

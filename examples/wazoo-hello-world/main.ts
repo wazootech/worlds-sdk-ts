@@ -4,7 +4,7 @@ import { createWazooSdk } from "@worlds/sdk/wazoo";
  * Wazoo Hello World — connects to a hosted Worlds API via createWazooSdk.
  *
  * Environment variables:
- *   WORLDS_BASE_URL  — Worlds data-plane API root (default: https://worlds-api.wazoo.dev)
+ *   WORLDS_BASE_URL  — Worlds data-plane API root (default: https://data.wazoo.dev)
  *   WORLDS_TOKEN     — Bearer token for authentication (required)
  *   WORLDS_WORLD_ID  — Canonical world identifier, e.g. w_<uuid> (required)
  *
@@ -13,7 +13,7 @@ import { createWazooSdk } from "@worlds/sdk/wazoo";
  */
 if (import.meta.main) {
   const baseUrl = Deno.env.get("WORLDS_BASE_URL") ??
-    "https://worlds-api.wazoo.dev";
+    "https://data.wazoo.dev";
   const token = Deno.env.get("WORLDS_TOKEN");
   const worldId = Deno.env.get("WORLDS_WORLD_ID");
 

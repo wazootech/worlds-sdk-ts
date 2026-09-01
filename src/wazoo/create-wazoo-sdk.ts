@@ -31,7 +31,7 @@ export interface CreateWazooSdkOptions {
  * import { createWazooSdk } from "@worlds/sdk/wazoo";
  *
  * const sdk = createWazooSdk({
- *   baseUrl: "https://worlds-api.wazoo.dev",
+ *   baseUrl: "https://data.wazoo.dev",
  *   token: process.env.WORLDS_TOKEN!,
  *   worldId: "w_my-world",
  * });

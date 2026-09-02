@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.9.0
+
+### Added
+
+- `SearchMode` type and optional `SearchResponse.mode` field (Phase C,
+  [worlds-cloudflare](https://github.com/wazootech/worlds-cloudflare)):
+  `SearchResponse` now carries an optional `mode: SearchMode`
+  (`"semantic" | "keyword" | "hybrid" | "fallback"`) mirroring the hosted search
+  contract D5 (worlds-api#30), so backends report which search mode actually ran
+  instead of leaving consumers to assume semantic. Optional for backward
+  compatibility — non-conforming backends omit it.
+
 ## 0.8.1
 
 ### Added
@@ -63,8 +75,6 @@
   round-trip, and materializeImportQuads from serialized TriG and dataset
   sources
   ([worlds-sdk-ts#167](https://github.com/wazootech/worlds-sdk-ts/issues/167)).
-
-# Changelog
 
 ## 0.6.0
 
@@ -211,8 +221,7 @@ packages (see workspace#86 for the full mapping).
 - Renamed `createLibsqlAdapter` → `createLibsqlClient` (and matching
   `LibsqlClientOptions`). Same pattern for RDF/JS and Deno KV.
 - Removed `createLibsqlClientFromStores`, `createLibsqlClientInfrastructure`,
-  `createLibsqlStores`, `createDenokvClientFromStores`, and
-  `createDenokvStores`. Custom assembly uses explicit
+  `createLibsqlStores`, `createDenokvStores`. Custom assembly uses explicit
   `new Client({ quadStore, searchIndex, sparqlEngine? })`.
 - Narrowed `@worlds/sdk/adapters/libsql` and `@worlds/sdk/adapters/denokv`
   exports to factory entry points, suffixed stores, and search helpers; SQL/KV

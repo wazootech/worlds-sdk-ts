@@ -16,11 +16,25 @@ export interface SearchRequest extends QuadFilter {
 }
 
 /**
+ * SearchMode is the set of search modes a backend can actually run, mirroring
+ * the hosted search contract (worlds-api#30 D5): `semantic` (vector only),
+ * `keyword` (full-text only), `hybrid` (both fused), or `fallback` (LIKE).
+ */
+export type SearchMode = "semantic" | "keyword" | "hybrid" | "fallback";
+
+/**
  * SearchResponse packages the set of discovered triple hits.
  */
 export interface SearchResponse {
   /** Total collected hits matching criteria. */
   results?: Array<SearchResult>;
+
+  /**
+   * mode reports which search mode actually ran (hosted search contract D5).
+   * Optional for backward compatibility — backends that have not yet conformed
+   * omit it and are treated as keyword-ranked by consumers.
+   */
+  mode?: SearchMode;
 }
 
 /**
@@ -95,10 +109,10 @@ export interface SearchResult {
  */
 export interface SearchIndexInterface {
   /**
-   * search executes a keyword query against the indexed graph data.
+   * search executes a keyword and/or vector query against the indexed graph data.
    *
    * @param request contains the raw query string and optional include/exclude boundary filters.
-   * @returns promise resolving to a set of relevancy-ranked triple matches.
+   * @returns promise resolving to a set of relevancy-ranked triple matches plus the mode that ran.
    */
   search(request: SearchRequest): Promise<SearchResponse>;
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.8.1
+
+### Added
+
+- Optional `SearchResult.scoreType` field
+  ([worlds-cloudflare#30](https://github.com/wazootech/worlds-cloudflare/issues/30)):
+  `SearchResult` now carries an optional `scoreType: SearchScoreType`
+  (`"rrf" | "cosine" | "unranked"`) so conforming backends can label which
+  scoring family `score` expresses, per the hosted search contract D7
+  (worlds-api#30). Optional for backward compatibility — backends that have not
+  yet conformed simply omit it.
+
 ## 0.8.0
 
 ### Added

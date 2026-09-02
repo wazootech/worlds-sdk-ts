@@ -1,4 +1,5 @@
 import type { QuadFilter } from "@/client/quad-store/mod.ts";
+import type { SearchScoreType } from "@/client/search-index/rrf-score.ts";
 
 /**
  * SearchRequest defines the parameters for executing a keyword search, extending central QuadFilter rules.
@@ -73,10 +74,20 @@ export interface SearchResult {
    *   should be treated as null-equivalent by consumers.
    *
    * The `SearchScoreType` union (`"rrf" | "cosine" | "unranked"`) in
-   * `rrf-score.ts` enumerates these families; backends opt in to emitting it
-   * as part of the hosted search contract rollout (worlds-cloudflare#30).
+   * `rrf-score.ts` enumerates these families; backends opt in to emitting
+   * `scoreType` as part of the hosted search contract rollout
+   * (worlds-cloudflare#30).
    */
   score: number;
+
+  /**
+   * scoreType identifies which scoring family score expresses. `rrf` results
+   * are normalized with 1.0 = best; `cosine` results are similarly bounded;
+   * `unranked` results carry no ordering meaning (e.g. fallback search) and
+   * should be treated as null-equivalent by consumers. Optional for backward
+   * compatibility — backends that have not yet conformed omit it.
+   */
+  scoreType?: SearchScoreType;
 }
 
 /**

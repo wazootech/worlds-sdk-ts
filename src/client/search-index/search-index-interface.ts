@@ -60,7 +60,21 @@ export interface SearchResult {
   text: string;
 
   /**
-   * score is the combined rank of the hit (Reciprocal Rank Fusion).
+   * score is the relevance score of the hit on the hosted search contract
+   * scale (worlds-api#30 D7): a number in [0, 1] where 1.0 = best.
+   *
+   * - `rrf` scores are reciprocal rank fusion normalized via the
+   *   `normalizeRrfScore` mapper (score = `k / (k + rank)`, k = 60, exported
+   *   from this module's sibling `rrf-score.ts`), so rank 0 maps to exactly
+   *   1.0 — raw `1/(k+rank)` values are NOT the contract scale and must be
+   *   normalized before comparison against `minScore`.
+   * - `cosine` scores are vector cosine similarity, already in [0, 1].
+   * - `unranked` scores carry no ordering meaning (e.g. fallback search) and
+   *   should be treated as null-equivalent by consumers.
+   *
+   * The `SearchScoreType` union (`"rrf" | "cosine" | "unranked"`) in
+   * `rrf-score.ts` enumerates these families; backends opt in to emitting it
+   * as part of the hosted search contract rollout (worlds-cloudflare#30).
    */
   score: number;
 }

@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.8.0
+
+### Added
+
+- Shared rrf score normalization mapper
+  ([worlds-sdk-ts#206](https://github.com/wazootech/worlds-sdk-ts/issues/206)):
+  `normalizeRrfScore(rank, k = 60)` normalizes raw reciprocal rank fusion scores
+  to the
+  [hosted search contract](https://github.com/wazootech/worlds-api/issues/30) D7
+  scale — `score = k / (k + rank)`, rank 0 → 1.0, strictly decreasing, in (0, 1]
+  for all finite ranks — as the single normalization point for all backends
+  (sqlite, libsql, indexeddb, cloudflare). Exported from
+  `@worlds/sdk/search-index` (`src/client/search-index/rrf-score.ts`) along with
+  `SearchScoreType` (`"rrf" | "cosine" | "unranked"`) and `DEFAULT_RRF_K` (60).
+  `SearchResult.score` docs updated to the contract scale; the hybrid fused-list
+  factor is deferred to Phase C
+  ([worlds-cloudflare#30](https://github.com/wazootech/worlds-cloudflare/issues/30)).
+
+### Added (test)
+
+- `src/client/search-index/rrf-score.test.ts`: `normalizeRrfScore` coverage for
+  rank 0 → 1.0, strict monotone decrease across wide rank ranges, (0, 1] bounds,
+  k edge cases (default 60, k = 1, larger-k behavior), asymptotic near-zero at
+  far ranks, and RangeError rejection of invalid rank/k
+  ([worlds-sdk-ts#206](https://github.com/wazootech/worlds-sdk-ts/issues/206)).
+
 ## 0.7.0
 
 ### Added

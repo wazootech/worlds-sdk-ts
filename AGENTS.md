@@ -24,7 +24,7 @@ Before working across Wazoo repositories:
 
 Do not clone, copy, scaffold, or create worktrees for sibling projects inside
 this repository. Local spillover folders such as `_wazoo-*`, `_worlds-*`,
-`_wazoopedia`, and `_console-worktrees` are ignored only as a last-resort guard;
+`_memory`, and `_console-worktrees` are ignored only as a last-resort guard;
 their presence indicates the environment should be cleaned up before continuing.
 
 Workspace-boundary or local-environment fixes MUST be committed atomically. Do

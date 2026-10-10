@@ -21,12 +21,19 @@ jobs:
         run: deno task ci
       - name: Publish dry run (smoke)
         run: deno task publish:dry
-      - name: Guard duplicate-version no-op publish
+      # A push to main that does not bump deno.json's version is routine (docs,
+      # CI, refactors): skip the publish green with a notice instead of failing
+      # main. A bumped version publishes. See wazootech/workspace#138.
+      - name: Check whether this version is already on JSR
+        id: guard
         run: |
           V=$(grep -m1 '"version"' deno.json | sed 's/.*"\([^"]*\)".*/\1/')
           if curl -sf "https://jsr.io/@worlds/sdk/meta.json" | grep -q "\"$V\""; then
-            echo "::error::Version $V of @worlds/sdk is already published - bump the version in deno.json or this job ships nothing."
-            exit 1
+            echo "::notice::Version $V of @worlds/sdk is already on JSR; nothing to publish. Bump the version in deno.json to release."
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Publish package
+        if: steps.guard.outputs.published == 'false'
         run: deno publish

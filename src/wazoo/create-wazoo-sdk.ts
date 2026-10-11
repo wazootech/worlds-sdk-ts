@@ -15,7 +15,7 @@ export interface CreateWazooSdkOptions {
   /** token is the Bearer token used to authenticate requests. */
   token: string;
 
-  /** worldId is the canonical world identifier (e.g. w_<uuid>). */
+  /** worldId is the canonical world identifier (e.g. w_<ULID>). */
   worldId: string;
 }
 

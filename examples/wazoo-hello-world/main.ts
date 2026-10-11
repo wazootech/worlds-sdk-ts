@@ -6,7 +6,7 @@ import { createWazooSdk } from "@worlds/sdk/wazoo";
  * Environment variables:
  *   WORLDS_BASE_URL  — Worlds data-plane API root (default: https://data.wazoo.dev)
  *   WORLDS_TOKEN     — Bearer token for authentication (required)
- *   WORLDS_WORLD_ID  — Canonical world identifier, e.g. w_<uuid> (required)
+ *   WORLDS_WORLD_ID  — Canonical world identifier, e.g. w_<ULID> (required)
  *
  * Usage:
  *   WORLDS_TOKEN=xxx WORLDS_WORLD_ID=w_xxx deno task example:wazoo-hello-world

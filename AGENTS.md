@@ -435,3 +435,17 @@ archived; agent evaluation and memory benchmarking continues in
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for package topology, scale
 considerations, and benchmark references.
+
+## Code health
+
+Family-wide rules live in the
+[wazootech workspace constitution](https://github.com/wazootech/workspace/blob/main/AGENTS.md#code-health-standards);
+this repo's specifics:
+
+- Before pushing, run `deno task ci` (fmt, lint, check, test).
+- `deno lint` keeps `no-explicit-any` on; use real types or `unknown`.
+- `@ts-ignore` is not used; prefer `@ts-expect-error` with a reason.
+- Actions are pinned to commit SHAs, and CI pins Deno to `v2.9.8`.
+- `secret-scan.yml` (gitleaks) runs on every PR; `code-health.yml` only warns
+  about file length and unlinked TODOs; `CODEOWNERS` assigns review.
+- Publishing to JSR runs from `main` and needs approval.

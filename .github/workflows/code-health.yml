@@ -15,12 +15,12 @@ jobs:
           # Counts lines of code, skipping blank, comment, and import/re-export
           # statements (including wrapped multi-line `import {` / `export { ... } from`).
           cat > "$RUNNER_TEMP/count.awk" <<'AWK'
-          inimp { if ($0 ~ /from[ \t]+["'][^"']*["'];?[ \t]*$/ || $0 ~ /^[ \t]*\};?[ \t]*$/) inimp = 0; next }
-          /^[ \t]*($|\/\/|\/\*|\*)/ { next }
-          /^[ \t]*(import[ \t{*]|export[ \t]+(type[ \t]+)?\{|export[ \t]+\*)/ {
-            if ($0 !~ /from[ \t]+["'][^"']*["'];?[ \t]*$/ && $0 !~ /^[ \t]*import[ \t]+["']/ && $0 !~ /;[ \t]*$/) inimp = 1
+          inimp { if ($0 ~ /from[ \t]*["'][^"']+["'];?[ \t]*$/ || $0 ~ /^[ \t]*\}/) inimp = 0; next }
+          /^[ \t]*(import[ \t]|export[ \t]+(type[ \t]+)?(\{|\*))/ {
+            if ($0 !~ /from[ \t]*["'][^"']+["'];?[ \t]*$/ && $0 !~ /^[ \t]*import[ \t]*["']/ && $0 !~ /\}/) inimp = 1
             next
           }
+          /^[ \t]*($|\/\/|\/\*|\*)/ { next }
           { n++ }
           END { print n + 0 }
           AWK

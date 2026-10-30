@@ -10,27 +10,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: File length (warn-only; 120 src / 300 test, blank/comment/import lines excluded)
+      - name: File length (enforced; 120 src / 300 test, blank/comment/import lines excluded)
         run: |
           # Counts lines of code, skipping blank, comment, and import/re-export
           # statements (including wrapped multi-line `import {` / `export { ... } from`).
           cat > "$RUNNER_TEMP/count.awk" <<'AWK'
-          inimp { if ($0 ~ /from[ \t]+["'][^"']*["'];?[ \t]*$/ || $0 ~ /^[ \t]*\};?[ \t]*$/) inimp = 0; next }
-          /^[ \t]*($|\/\/|\/\*|\*)/ { next }
-          /^[ \t]*(import[ \t{*]|export[ \t]+(type[ \t]+)?\{|export[ \t]+\*)/ {
-            if ($0 !~ /from[ \t]+["'][^"']*["'];?[ \t]*$/ && $0 !~ /^[ \t]*import[ \t]+["']/ && $0 !~ /;[ \t]*$/) inimp = 1
+          inimp { if ($0 ~ /from[ \t]*["'][^"']+["'];?[ \t]*$/ || $0 ~ /^[ \t]*\}/) inimp = 0; next }
+          /^[ \t]*(import[ \t]|export[ \t]+(type[ \t]+)?(\{|\*))/ {
+            if ($0 !~ /from[ \t]*["'][^"']+["'];?[ \t]*$/ && $0 !~ /^[ \t]*import[ \t]*["']/ && $0 !~ /\}/) inimp = 1
             next
           }
+          /^[ \t]*($|\/\/|\/\*|\*)/ { next }
           { n++ }
           END { print n + 0 }
           AWK
-          git ls-files '*.ts' '*.tsx' '*.js' '*.mjs' \
-            | grep -vE '(^|/)(node_modules|dist|generated|fixtures|\.next)/|\.d\.ts$|\.gen\.|openapi|snapshot|schema' \
-            | while read -r f; do
-                n=$(awk -f "$RUNNER_TEMP/count.awk" "$f")
-                case "$f" in *.test.*|*.spec.*|*/tests/*|tests/*) max=300;; *) max=120;; esac
-                if [ "$n" -gt "$max" ]; then echo "::warning file=$f::$n lines of code (limit $max)"; echo "- \`$f\`: $n (limit $max)" >> "$GITHUB_STEP_SUMMARY"; fi
-              done
+          # Allowlist: may only shrink. Each entry needs a reason.
+          #  - src/testing/parity-fixtures.ts: hand-authored N-Quads corpus data (fixture data; path just is not under a fixtures/ dir).
+          allow='^src/testing/parity-fixtures\.ts$'
+          fail=0
+          while read -r f; do
+            n=$(awk -f "$RUNNER_TEMP/count.awk" "$f")
+            case "$f" in *.test.*|*.spec.*|*/tests/*|tests/*) max=300;; *) max=120;; esac
+            if [ "$n" -gt "$max" ]; then
+              if echo "$f" | grep -qE "$allow"; then echo "allowlisted: $f ($n)"; continue; fi
+              echo "::error file=$f::$n lines of code (limit $max)"
+              echo "- \`$f\`: $n (limit $max)" >> "$GITHUB_STEP_SUMMARY"
+              fail=1
+            fi
+          done < <(git ls-files '*.ts' '*.tsx' '*.js' '*.mjs'             | grep -vE '(^|/)(node_modules|dist|generated|fixtures|\.next)/|\.d\.ts$|\.gen\.|openapi|snapshot|schema')
+          exit "$fail"
       - name: TODO/FIXME without an issue link (warn-only)
         run: |
           git grep -nE '\b(TODO|FIXME)\b' -- '*.ts' '*.tsx' '*.js' '*.mjs' ':!*generated*' \

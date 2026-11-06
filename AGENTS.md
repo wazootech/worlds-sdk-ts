@@ -446,6 +446,8 @@ this repo's specifics:
 - `deno lint` keeps `no-explicit-any` on; use real types or `unknown`.
 - `@ts-ignore` is not used; prefer `@ts-expect-error` with a reason.
 - Actions are pinned to commit SHAs, and CI pins Deno to `v2.9.8`.
-- `secret-scan.yml` (gitleaks) runs on every PR; `code-health.yml` only warns
-  about file length and unlinked TODOs; `CODEOWNERS` assigns review.
+- `secret-scan.yml` (gitleaks) runs on every PR; `code-health.yml` fails any
+  source file over 120 lines of code (300 for tests; blank, comment, and import
+  lines excluded) unless it is on the short allowlist in the workflow (it may
+  only shrink), and warns about unlinked TODOs; `CODEOWNERS` assigns review.
 - Publishing to JSR runs from `main` and needs approval.

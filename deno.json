@@ -36,6 +36,9 @@
     "zod": "npm:zod@^4.4.3",
     "@worlds/client": "jsr:@worlds/client@^0.1.0"
   },
+  "compilerOptions": {
+    "strict": true
+  },
   "tasks": {
     "download:tfjs-use": "deno -A ./scripts/download-tfjs-use.ts",
     "example:hello-world": "deno -A ./examples/hello-world/main.ts",

@@ -36,7 +36,7 @@ export async function importViaTransaction(
     for (const quad of quads) {
       tx.addQuad(quad);
     }
-    await tx.commit({ importMode: mode });
+    await tx.commit({ importMode: mode, provenance: request.provenance });
   } catch (error) {
     tx.rollback();
     throw error;

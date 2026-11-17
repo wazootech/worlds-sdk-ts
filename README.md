@@ -100,6 +100,22 @@ console.log(sparqlResponse);
 > [archived](https://github.com/wazootech/worlds-denokv); use `@worlds/libsql`
 > instead.
 
+## How a fact moves through a world
+
+![Worlds: the life of a fact. An operator creates a world and mints a token; the agent curates what to keep; the SDK imports facts as atomic patches; later the agent recalls them with search, grounds them with SPARQL, and answers from graph facts.](docs/diagrams/worlds.svg)
+
+Time runs left to right. The stroke shows who is acting: the agent (wave), SDK
+or API code (solid), an operator (dashed), or nothing at all while the fact sits
+in the world (dotted). Red marks steps that cannot be undone: world IDs are
+immutable, token secrets are shown once, and Worlds keeps no history of deleted
+triples yet. Retrieval takes two hops: fuzzy search finds subject IRIs, then
+SPARQL fetches the exact facts about them.
+
+The diagram is generated from
+[`docs/diagrams/worlds.feynman.json`](docs/diagrams/worlds.feynman.json) with
+the [`feynman-diagram`](https://github.com/EthanThatOneKid/feynman-diagram)
+skill.
+
 ## Core concepts
 
 **Quad store**: Manages RDF triples (subject, predicate, object, graph) with

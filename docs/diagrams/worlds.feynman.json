@@ -1,0 +1,218 @@
+{
+  "title": "Worlds: the life of a fact",
+  "lines": {
+    "agent": {
+      "stroke": "wave",
+      "color": "blue",
+      "legend": "the agent decides",
+      "len": 200
+    },
+    "sdk": {
+      "stroke": "solid",
+      "color": "ink",
+      "legend": "Worlds SDK / API code runs",
+      "len": 100
+    },
+    "operator": {
+      "stroke": "dashed",
+      "color": "orange",
+      "legend": "an operator sets up",
+      "len": 120
+    },
+    "rest": {
+      "stroke": "dotted",
+      "color": "gray",
+      "legend": "at rest in the world, nothing running",
+      "len": 220
+    }
+  },
+  "vertices": {
+    "write": {
+      "shape": "diamond",
+      "legend": "writes a patch, can be revised"
+    },
+    "irreversible": {
+      "shape": "diamond",
+      "color": "red",
+      "legend": "cannot be undone",
+      "labelColor": true,
+      "bold": true
+    },
+    "search": {
+      "shape": "triangle",
+      "color": "purple",
+      "legend": "fuzzy retrieval, ranked"
+    },
+    "sparql": {
+      "shape": "square",
+      "fill": "hollow",
+      "legend": "exact graph traversal"
+    }
+  },
+  "tracks": [
+    {
+      "id": "main",
+      "lane": 0,
+      "line": "operator",
+      "start": {
+        "label": "operator",
+        "note": "wzp_ platform token"
+      },
+      "steps": [
+        {
+          "line": "operator",
+          "len": 230
+        },
+        {
+          "vertex": "irreversible",
+          "label": "create world",
+          "note": "w_<ULID> · immutable id"
+        },
+        {
+          "line": "operator",
+          "len": 250
+        },
+        {
+          "vertex": "irreversible",
+          "label": "mint world token",
+          "note": "wzw_ secret shown once"
+        },
+        {
+          "line": "rest",
+          "note": "world ready, empty",
+          "len": 210
+        },
+        {
+          "vertex": "junction",
+          "id": "in"
+        },
+        {
+          "line": "agent",
+          "label": "Curate",
+          "note": [
+            "keep durable facts",
+            "drop the rest"
+          ]
+        },
+        {
+          "vertex": "branch",
+          "id": "keep",
+          "by": "agent"
+        },
+        {
+          "line": "sdk",
+          "label": "new fact",
+          "len": 150
+        },
+        {
+          "vertex": "write",
+          "label": "import",
+          "note": "triples become a patch"
+        },
+        {
+          "line": "sdk",
+          "len": 330
+        },
+        {
+          "vertex": "write",
+          "id": "commit",
+          "label": "commit",
+          "note": "atomic patch"
+        },
+        {
+          "line": "rest",
+          "label": "later",
+          "note": [
+            "current state only",
+            "no history yet"
+          ]
+        },
+        {
+          "line": "agent",
+          "label": "Recall",
+          "note": "what do I need to know?"
+        },
+        {
+          "vertex": "search",
+          "label": "search",
+          "note": [
+            "keyword + vector · RRF",
+            "finds subject IRIs"
+          ]
+        },
+        {
+          "line": "sdk",
+          "label": "ground",
+          "len": 240
+        },
+        {
+          "vertex": "sparql",
+          "label": "SPARQL",
+          "note": [
+            "exact facts about",
+            "those subjects"
+          ]
+        },
+        {
+          "line": "agent",
+          "label": "Answer",
+          "note": "from graph facts, not weights"
+        },
+        {
+          "vertex": "stop"
+        }
+      ]
+    },
+    {
+      "id": "turn",
+      "lane": -1.4,
+      "line": "agent",
+      "start": {
+        "label": "agent turn",
+        "note": "conversation · tool output"
+      },
+      "merge": "in"
+    },
+    {
+      "id": "drop",
+      "lane": 1.2,
+      "from": "keep",
+      "label": "noise",
+      "steps": [
+        {
+          "line": "agent",
+          "len": 110
+        },
+        {
+          "vertex": "stop",
+          "note": "never stored"
+        }
+      ]
+    },
+    {
+      "id": "revise",
+      "lane": -1.2,
+      "from": "keep",
+      "merge": "commit",
+      "label": "changed fact",
+      "steps": [
+        {
+          "line": "sdk"
+        },
+        {
+          "vertex": "irreversible",
+          "label": "delete old triple",
+          "note": "gone · no undo"
+        },
+        {
+          "line": "sdk"
+        },
+        {
+          "vertex": "write",
+          "label": "insert new"
+        }
+      ],
+      "line": "sdk"
+    }
+  ]
+}

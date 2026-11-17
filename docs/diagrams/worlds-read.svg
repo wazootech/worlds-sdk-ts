@@ -1,0 +1,212 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1033.9 367" width="1033.9"
+  height="367"
+  font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, Menlo, 'DejaVu Sans Mono', 'MS Gothic', ui-monospace, monospace">
+  <title>Worlds, part 2: recalling a fact</title>
+  <style>
+  .bg {
+    fill: #fafafa;
+  }
+  .card {
+    fill: #ffffff;
+    stroke: #ececec;
+  }
+  .f-card {
+    fill: #ffffff;
+  }
+  .k-card {
+    stroke: #ffffff;
+  }
+  .f-ink {
+    fill: #1f1f1f;
+  }
+  .k-ink {
+    stroke: #1f1f1f;
+  }
+  .f-gray {
+    fill: #8a8a8a;
+  }
+  .k-gray {
+    stroke: #8a8a8a;
+  }
+  .f-blue {
+    fill: #4a7bf7;
+  }
+  .k-blue {
+    stroke: #4a7bf7;
+  }
+  .f-orange {
+    fill: #f0a030;
+  }
+  .k-orange {
+    stroke: #f0a030;
+  }
+  .f-red {
+    fill: #e5484d;
+  }
+  .k-red {
+    stroke: #e5484d;
+  }
+  .f-green {
+    fill: #2f9e5b;
+  }
+  .k-green {
+    stroke: #2f9e5b;
+  }
+  .f-purple {
+    fill: #8b5cf6;
+  }
+  .k-purple {
+    stroke: #8b5cf6;
+  }
+  .f-teal {
+    fill: #0f9fa8;
+  }
+  .k-teal {
+    stroke: #0f9fa8;
+  }
+  .f-pink {
+    fill: #e04f9b;
+  }
+  .k-pink {
+    stroke: #e04f9b;
+  }
+  @media (prefers-color-scheme: dark) {
+    .bg {
+      fill: #141414;
+    }
+    .card {
+      fill: #1b1b1b;
+      stroke: #2a2a2a;
+    }
+    .f-card {
+      fill: #1b1b1b;
+    }
+    .k-card {
+      stroke: #1b1b1b;
+    }
+    .f-ink {
+      fill: #e8e8e8;
+    }
+    .k-ink {
+      stroke: #e8e8e8;
+    }
+    .f-gray {
+      fill: #8f8f8f;
+    }
+    .k-gray {
+      stroke: #8f8f8f;
+    }
+    .f-blue {
+      fill: #7aa2ff;
+    }
+    .k-blue {
+      stroke: #7aa2ff;
+    }
+    .f-orange {
+      fill: #f5b04a;
+    }
+    .k-orange {
+      stroke: #f5b04a;
+    }
+    .f-red {
+      fill: #ff6b6f;
+    }
+    .k-red {
+      stroke: #ff6b6f;
+    }
+    .f-green {
+      fill: #4cc47e;
+    }
+    .k-green {
+      stroke: #4cc47e;
+    }
+    .f-purple {
+      fill: #a98bff;
+    }
+    .k-purple {
+      stroke: #a98bff;
+    }
+    .f-teal {
+      fill: #3cc4cc;
+    }
+    .k-teal {
+      stroke: #3cc4cc;
+    }
+    .f-pink {
+      fill: #f27ab8;
+    }
+    .k-pink {
+      stroke: #f27ab8;
+    }
+  }
+  </style>
+  <rect class="bg" width="100%" height="100%" />
+  <text x="24" y="32" font-size="20" font-weight="650"
+    class="f-ink">Worlds, part 2: recalling a fact</text>
+  <rect class="card" x="8" y="52" width="1017.9" height="90" rx="10" />
+  <path
+    d="M24 78L25.5 80.5L27 82.5L28.5 83.7L30 83.9L31.4 83.1L32.9 81.3L34.4 79L35.9 76.5L37.4 74.2L38.9 72.6L40.4 72L41.9 72.5L43.4 73.9L44.9 76.1L46.3 78.6L47.8 81L49.3 82.9L50.8 83.9L52.3 83.8L53.8 82.8L55.3 80.8L56.8 78.4L58.3 75.9L59.7 73.8L61.2 72.4L62.7 72L64.2 72.7L65.7 74.3L67.2 76.6L68.7 79.2L70.2 81.5L71.7 83.2L73.1 84L74.6 83.7L76.1 82.4L77.6 80.3L79.1 77.8L80.6 75.4L82.1 73.4L83.6 72.2L85.1 72.1L86.6 73L88 74.8L89.5 77.2L91 79.7L92.5 81.9L94 83.5"
+    fill="none" stroke-linejoin="round" stroke-width="2.2"
+    stroke-linecap="round" class="k-blue" />
+  <text x="106" y="83" font-size="15" text-anchor="start"
+    class="f-ink">the agent decides</text>
+  <path d="M262.7 78L332.7 78" fill="none" stroke-linejoin="round"
+    stroke-width="2.2" stroke-linecap="round" class="k-ink" />
+  <text x="344.7" y="83" font-size="15" text-anchor="start"
+    class="f-ink">Worlds SDK / API code runs</text>
+  <path d="M578.4 68.6L587.4 84.8L569.4 84.8Z" class="f-purple" />
+  <text x="598.4" y="83" font-size="15" text-anchor="start"
+    class="f-ink">fuzzy retrieval, ranked</text>
+  <path d="M25.9 107.9L42.1 107.9L42.1 124.1L25.9 124.1Z" class="f-card k-ink"
+    stroke-width="2.5" stroke-linejoin="round" />
+  <text x="54" y="121" font-size="15" text-anchor="start"
+    class="f-ink">exact graph traversal</text>
+  <rect x="248.49200000000002" y="101" width="4" height="30" rx="1"
+    class="f-ink" />
+  <text x="270.5" y="121" font-size="15" text-anchor="start"
+    class="f-ink">stops</text>
+  <rect class="card" x="8" y="160" width="1017.9" height="199" rx="12" />
+  <g transform="translate(4 227)">
+    <path
+      d="M40 0L41.5 2.5L43 4.5L44.5 5.8L46 5.9L47.5 5.1L49 3.3L50.5 0.9L52 -1.7L53.5 -3.9L55 -5.4L56.5 -6L58 -5.5L59.5 -4L61 -1.8L62.5 0.8L64 3.2L65.5 5L67 5.9L68.4 5.8L69.9 4.6L71.4 2.6L72.9 0.1L74.4 -2.4L75.9 -4.5L77.4 -5.7L78.9 -6L80.4 -5.1L81.9 -3.4L83.4 -1L84.9 1.6L86.4 3.8L87.9 5.4L89.4 6L90.9 5.5L92.4 4.1L93.9 1.9L95.4 -0.7L96.9 -3.1L98.4 -4.9L99.9 -5.9L101.4 -5.8L102.9 -4.7L104.4 -2.7L105.9 -0.2L107.4 2.3L108.9 4.4L110.4 5.7L111.9 6L113.4 5.2L114.9 3.4L116.4 1.1L117.9 -1.5L119.4 -3.7L120.9 -5.3L122.4 -6L123.8 -5.6L125.3 -4.1L126.8 -1.9L128.3 0.6L129.8 3L131.3 4.9L132.8 5.9L134.3 5.8L135.8 4.7L137.3 2.8L138.8 0.3L140.3 -2.2L141.8 -4.3L143.3 -5.7L144.8 -6L146.3 -5.2L147.8 -3.5L149.3 -1.2L150.8 1.4L152.3 3.7L153.8 5.3L155.3 6L156.8 5.6L158.3 4.2L159.8 2L161.3 -0.5L162.8 -2.9L164.3 -4.8L165.8 -5.9L167.3 -5.9L168.8 -4.8L170.3 -2.9L171.8 -0.4L173.3 2.1L174.8 4.2L176.3 5.6L177.7 6L179.2 5.3L180.7 3.6L182.2 1.3L183.7 -1.3L185.2 -3.6L186.7 -5.3L188.2 -6L189.7 -5.6L191.2 -4.3L192.7 -2.1L194.2 0.4L195.7 2.8L197.2 4.8L198.7 5.8L200.2 5.9L201.7 4.8L203.2 2.9L204.7 0.5L206.2 -2L207.7 -4.2L209.2 -5.6L210.7 -6L212.2 -5.3L213.7 -3.7L215.2 -1.4L216.7 1.2L218.2 3.5L219.7 5.2L221.2 6L222.7 5.7L224.2 4.3L225.7 2.2L227.2 -0.3L228.7 -2.7L230.2 -4.7L231.7 -5.8L233.1 -5.9L234.6 -4.9L236.1 -3L237.6 -0.6L239.1 1.9L240.6 4.1L242.1 5.5L243.6 6L245.1 5.4L246.6 3.8L248.1 1.5L249.6 -1.1L251.1 -3.4L252.6 -5.1L254.1 -6L255.6 -5.7L257.1 -4.4L258.6 -2.3L260.1 0.2L261.6 2.6L263.1 4.6L264.6 5.8L266.1 5.9L267.6 5L269.1 3.1L270.6 0.7L272.1 -1.8L273.6 -4L275.1 -5.5L276.6 -6L278.1 -5.4L279.6 -3.8L281.1 -1.6L282.6 1L284.1 3.3L285.6 5.1L287.1 6L288.5 5.7L290 4.5L291.5 2.4L293 -0.1L294.5 -2.5L296 -4.6L297.5 -5.8L299 -5.9L300.5 -5L302 -3.2L303.5 -0.8L305 1.7L306.5 3.9L308 5.5L309.5 6L311 5.5L312.5 3.9L314 1.7L315.5 -0.9L317 -3.2L318.5 -5L320 -5.9L321.5 -5.8L323 -4.6L324.5 -2.5L326 0L327.5 2.5L329 4.5L330.5 5.7L332 5.9L333.5 5.1L335 3.3L336.5 0.9L338 -1.6L339.5 -3.9L341 -5.4L342.4 -6L343.9 -5.5L345.4 -4L346.9 -1.8L348.4 0.7L349.9 3.2L351.4 5L352.9 5.9L354.4 5.8L355.9 4.6L357.4 2.6L358.9 0.1L360.4 -2.4L361.9 -4.4L363.4 -5.7L364.9 -6L366.4 -5.1L367.9 -3.4L369.4 -1L370.9 1.5L372.4 3.8L373.9 5.4L375.4 6L376.9 5.5L378.4 4.1L379.9 1.9L381.4 -0.6L382.9 -3.1L384.4 -4.9L385.9 -5.9L387.4 -5.8L388.9 -4.7L390.4 -2.7L391.9 -0.2L393.4 2.3L394.9 4.4L396.4 5.7L397.8 6L399.3 5.2L400.8 3.5L402.3 1.1L403.8 -1.4L405.3 -3.7L406.8 -5.3L408.3 -6L409.8 -5.6L411.3 -4.2L412.8 -2L414.3 0.5L415.8 3L417.3 4.9L418.8 5.9L420.3 5.8L421.8 4.7L423.3 2.8L424.8 0.3L426.3 -2.2L427.8 -4.3L429.3 -5.6L430.8 -6L432.3 -5.2L433.8 -3.5L435.3 -1.2L436.8 1.3L438.3 3.6L439.8 5.3L441.3 6L442.8 5.6L444.3 4.2L445.8 2.1L447.3 -0.4L448.8 -2.9L450.3 -4.8L451.8 -5.9L453.2 -5.9L454.7 -4.8L456.2 -2.9L457.7 -0.4L459.2 2.1L460.7 4.2L462.2 5.6L463.7 6L465.2 5.3L466.7 3.6L468.2 1.3L469.7 -1.2L471.2 -3.5L472.7 -5.2L474.2 -6L475.7 -5.6L477.2 -4.3L478.7 -2.2L480.2 0.3L481.7 2.8L483.2 4.7L484.7 5.8L486.2 5.9L487.7 4.9L489.2 3L490.7 0.5"
+      fill="none" stroke-linejoin="round" stroke-width="2.2"
+      stroke-linecap="round" class="k-blue" />
+    <path d="M490.7 0L680.7 0" fill="none" stroke-linejoin="round"
+      stroke-width="2.2" stroke-linecap="round" class="k-ink" />
+    <path
+      d="M680.7 0L682.2 2.5L683.7 4.5L685.2 5.8L686.7 5.9L688.2 5.1L689.7 3.3L691.2 0.9L692.7 -1.7L694.2 -3.9L695.7 -5.4L697.2 -6L698.7 -5.5L700.2 -4L701.7 -1.7L703.2 0.8L704.7 3.2L706.2 5L707.7 5.9L709.2 5.8L710.7 4.6L712.2 2.5L713.7 0L715.2 -2.4L716.6 -4.5L718.1 -5.7L719.6 -5.9L721.1 -5.1L722.6 -3.3L724.1 -0.9L725.6 1.6L727.1 3.9L728.6 5.4L730.1 6L731.6 5.5L733.1 4L734.6 1.8L736.1 -0.8L737.6 -3.2L739.1 -5L740.6 -5.9L742.1 -5.8L743.6 -4.6L745.1 -2.6L746.6 -0.1L748.1 2.4L749.6 4.5L751.1 5.7L752.6 6L754.1 5.1L755.6 3.3L757.1 1L758.6 -1.6L760.1 -3.8L761.6 -5.4L763.1 -6L764.6 -5.5L766.1 -4L767.6 -1.8L769.1 0.7L770.6 3.1L772.1 5L773.6 5.9L775.1 5.8L776.6 4.6L778.1 2.6L779.6 0.1L781.1 -2.4L782.6 -4.4L784.1 -5.7L785.6 -6L787.1 -5.1L788.6 -3.4L790.1 -1L791.6 1.5L793.1 3.8L794.6 5.4L796.1 6L797.6 5.5L799.1 4.1L800.6 1.9L802.1 -0.7L803.6 -3.1L805.1 -4.9L806.6 -5.9L808.1 -5.8L809.6 -4.7L811.1 -2.7L812.6 -0.2L814.1 2.3L815.6 4.4L817.1 5.7L818.6 6L820.1 5.2L821.6 3.4L823.1 1.1L824.6 -1.5L826.1 -3.8L827.6 -5.4L829.1 -6L830.6 -5.5L832.1 -4.1L833.6 -1.9L835 0.6L836.5 3.1L838 4.9L839.5 5.9L841 5.8L842.5 4.7L844 2.7L845.5 0.2L847 -2.3L848.5 -4.4L850 -5.7L851.5 -6L853 -5.2L854.5 -3.5L856 -1.1L857.5 1.4L859 3.7L860.5 5.3L862 6L863.5 5.6L865 4.1L866.5 1.9L868 -0.6L869.5 -3L871 -4.9L872.5 -5.9L874 -5.8L875.5 -4.7L877 -2.7L878.5 -0.3L880 2.2L881.5 4.3L883 5.7L884.5 6L886 5.2L887.5 3.5L889 1.2L890.5 -1.4L892 -3.7L893.5 -5.3L895 -6L896.5 -5.6L898 -4.2L899.5 -2L901 0.5L902.5 3L904 4.9L905.5 5.9L907 5.8L908.5 4.7L910 2.8L911.5 0.3L913 -2.2L914.5 -4.3L916 -5.7L917.5 -6L919 -5.2L920.5 -3.5L922 -1.2L923.5 1.3L925 3.7L926.5 5.3L928 6L929.5 5.6L931 4.2L932.5 2L934 -0.5L935.5 -2.9L937 -4.8L938.5 -5.9L940 -5.9L941.5 -4.8L943 -2.8L944.5 -0.4L946 2.1L947.5 4.3L949 5.6L950.5 6L952 5.2L953.4 3.6L954.9 1.2L956.4 -1.3L957.9 -3.6L959.4 -5.3L960.9 -6L962.4 -5.6L963.9 -4.2L965.4 -2.1L966.9 0.4L968.4 2.9L969.9 4.8L971.4 5.9L972.9 5.9L974.4 4.8L975.9 2.9"
+      fill="none" stroke-linejoin="round" stroke-width="2.2"
+      stroke-linecap="round" class="k-blue" />
+    <path d="M490.7 -9.5L499.7 6.8L481.7 6.8Z" class="f-purple" />
+    <path d="M672.6 -8.1L688.8 -8.1L688.8 8.1L672.6 8.1Z" class="f-card k-ink"
+      stroke-width="2.5" stroke-linejoin="round" />
+    <rect x="973.9300000000001" y="-15" width="4" height="30" rx="1"
+      class="f-ink" />
+    <text x="36" y="-14" font-size="15" text-anchor="start" class="f-blue"
+      font-weight="600">agent needs a fact</text>
+    <text x="355.3" y="-16" font-size="15" text-anchor="middle" class="f-blue"
+      font-weight="600">Recall</text>
+    <text x="312.7" y="30" font-size="13" text-anchor="middle"
+      class="f-gray">what do I need to know?</text>
+    <text x="490.7" y="32" font-size="15" text-anchor="middle"
+      class="f-ink">search</text>
+    <text x="490.7" y="49" font-size="13" text-anchor="middle"
+      class="f-gray">keyword + vector · RRF</text>
+    <text x="490.7" y="66" font-size="13" text-anchor="middle"
+      class="f-gray">finds subject IRIs</text>
+    <text x="585.7" y="-16" font-size="15" text-anchor="middle"
+      class="f-ink">ground</text>
+    <text x="680.7" y="32" font-size="15" text-anchor="middle"
+      class="f-ink">SPARQL</text>
+    <text x="680.7" y="49" font-size="13" text-anchor="middle"
+      class="f-gray">exact facts about</text>
+    <text x="680.7" y="66" font-size="13" text-anchor="middle"
+      class="f-gray">those subjects</text>
+    <text x="828.3" y="-16" font-size="15" text-anchor="middle" class="f-blue"
+      font-weight="600">Answer</text>
+    <text x="862.1" y="30" font-size="13" text-anchor="middle"
+      class="f-gray">from graph facts, not weights</text>
+  </g>
+  <text x="30" y="343" font-size="13" text-anchor="start"
+    class="f-gray">time <tspan font-family="Menlo, 'DejaVu Sans Mono', 'MS Gothic', ui-monospace, monospace">→</tspan></text>
+</svg>

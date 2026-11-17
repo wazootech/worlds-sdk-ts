@@ -1,0 +1,296 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1392.4 629" width="1392.4"
+  height="629"
+  font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, Menlo, 'DejaVu Sans Mono', 'MS Gothic', ui-monospace, monospace">
+  <title>Worlds, part 1: writing a fact</title>
+  <style>
+  .bg {
+    fill: #fafafa;
+  }
+  .card {
+    fill: #ffffff;
+    stroke: #ececec;
+  }
+  .f-card {
+    fill: #ffffff;
+  }
+  .k-card {
+    stroke: #ffffff;
+  }
+  .f-ink {
+    fill: #1f1f1f;
+  }
+  .k-ink {
+    stroke: #1f1f1f;
+  }
+  .f-gray {
+    fill: #8a8a8a;
+  }
+  .k-gray {
+    stroke: #8a8a8a;
+  }
+  .f-blue {
+    fill: #4a7bf7;
+  }
+  .k-blue {
+    stroke: #4a7bf7;
+  }
+  .f-orange {
+    fill: #f0a030;
+  }
+  .k-orange {
+    stroke: #f0a030;
+  }
+  .f-red {
+    fill: #e5484d;
+  }
+  .k-red {
+    stroke: #e5484d;
+  }
+  .f-green {
+    fill: #2f9e5b;
+  }
+  .k-green {
+    stroke: #2f9e5b;
+  }
+  .f-purple {
+    fill: #8b5cf6;
+  }
+  .k-purple {
+    stroke: #8b5cf6;
+  }
+  .f-teal {
+    fill: #0f9fa8;
+  }
+  .k-teal {
+    stroke: #0f9fa8;
+  }
+  .f-pink {
+    fill: #e04f9b;
+  }
+  .k-pink {
+    stroke: #e04f9b;
+  }
+  @media (prefers-color-scheme: dark) {
+    .bg {
+      fill: #141414;
+    }
+    .card {
+      fill: #1b1b1b;
+      stroke: #2a2a2a;
+    }
+    .f-card {
+      fill: #1b1b1b;
+    }
+    .k-card {
+      stroke: #1b1b1b;
+    }
+    .f-ink {
+      fill: #e8e8e8;
+    }
+    .k-ink {
+      stroke: #e8e8e8;
+    }
+    .f-gray {
+      fill: #8f8f8f;
+    }
+    .k-gray {
+      stroke: #8f8f8f;
+    }
+    .f-blue {
+      fill: #7aa2ff;
+    }
+    .k-blue {
+      stroke: #7aa2ff;
+    }
+    .f-orange {
+      fill: #f5b04a;
+    }
+    .k-orange {
+      stroke: #f5b04a;
+    }
+    .f-red {
+      fill: #ff6b6f;
+    }
+    .k-red {
+      stroke: #ff6b6f;
+    }
+    .f-green {
+      fill: #4cc47e;
+    }
+    .k-green {
+      stroke: #4cc47e;
+    }
+    .f-purple {
+      fill: #a98bff;
+    }
+    .k-purple {
+      stroke: #a98bff;
+    }
+    .f-teal {
+      fill: #3cc4cc;
+    }
+    .k-teal {
+      stroke: #3cc4cc;
+    }
+    .f-pink {
+      fill: #f27ab8;
+    }
+    .k-pink {
+      stroke: #f27ab8;
+    }
+  }
+  </style>
+  <rect class="bg" width="100%" height="100%" />
+  <text x="24" y="32" font-size="20" font-weight="650"
+    class="f-ink">Worlds, part 1: writing a fact</text>
+  <rect class="card" x="8" y="52" width="1376.4" height="90" rx="10" />
+  <path
+    d="M24 78L25.5 80.5L27 82.5L28.5 83.7L30 83.9L31.4 83.1L32.9 81.3L34.4 79L35.9 76.5L37.4 74.2L38.9 72.6L40.4 72L41.9 72.5L43.4 73.9L44.9 76.1L46.3 78.6L47.8 81L49.3 82.9L50.8 83.9L52.3 83.8L53.8 82.8L55.3 80.8L56.8 78.4L58.3 75.9L59.7 73.8L61.2 72.4L62.7 72L64.2 72.7L65.7 74.3L67.2 76.6L68.7 79.2L70.2 81.5L71.7 83.2L73.1 84L74.6 83.7L76.1 82.4L77.6 80.3L79.1 77.8L80.6 75.4L82.1 73.4L83.6 72.2L85.1 72.1L86.6 73L88 74.8L89.5 77.2L91 79.7L92.5 81.9L94 83.5"
+    fill="none" stroke-linejoin="round" stroke-width="2.2"
+    stroke-linecap="round" class="k-blue" />
+  <text x="106" y="83" font-size="15" text-anchor="start"
+    class="f-ink">the agent decides</text>
+  <path d="M262.7 78L332.7 78" fill="none" stroke-linejoin="round"
+    stroke-width="2.2" stroke-linecap="round" class="k-ink" />
+  <text x="344.7" y="83" font-size="15" text-anchor="start"
+    class="f-ink">Worlds SDK / API code runs</text>
+  <path d="M568.4 78L638.4 78" fill="none" stroke-linejoin="round"
+    stroke-width="2.2" stroke-dasharray="9 7" class="k-orange" />
+  <text x="650.4" y="83" font-size="15" text-anchor="start"
+    class="f-ink">an operator sets up</text>
+  <path d="M822 78L892 78" fill="none" stroke-linejoin="round"
+    stroke-width="2.6" stroke-linecap="round" stroke-dasharray="0.1 7"
+    class="k-gray" />
+  <text x="904" y="83" font-size="15" text-anchor="start"
+    class="f-ink">at rest, nothing running</text>
+  <path d="M1122.9 68L1132.9 78L1122.9 88L1112.9 78Z" class="f-ink" />
+  <text x="1142.9" y="83" font-size="15" text-anchor="start"
+    class="f-ink">writes, can be revised</text>
+  <path d="M34 106L44 116L34 126L24 116Z" class="f-red" />
+  <text x="54" y="121" font-size="15" text-anchor="start"
+    class="f-ink">cannot be undone</text>
+  <path
+    d="M222.2 116L217.7 123.8L208.7 123.8L204.2 116L208.7 108.2L217.7 108.2Z"
+    class="f-purple" />
+  <text x="233.2" y="121" font-size="15" text-anchor="start"
+    class="f-ink">indexed for search</text>
+  <rect x="405.36800000000005" y="101" width="4" height="30" rx="1"
+    class="f-ink" />
+  <text x="427.4" y="121" font-size="15" text-anchor="start"
+    class="f-ink">stops</text>
+  <rect class="card" x="8" y="160" width="1376.4" height="461" rx="12" />
+  <g transform="translate(4 403)">
+    <path d="M40 0L192 0" fill="none" stroke-linejoin="round" stroke-width="2.2"
+      stroke-dasharray="9 7" class="k-orange" />
+    <path d="M192 0L287 0" fill="none" stroke-linejoin="round"
+      stroke-width="2.2" stroke-dasharray="9 7" class="k-orange" />
+    <path d="M287 0L362 0" fill="none" stroke-linejoin="round"
+      stroke-width="2.6" stroke-linecap="round" stroke-dasharray="0.1 7"
+      class="k-gray" />
+    <path
+      d="M362 0L363.5 2.5L365 4.5L366.5 5.8L368 5.9L369.5 5.1L371 3.3L372.5 0.9L374 -1.6L375.5 -3.9L377 -5.4L378.4 -6L379.9 -5.5L381.4 -4L382.9 -1.8L384.4 0.7L385.9 3.1L387.4 5L388.9 5.9L390.4 5.8L391.9 4.6L393.4 2.6L394.9 0.2L396.4 -2.3L397.9 -4.4L399.4 -5.7L400.9 -6L402.4 -5.2L403.9 -3.4L405.4 -1.1L406.9 1.5L408.4 3.7L409.9 5.3L411.3 6L412.8 5.6L414.3 4.1L415.8 2L417.3 -0.6L418.8 -3L420.3 -4.9L421.8 -5.9L423.3 -5.8L424.8 -4.7L426.3 -2.8L427.8 -0.4L429.3 2.2L430.8 4.3L432.3 5.6L433.8 6L435.3 5.2L436.8 3.6L438.3 1.3L439.8 -1.3L441.3 -3.6L442.7 -5.3L444.2 -6L445.7 -5.6L447.2 -4.3L448.7 -2.1L450.2 0.4L451.7 2.8L453.2 4.8L454.7 5.8L456.2 5.9L457.7 4.9L459.2 3L460.7 0.5L462.2 -2L463.7 -4.2L465.2 -5.6L466.7 -6L468.2 -5.3L469.7 -3.7L471.2 -1.4L472.7 1.1L474.1 3.5L475.6 5.2L477.1 6L478.6 5.7L480.1 4.4L481.6 2.3L483.1 -0.2L484.6 -2.7L486.1 -4.7L487.6 -5.8L489.1 -5.9L490.6 -5L492.1 -3.1L493.6 -0.7L495.1 1.8L496.6 4L498.1 5.5L499.6 6L501.1 5.4L502.6 3.8L504.1 1.6L505.6 -0.9L507 -3.3L508.5 -5.1L510 -5.9L511.5 -5.7L513 -4.5L514.5 -2.5L516 0L517.5 2.5L519 4.5L520.5 5.8L522 5.9"
+      fill="none" stroke-linejoin="round" stroke-width="2.2"
+      stroke-linecap="round" class="k-blue" />
+    <path d="M522 0L702 0" fill="none" stroke-linejoin="round"
+      stroke-width="2.2" stroke-linecap="round" class="k-ink" />
+    <path d="M702 0L1002 0" fill="none" stroke-linejoin="round"
+      stroke-width="2.2" stroke-linecap="round" class="k-ink" />
+    <path d="M1002 0L1122 0" fill="none" stroke-linejoin="round"
+      stroke-width="2.2" stroke-linecap="round" class="k-ink" />
+    <path d="M1122 0L1212 0" fill="none" stroke-linejoin="round"
+      stroke-width="2.6" stroke-linecap="round" stroke-dasharray="0.1 7"
+      class="k-gray" />
+    <path
+      d="M40 -161L41.4 -158.6L42.7 -156.6L44.1 -155.3L45.5 -154.9L46.9 -155.4L48.4 -156.8L49.8 -158.9L51.2 -161.1L52.7 -163.2L54.2 -165L55.6 -166.1L57 -166.3L58.3 -165.7L59.7 -164.3L60.9 -162.3L61.9 -160L63 -157.7L64.1 -155.7L65.2 -154.2L66.4 -153.4L67.6 -153.5L69.1 -154.4L70.9 -156.1L72.7 -158.3L74.5 -160.5L76.3 -162.3L78.1 -163.4L79.7 -163.4L80.9 -162.5L82 -160.8L83 -158.4L83.9 -155.8L84.8 -153.3L85.6 -151.2L86.7 -149.8L88 -149.3L89.5 -149.7L91.2 -150.9L93 -152.6L94.9 -154.4L96.9 -156.1L98.7 -157.3L100.3 -158L101.6 -157.8L102.9 -156.8L103.8 -155.1L104.3 -152.8L104.8 -150.3L105.3 -147.8L105.9 -145.6L106.6 -144L107.5 -143L108.8 -142.8L110.4 -143.3L112.2 -144.3L114.1 -145.7L116.2 -147.2L118.2 -148.5L120 -149.4L121.6 -149.8L122.8 -149.4L123.7 -148.4L124.4 -146.7L124.8 -144.1L125 -141.2L125.2 -138.3L125.7 -135.9L126.4 -134.4L127.6 -133.7L129.3 -133.8L131.5 -134.7L134 -136L136.6 -137.5L139 -138.5L141 -138.9L142.5 -138.6L143.5 -137.4L144 -135.3L144.1 -132.7L143.9 -129.9L143.8 -127.1L143.9 -124.8L144.4 -123.1L145.5 -122.3L147.2 -122.2L149.3 -122.7L151.9 -123.7L154.5 -124.8L157 -125.7L159.1 -126L160.7 -125.7L161.6 -124.6L162.1 -122.8L162 -120.3L161.6 -117.6L161.2 -114.8L161 -112.3L161.2 -110.5L161.9 -109.2L163.4 -108.7L165.4 -108.9L167.9 -109.6L170.5 -110.5L173.2 -111.2L175.5 -111.7L177.2 -111.5L178.4 -110.7L178.9 -109.1L178.9 -106.8L178.4 -104.2L177.8 -101.5L177.3 -98.9L177.2 -96.7L177.6 -95.2L178.7 -94.3L180.5 -94.1L182.8 -94.4L185.4 -95.1L188.1 -95.9L190.6 -96.4L192.7 -96.4L194.1 -95.8L194.8 -94.5L194.9 -92.6L194.5 -90.1L193.9 -87.5L193.2 -84.8L192.8 -82.4L193 -80.5L193.8 -79.3L195.2 -78.7L197.3 -78.8L199.8 -79.3L202.6 -80L205.2 -80.7L207.4 -80.9L209.2 -80.6L210.2 -79.7L210.6 -78L210.4 -75.8L209.8 -73.2L209.1 -70.5L208.6 -67.9L208.5 -65.7L209 -64.2L210.1 -63.4L211.9 -63.2L214.3 -63.6L217 -64.2L219.6 -65L222.1 -65.5L224.1 -65.5L225.4 -64.9L226.1 -63.6L226.2 -61.6L225.9 -59.2L225.3 -56.4L224.7 -53.7L224.5 -51.4L224.8 -49.5L225.7 -48.4L227.3 -48L229.4 -48.2L232 -48.9L234.6 -49.8L237.2 -50.6L239.4 -51L241 -50.8L242 -49.9L242.5 -48.2L242.4 -45.9L242.1 -43.2L241.7 -40.4L241.5 -37.8L241.7 -35.7L242.5 -34.4L243.8 -33.8L245.8 -33.9L248.2 -34.6L250.8 -35.7L253.4 -36.8L255.7 -37.6L257.5 -37.8L258.8 -37.2L259.6 -35.8L259.8 -33.6L259.8 -31L259.6 -28.1L259.7 -25.4L260 -23.2L260.8 -21.7L262.1 -21L264 -21.2L266.4 -22.1L268.9 -23.5L271.4 -24.9L273.7 -26L275.5 -26.5L276.9 -26.1L277.9 -24.8L278.4 -22.6L278.7 -19.8L278.8 -16.9L279.2 -14.5L279.7 -12.6L280.4 -11.2L281.5 -10.5L282.9 -10.5L284.6 -11.1L286.6 -12.3L288.6 -13.8L290.6 -15.3L292.5 -16.5L294.2 -17.3L295.6 -17.5L296.6 -17L297.5 -15.6L298.2 -13.7L298.8 -11.3L299.2 -8.7L299.8 -6.3L300.7 -4.3L301.7 -2.9L303 -2.4L304.4 -2.7L306.2 -3.7L308.1 -5.3L310 -7.2L311.9 -9L313.7 -10.4L315.3 -11.1L316.7 -11L317.7 -10L318.7 -8.2L319.7 -5.8L320.6 -3.1L321.5 -0.6L322.5 1.4L323.9 2.6L325.5 2.8L327.1 2.1L328.8 0.4L330.6 -1.7L332.5 -3.9L334.2 -5.8L335.5 -7L336.9 -7.5L338.1 -7.1L339.3 -6L340.4 -4.2L341.5 -1.9L342.6 0.4L343.8 2.6L345.1 4.3L346.4 5.3L347.7 5.4L349.1 4.7L350.6 3.2L352.1 1.2L353.6 -1.2L355 -3.4L356.5 -5.1L357.9 -6L359.3 -5.9L360.7 -4.9L362.1 -3.2"
+      fill="none" stroke-linejoin="round" stroke-width="2.2"
+      stroke-linecap="round" class="k-blue" />
+    <path
+      d="M522 0L523 1.8L523.9 3.5L524.7 4.9L525.3 5.9L526.2 6.4L526.9 6.4L527.8 6L529 5.3L530.3 4.1L531.7 3L533.3 1.8L535 0.6L536.7 -0.1L538.1 -0.7L539.6 -0.7L540.9 -0.2L541.6 0.6L542.2 1.9L542.5 3.7L542.3 5.6L542 7.7L541.5 9.8L541.1 11.8L540.8 13.5L540.8 14.8L541.3 15.9L542.1 16.5L543.4 16.7L545.2 16.8L547.3 16.5L549.7 16.2L552 16L554.2 16.1L556 16.5L557.2 17.2L557.8 18.5L557.7 20.2L557 22.1L555.9 24.3L554.6 26.6L553.4 28.7L552.5 30.6L552.3 32.3L552.8 33.5L554.1 34.3L556.1 34.8L558.6 35.1L561.4 35.4L564 35.7L566.2 36.3L567.7 37.3L568.2 38.7L567.9 40.4L566.8 42.5L565.1 44.8L563.4 47.1L562 49.3L561.2 51.2L561.3 52.8L562.4 53.9L563.9 54.5L565.8 55L567.9 55.4L570.1 55.7L572.2 56.1L574.1 56.7L575.5 57.3L576.3 58.3L576.6 59.4L576.2 60.8L575.4 62.3L574.2 64L572.8 65.7L571.4 67.5L570.2 69.2L569.3 70.8L569 72.1L569.2 73.3L570 74.2L571.4 74.9L573.2 75.4L575.3 75.9L577.6 76.2L579.7 76.7L581.6 77.1L583.1 77.8L584 78.7L584.4 79.7L584.1 81L583.4 82.5L582.3 84.2L581 85.9L579.2 88.2L577.8 90.4L577 92.4L577.3 93.9L578.4 95L580.5 95.8L583.1 96.3L585.9 96.6L588.6 97L590.8 97.6L592.2 98.5L592.8 99.7L592.5 101.3L591.5 103.4L590.1 105.6L588.7 107.9L587.4 110L586.7 112L586.6 113.7L587.3 114.8L588.8 115.6L590.8 116L593.2 116.1L595.7 116.1L598.1 116L600.2 116.1L601.8 116.4L602.7 117L603.2 118.2L603.1 119.7L602.6 121.4L601.9 123.5L601.1 125.7L600.5 127.8L600 129.7L600.1 131.5L600.6 132.8L601.3 133.6L602.6 134.1L604.3 134.1L606 133.7L608 133.1L609.9 132.2L611.7 131.4L613.3 130.6L614.6 129.9L615.8 129.8L616.6 129.9L617.1 130.3L617.8 131.4L618.1 132.7L618.5 134.4L619 136.2L619.5 138.2L620.3 140.1L621.1 141.7L622.2 143L623.5 143.7L624.6 143.9L625.7 143.6"
+      fill="none" stroke-linejoin="round" stroke-width="2.2"
+      stroke-linecap="round" class="k-blue" />
+    <path
+      d="M626 138L627.5 140.5L629 142.5L630.5 143.8L632 143.9L633.5 143L635 141.2L636.5 138.9L638 136.3L639.5 134.1L641 132.5L642.5 132L644 132.5L645.5 134.1L647 136.3L648.5 138.9L650 141.2L651.5 143L653 143.9L654.5 143.8L656 142.5L657.5 140.5L659 138L660.5 135.5L662 133.5L663.5 132.2L665 132.1L666.5 133L668 134.8L669.5 137.1L671 139.7L672.5 141.9L674 143.5L675.5 144L677 143.5L678.5 141.9L680 139.7L681.5 137.1L683 134.8L684.5 133L686 132.1L687.5 132.2L689 133.5L690.5 135.5L692 138L693.5 140.5L695 142.5L696.5 143.8L698 143.9L699.5 143L701 141.2L702.5 138.9L704 136.3L705.5 134.1L707 132.5L708.5 132L710 132.5L711.5 134.1L713 136.3L714.5 138.9L716 141.2"
+      fill="none" stroke-linejoin="round" stroke-width="2.2"
+      stroke-linecap="round" class="k-blue" />
+    <path
+      d="M522 0L525.2 -0.2L528.2 -0.7L531.2 -1.5L534 -2.7L536.7 -4.2L539.3 -5.9L541.7 -7.9L544.1 -10.2L546.4 -12.7L548.7 -15.5L550.8 -18.4L552.9 -21.6L554.9 -24.9L556.8 -28.4L558.7 -32L560.5 -35.8L562.3 -39.7L564 -43.7L565.7 -47.7L567.4 -51.9L569.1 -56.1L570.7 -60.4L572.4 -64.7L574 -69L575.6 -73.3L577.2 -77.6L578.9 -81.9L580.5 -86.1L582.2 -90.3L583.9 -94.3L585.7 -98.3L587.5 -102.2L589.3 -106L591.2 -109.6L593.1 -113.1L595.1 -116.4L597.2 -119.6L599.3 -122.5L601.5 -125.3L603.8 -127.8L606.2 -130.1L608.7 -132.1L611.3 -133.8L614 -135.3L616.8 -136.5L619.7 -137.3L622.8 -137.8L626 -138"
+      fill="none" stroke-linejoin="round" stroke-width="2.2"
+      stroke-linecap="round" class="k-ink" />
+    <path d="M626 -138L701.5 -138" fill="none" stroke-linejoin="round"
+      stroke-width="2.2" stroke-linecap="round" class="k-ink" />
+    <path d="M701.5 -138L827.5 -138" fill="none" stroke-linejoin="round"
+      stroke-width="2.2" stroke-linecap="round" class="k-ink" />
+    <path d="M827.5 -138L898 -138" fill="none" stroke-linejoin="round"
+      stroke-width="2.2" stroke-linecap="round" class="k-ink" />
+    <path
+      d="M898 -138L901.2 -137.8L904.3 -137.3L907.2 -136.5L910 -135.3L912.7 -133.8L915.3 -132.1L917.8 -130.1L920.2 -127.8L922.5 -125.3L924.7 -122.5L926.8 -119.6L928.9 -116.4L930.9 -113.1L932.8 -109.6L934.7 -106L936.5 -102.2L938.3 -98.3L940.1 -94.3L941.8 -90.3L943.5 -86.1L945.1 -81.9L946.8 -77.6L948.4 -73.3L950 -69L951.6 -64.7L953.3 -60.4L954.9 -56.1L956.6 -51.9L958.3 -47.7L960 -43.7L961.7 -39.7L963.5 -35.8L965.3 -32L967.2 -28.4L969.1 -24.9L971.1 -21.6L973.2 -18.4L975.3 -15.5L977.6 -12.7L979.9 -10.2L982.3 -7.9L984.7 -5.9L987.3 -4.2L990 -2.7L992.8 -1.5L995.8 -0.7L998.8 -0.2L1002 0"
+      fill="none" stroke-linejoin="round" stroke-width="2.2"
+      stroke-linecap="round" class="k-ink" />
+    <path d="M192 -10L202 0L192 10L182 0Z" class="f-red" />
+    <path d="M287 -10L297 0L287 10L277 0Z" class="f-red" />
+    <circle cx="362" cy="0" r="4.1" class="f-ink" />
+    <path d="M522 -8.5L530.5 0L522 8.5L513.5 0Z" class="f-blue" />
+    <path d="M702 -10L712 0L702 10L692 0Z" class="f-ink" />
+    <path d="M1002 -10L1012 0L1002 10L992 0Z" class="f-ink" />
+    <path d="M1131 0L1126.5 7.8L1117.5 7.8L1113 0L1117.5 -7.8L1126.5 -7.8Z"
+      class="f-purple" />
+    <rect x="1210" y="-15" width="4" height="30" rx="1" class="f-ink" />
+    <rect x="713.96" y="123" width="4" height="30" rx="1" class="f-ink" />
+    <path d="M701.5 -148L711.5 -138L701.5 -128L691.5 -138Z" class="f-red" />
+    <path d="M827.5 -148L837.5 -138L827.5 -128L817.5 -138Z" class="f-ink" />
+    <text x="36" y="-14" font-size="15" text-anchor="start" class="f-orange"
+      font-weight="600">operator</text>
+    <text x="192" y="32" font-size="15" text-anchor="middle" class="f-red"
+      font-weight="600">create world</text>
+    <text x="192" y="49" font-size="13" text-anchor="middle"
+      class="f-gray">immutable id</text>
+    <text x="287" y="32" font-size="15" text-anchor="middle" class="f-red"
+      font-weight="600">mint token</text>
+    <text x="287" y="49" font-size="13" text-anchor="middle"
+      class="f-gray">shown once</text>
+    <text x="442" y="-16" font-size="15" text-anchor="middle" class="f-blue"
+      font-weight="600">Curate</text>
+    <text x="442" y="30" font-size="13" text-anchor="middle"
+      class="f-gray">keep durable facts</text>
+    <text x="442" y="47" font-size="13" text-anchor="middle"
+      class="f-gray">drop the rest</text>
+    <text x="612" y="-16" font-size="15" text-anchor="middle" class="f-blue"
+      font-weight="600">new fact</text>
+    <text x="702" y="32" font-size="15" text-anchor="middle"
+      class="f-ink">import</text>
+    <text x="1002" y="32" font-size="15" text-anchor="middle"
+      class="f-ink">commit</text>
+    <text x="1002" y="49" font-size="13" text-anchor="middle"
+      class="f-gray">atomic patch</text>
+    <text x="1002" y="66" font-size="13" text-anchor="middle"
+      class="f-gray">skips known triples</text>
+    <text x="1122" y="32" font-size="15" text-anchor="middle"
+      class="f-ink">index</text>
+    <text x="1122" y="49" font-size="13" text-anchor="middle"
+      class="f-gray">embed + chunk</text>
+    <text x="1122" y="66" font-size="13" text-anchor="middle"
+      class="f-gray">failure rolls back</text>
+    <text x="1226" y="5" font-size="13" text-anchor="start"
+      class="f-gray">stored</text>
+    <text x="1226" y="22" font-size="13" text-anchor="start"
+      class="f-gray">current state only</text>
+    <text x="36" y="-192" font-size="15" text-anchor="start" class="f-blue"
+      font-weight="600">agent turn</text>
+    <text x="36" y="-175" font-size="13" text-anchor="start"
+      class="f-gray">conversation · tool output</text>
+    <text x="671" y="124" font-size="15" text-anchor="middle" class="f-blue"
+      font-weight="600">noise</text>
+    <text x="730" y="143" font-size="13" text-anchor="start"
+      class="f-gray">never stored</text>
+    <text x="663.7" y="-152" font-size="15" text-anchor="middle" class="f-blue"
+      font-weight="600">changed fact</text>
+    <text x="701.5" y="-106" font-size="15" text-anchor="middle" class="f-red"
+      font-weight="600">delete old</text>
+    <text x="701.5" y="-89" font-size="13" text-anchor="middle"
+      class="f-gray">no undo</text>
+    <text x="827.5" y="-106" font-size="15" text-anchor="middle"
+      class="f-ink">insert new</text>
+  </g>
+  <text x="30" y="605" font-size="13" text-anchor="start"
+    class="f-gray">time <tspan font-family="Menlo, 'DejaVu Sans Mono', 'MS Gothic', ui-monospace, monospace">→</tspan></text>
+</svg>

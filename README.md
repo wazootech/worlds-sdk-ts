@@ -102,19 +102,24 @@ console.log(sparqlResponse);
 
 ## How a fact moves through a world
 
-![Worlds: the life of a fact. An operator creates a world and mints a token; the agent curates what to keep; the SDK imports facts as atomic patches; later the agent recalls them with search, grounds them with SPARQL, and answers from graph facts.](docs/diagrams/worlds.svg)
+![Worlds, part 1: writing a fact. An operator creates a world and mints a token; each agent turn, the agent curates what to keep; the SDK imports new facts, commits them as one atomic patch, and indexes them for search. A changed fact deletes the old triple and inserts the new one.](docs/diagrams/worlds-write.svg)
+
+![Worlds, part 2: recalling a fact. The agent searches with keyword and vector retrieval to find subject IRIs, grounds them with an exact SPARQL query, and answers from graph facts.](docs/diagrams/worlds-read.svg)
 
 Time runs left to right. The stroke shows who is acting: the agent (wave), SDK
 or API code (solid), an operator (dashed), or nothing at all while the fact sits
 in the world (dotted). Red marks steps that cannot be undone: world IDs are
 immutable, token secrets are shown once, and Worlds keeps no history of deleted
-triples yet. Retrieval takes two hops: fuzzy search finds subject IRIs, then
-SPARQL fetches the exact facts about them.
+triples yet. A commit skips triples the world already holds. Durable backends
+such as [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) index new
+triples on commit and roll the commit back if indexing fails; indexing can also
+be deferred and run later with `reindex()`. Retrieval takes two hops: fuzzy
+search finds subject IRIs, then SPARQL fetches the exact facts about them.
 
-The diagram is generated from
-[`docs/diagrams/worlds.feynman.json`](docs/diagrams/worlds.feynman.json) with
-the [`feynman-diagram`](https://github.com/EthanThatOneKid/feynman-diagram)
-skill.
+The diagrams are generated from
+[`worlds-write.feynman.json`](docs/diagrams/worlds-write.feynman.json) and
+[`worlds-read.feynman.json`](docs/diagrams/worlds-read.feynman.json) with the
+[`feynman-diagram`](https://github.com/EthanThatOneKid/feynman-diagram) skill.
 
 ## Core concepts
 

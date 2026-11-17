@@ -1,35 +1,35 @@
 {
-  "title": "Worlds: the life of a fact",
+  "title": "Worlds, part 1: writing a fact",
   "lines": {
     "agent": {
       "stroke": "wave",
       "color": "blue",
       "legend": "the agent decides",
-      "len": 200
+      "len": 160
     },
     "sdk": {
       "stroke": "solid",
       "color": "ink",
       "legend": "Worlds SDK / API code runs",
-      "len": 100
+      "len": 90
     },
     "operator": {
       "stroke": "dashed",
       "color": "orange",
       "legend": "an operator sets up",
-      "len": 120
+      "len": 110
     },
     "rest": {
       "stroke": "dotted",
       "color": "gray",
-      "legend": "at rest in the world, nothing running",
-      "len": 220
+      "legend": "at rest, nothing running",
+      "len": 120
     }
   },
   "vertices": {
     "write": {
       "shape": "diamond",
-      "legend": "writes a patch, can be revised"
+      "legend": "writes, can be revised"
     },
     "irreversible": {
       "shape": "diamond",
@@ -38,15 +38,10 @@
       "labelColor": true,
       "bold": true
     },
-    "search": {
-      "shape": "triangle",
+    "index": {
+      "shape": "hexagon",
       "color": "purple",
-      "legend": "fuzzy retrieval, ranked"
-    },
-    "sparql": {
-      "shape": "square",
-      "fill": "hollow",
-      "legend": "exact graph traversal"
+      "legend": "indexed for search"
     }
   },
   "tracks": [
@@ -55,32 +50,26 @@
       "lane": 0,
       "line": "operator",
       "start": {
-        "label": "operator",
-        "note": "wzp_ platform token"
+        "label": "operator"
       },
       "steps": [
         {
-          "line": "operator",
-          "len": 230
-        },
-        {
           "vertex": "irreversible",
           "label": "create world",
-          "note": "w_<ULID> · immutable id"
+          "note": "immutable id"
         },
         {
           "line": "operator",
-          "len": 250
+          "len": 95
         },
         {
           "vertex": "irreversible",
-          "label": "mint world token",
-          "note": "wzw_ secret shown once"
+          "label": "mint token",
+          "note": "shown once"
         },
         {
           "line": "rest",
-          "note": "world ready, empty",
-          "len": 210
+          "len": 75
         },
         {
           "vertex": "junction",
@@ -102,64 +91,47 @@
         {
           "line": "sdk",
           "label": "new fact",
-          "len": 150
+          "len": 180
         },
         {
           "vertex": "write",
-          "label": "import",
-          "note": "triples become a patch"
+          "label": "import"
         },
         {
           "line": "sdk",
-          "len": 330
+          "len": 300
         },
         {
           "vertex": "write",
           "id": "commit",
           "label": "commit",
-          "note": "atomic patch"
-        },
-        {
-          "line": "rest",
-          "label": "later",
           "note": [
-            "current state only",
-            "no history yet"
-          ]
-        },
-        {
-          "line": "agent",
-          "label": "Recall",
-          "note": "what do I need to know?"
-        },
-        {
-          "vertex": "search",
-          "label": "search",
-          "note": [
-            "keyword + vector · RRF",
-            "finds subject IRIs"
+            "atomic patch",
+            "skips known triples"
           ]
         },
         {
           "line": "sdk",
-          "label": "ground",
-          "len": 240
+          "len": 120
         },
         {
-          "vertex": "sparql",
-          "label": "SPARQL",
+          "vertex": "index",
+          "label": "index",
           "note": [
-            "exact facts about",
-            "those subjects"
+            "embed + chunk",
+            "failure rolls back"
           ]
         },
         {
-          "line": "agent",
-          "label": "Answer",
-          "note": "from graph facts, not weights"
+          "line": "rest",
+          "len": 90
         },
         {
-          "vertex": "stop"
+          "vertex": "stop",
+          "note": [
+            "stored",
+            "current state only"
+          ]
         }
       ]
     },
@@ -181,7 +153,7 @@
       "steps": [
         {
           "line": "agent",
-          "len": 110
+          "len": 90
         },
         {
           "vertex": "stop",
@@ -192,27 +164,29 @@
     {
       "id": "revise",
       "lane": -1.2,
+      "line": "sdk",
       "from": "keep",
       "merge": "commit",
       "label": "changed fact",
       "steps": [
         {
-          "line": "sdk"
+          "line": "sdk",
+          "len": 60
         },
         {
           "vertex": "irreversible",
-          "label": "delete old triple",
-          "note": "gone · no undo"
+          "label": "delete old",
+          "note": "no undo"
         },
         {
-          "line": "sdk"
+          "line": "sdk",
+          "len": 100
         },
         {
           "vertex": "write",
           "label": "insert new"
         }
-      ],
-      "line": "sdk"
+      ]
     }
   ]
 }

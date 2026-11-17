@@ -1,0 +1,75 @@
+{
+  "title": "Worlds, part 2: recalling a fact",
+  "lines": {
+    "agent": {
+      "stroke": "wave",
+      "color": "blue",
+      "legend": "the agent decides",
+      "len": 160
+    },
+    "sdk": {
+      "stroke": "solid",
+      "color": "ink",
+      "legend": "Worlds SDK / API code runs",
+      "len": 90
+    }
+  },
+  "vertices": {
+    "search": {
+      "shape": "triangle",
+      "color": "purple",
+      "legend": "fuzzy retrieval, ranked"
+    },
+    "sparql": {
+      "shape": "square",
+      "fill": "hollow",
+      "legend": "exact graph traversal"
+    }
+  },
+  "tracks": [
+    {
+      "id": "main",
+      "lane": 0,
+      "line": "agent",
+      "start": {
+        "label": "agent needs a fact"
+      },
+      "steps": [
+        {
+          "line": "agent",
+          "label": "Recall",
+          "note": "what do I need to know?"
+        },
+        {
+          "vertex": "search",
+          "label": "search",
+          "note": [
+            "keyword + vector · RRF",
+            "finds subject IRIs"
+          ]
+        },
+        {
+          "line": "sdk",
+          "label": "ground",
+          "len": 190
+        },
+        {
+          "vertex": "sparql",
+          "label": "SPARQL",
+          "note": [
+            "exact facts about",
+            "those subjects"
+          ]
+        },
+        {
+          "line": "agent",
+          "label": "Answer",
+          "note": "from graph facts, not weights"
+        },
+        {
+          "vertex": "stop"
+        }
+      ]
+    }
+  ]
+}

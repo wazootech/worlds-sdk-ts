@@ -1,4 +1,5 @@
 import type * as rdfjs from "@rdfjs/types";
+import type { ImportProvenance } from "./provenance/mod.ts";
 
 /**
  * ImportMode is the type of import to perform.
@@ -17,6 +18,14 @@ export interface ImportRequest {
 
   /** source of data */
   source: ImportSource;
+
+  /**
+   * provenance optionally stamps every quad written by this import with
+   * writer and source metadata. recordedAt defaults to the write time.
+   * Omitted provenance leaves imported quads without sidecar records, which
+   * provenance queries treat as "written pre-provenance".
+   */
+  provenance?: ImportProvenance;
 }
 
 /**

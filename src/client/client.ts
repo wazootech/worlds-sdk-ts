@@ -2,6 +2,9 @@ import type {
   ExportRequest,
   ExportResponse,
   ImportRequest,
+  ProvenanceQueryHandler,
+  ProvenanceQueryRequest,
+  ProvenanceQueryResponse,
   QuadStoreInterface,
 } from "./quad-store/mod.ts";
 import type {
@@ -56,6 +59,15 @@ export interface WorldsSdkInterface {
    * @returns A promise that resolves to processed quad and chunk row counts.
    */
   reindex(request?: ReindexRequest): Promise<ReindexResponse>;
+
+  /**
+   * provenance returns sidecar provenance records and supersedes history for
+   * quads matching the RDF pattern. Quads written before provenance recording
+   * appear with empty records; queries never fail on missing provenance.
+   * @param request The subject/predicate/object pattern to match.
+   * @returns A promise that resolves to per-quad provenance records and history.
+   */
+  provenance(request: ProvenanceQueryRequest): Promise<ProvenanceQueryResponse>;
 }
 
 /**
@@ -70,6 +82,9 @@ export interface WorldsSdkOptions {
 
   /** searchIndex enables high-performance keyword search across the graph literals. */
   searchIndex?: SearchIndexInterface;
+
+  /** provenance overrides the provenance query handler; defaults to the quad store when it exposes one. */
+  provenance?: ProvenanceQueryHandler;
 }
 
 /**
@@ -114,4 +129,31 @@ export class WorldsSdk implements WorldsSdkInterface {
     }
     return this.options.searchIndex.reindex(request);
   }
+
+  public async provenance(
+    request: ProvenanceQueryRequest,
+  ): Promise<ProvenanceQueryResponse> {
+    const handler = this.options.provenance ??
+      asProvenanceHandler(this.options.quadStore);
+    if (!handler) {
+      throw new Error("Provenance is not configured.");
+    }
+    return await handler.provenanceQuery(request);
+  }
+}
+
+/**
+ * asProvenanceHandler adapts a quad store that exposes provenanceQuery into a
+ * ProvenanceQueryHandler.
+ */
+function asProvenanceHandler(
+  quadStore?: QuadStoreInterface,
+): ProvenanceQueryHandler | undefined {
+  if (
+    quadStore && "provenanceQuery" in quadStore &&
+    typeof quadStore.provenanceQuery === "function"
+  ) {
+    return quadStore as unknown as ProvenanceQueryHandler;
+  }
+  return undefined;
 }

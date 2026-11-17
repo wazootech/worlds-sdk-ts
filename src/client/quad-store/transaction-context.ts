@@ -2,6 +2,7 @@ import type * as rdfjs from "@rdfjs/types";
 
 import type { ImportMode } from "./quad-store-interface.ts";
 import type { Patch } from "./patch.ts";
+import type { ImportProvenance } from "./provenance/mod.ts";
 
 /**
  * TransactionContext carries optional metadata for a buffered commit flush.
@@ -9,6 +10,9 @@ import type { Patch } from "./patch.ts";
 export interface TransactionContext {
   /** importMode signals bulk import replace semantics to durable commit handlers. */
   importMode?: ImportMode;
+
+  /** provenance carries the import's writer/source metadata to provenance-recording commit handlers. */
+  provenance?: ImportProvenance;
 }
 
 /**

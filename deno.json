@@ -16,6 +16,10 @@
     "./testing": "./src/testing/mod.ts",
     "./wazoo": "./src/wazoo/mod.ts"
   },
+  "minimumDependencyAge": {
+    "age": "P1D",
+    "exclude": ["jsr:@wazoo/sparql-engine", "jsr:@worlds/client"]
+  },
   "imports": {
     "@/": "./src/",
     "ai": "npm:ai@^6.0.195",

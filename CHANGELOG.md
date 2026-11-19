@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Shared commit and search-projection logic for the `worlds-*` backends
+  ([#266](https://github.com/wazootech/worlds-sdk-ts/issues/266), part of
+  [#265](https://github.com/wazootech/worlds-sdk-ts/issues/265)). All additive:
+  - `@worlds/sdk/quad-store`: `preparePatch`, `selectNovelQuads`, and
+    `computeNovelQuads` (include/exclude filter, hashing, and "novel unless
+    already stored, or deleted in the same patch").
+  - `@worlds/sdk/search-index`: `planSearchIndexing` and
+    `DEFAULT_SEARCH_INDEX_ON_IMPORT` (the `searchIndexOnImport` policy, with a
+    per-backend default).
+  - `@worlds/sdk/search-index/quad-chunker`: `chunkAndEmbedQuads` (chunk and
+    embed before any write; throw or degrade on an embedding failure).
+  - `@worlds/sdk/testing`: `runCommitConformanceSuite`, failure-path conformance
+    cases a backend runs against its own commit path.
+
 ## 0.9.0
 
 ### Added

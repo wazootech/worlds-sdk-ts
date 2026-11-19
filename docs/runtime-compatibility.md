@@ -7,8 +7,9 @@ it is not the only supported path.
 
 Measured 2026-11-18 against `@worlds/sdk` 0.9.0 on Node 24.11, npm 11.6, Bun
 1.3.14. Re-run after each publish with
-`node scripts/consumer-smoke.mjs <node|bun>`; it installs the published package
-into a throwaway project and runs import, search and SPARQL.
+`node scripts/consumer-smoke.mjs <node|bun>`, which the `Consumer smoke`
+workflow also runs after each `Publish`; it installs the published package into
+a throwaway project and runs import, search and SPARQL.
 
 ## Matrix
 

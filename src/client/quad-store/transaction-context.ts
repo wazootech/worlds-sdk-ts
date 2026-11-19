@@ -1,3 +1,4 @@
+import type { RdfjsStoreLike } from "./rdfjs-store-like.ts";
 import type * as rdfjs from "@rdfjs/types";
 
 import type { ImportMode } from "./quad-store-interface.ts";
@@ -18,7 +19,7 @@ export interface TransactionContext {
 /**
  * PatchableStore is an RDFJS store that natively supports atomic bulk-mutations via Patches.
  */
-export interface PatchableStore extends rdfjs.Store {
+export interface PatchableStore extends RdfjsStoreLike {
   /** applyPatch persists a patch atomically. */
   applyPatch(patch: Patch, context?: TransactionContext): Promise<void>;
 }

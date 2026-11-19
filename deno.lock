@@ -9,8 +9,7 @@
     "jsr:@std/internal@^1.0.12": "1.0.14",
     "jsr:@std/internal@^1.0.14": "1.0.14",
     "jsr:@std/path@^1.1.5": "1.1.5",
-    "jsr:@wazoo/sparql-engine@*": "0.4.1",
-    "jsr:@wazoo/sparql-engine@~0.4.1": "0.4.1",
+    "jsr:@wazoo/sparql-engine@0.5": "0.5.0",
     "jsr:@worlds/client@0.1": "0.1.0",
     "npm:@ai-sdk/google@^3.0.80": "3.0.80_zod@4.4.3",
     "npm:@langchain/core@^1.1.48": "1.1.48",
@@ -61,8 +60,8 @@
         "jsr:@std/internal@^1.0.14"
       ]
     },
-    "@wazoo/sparql-engine@0.4.1": {
-      "integrity": "6881bda5e45aaf8bac2cd87f8b43db5db51d307fccbffc1cd4edaa46454f9bd7",
+    "@wazoo/sparql-engine@0.5.0": {
+      "integrity": "2ffa7d4a542e0a3ddb4b75fb6fcf88d295d81b9ba99eedfd0904dbd2497b0afc",
       "dependencies": [
         "npm:@rdfjs/types"
       ]
@@ -626,7 +625,7 @@
       "jsr:@std/encoding@^1.0.10",
       "jsr:@std/fs@^1.0.24",
       "jsr:@std/path@^1.1.5",
-      "jsr:@wazoo/sparql-engine@~0.4.1",
+      "jsr:@wazoo/sparql-engine@0.5",
       "jsr:@worlds/client@0.1",
       "npm:@ai-sdk/google@^3.0.80",
       "npm:@langchain/core@^1.1.48",

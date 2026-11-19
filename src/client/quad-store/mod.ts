@@ -13,4 +13,5 @@ export * from "./rdf-formats.ts";
 export * from "./import-export-via-transaction.ts";
 export * from "./transaction.ts";
 export * from "./transactional-rdfjs-store.ts";
+export * from "./rdfjs-store-like.ts";
 export * from "./novel-quads.ts";

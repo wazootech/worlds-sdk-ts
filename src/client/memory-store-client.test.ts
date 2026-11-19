@@ -9,7 +9,6 @@
  * against @worlds/sdk/testing (see worlds-sqlite's client-integration and
  * parity suites).
  */
-import type * as rdfjs from "@rdfjs/types";
 import { assertEquals } from "@std/assert";
 import { DataFactory } from "@wazoo/sparql-engine/data-model";
 import { MemoryStore, WazooSparqlEngine } from "@wazoo/sparql-engine";
@@ -34,7 +33,7 @@ const ASK_QUERY =
   "ASK WHERE { <urn:alice> <http://schema.org/knows> <urn:bob> }";
 
 /* * Wires the full WorldsSdk facade over one shared RDF/JS store + WazooSparqlEngine. */
-function createWazooClient(store: rdfjs.Store & { size: number }): WorldsSdk {
+function createWazooClient(store: MemoryStore): WorldsSdk {
   return new WorldsSdk({
     quadStore: new RdfjsQuadStore({ store }),
     sparqlEngine: new WazooSparqlEngine({ store }),

@@ -39,12 +39,8 @@ of `@worlds/sdk` 0.9.0.
   `Cannot find package 'zod'` from `ai/dist/index.mjs`: `ai` declares `zod` as a
   peer dependency and a plain `npx jsr add` did not install it. `npm i zod@4`
   fixes it (verified). Bun installed it automatically.
-- **TypeScript under Node with `@wazoo/sparql-engine` 0.5.0.** With `tsc` 5
-  (`nodenext`, `strict`, `@types/node` 24), the hello-world
-  `new RdfjsQuadStore({ store })` and `new RdfjsSearchIndex(store)` calls report
-  that `MemoryStore` is not assignable to `Store<Quad>` (`remove()` returns
-  `RdfStream<RdfQuad>`, which lacks `EventEmitter` members). The program runs
-  correctly; only the type check fails. `@wazoo/sparql-engine` 0.4.1, the
-  version this package declares, type-checks cleanly, and `npx jsr add` installs
-  0.5.0 by default. Tracked in
-  [worlds-sdk-ts#268](https://github.com/wazootech/worlds-sdk-ts/issues/268).
+- **TypeScript under Node with `@worlds/sdk` 0.9.0 and `@wazoo/sparql-engine`
+  0.5.0.** The hello-world `MemoryStore` failed the type check
+  ([worlds-sdk-ts#268](https://github.com/wazootech/worlds-sdk-ts/issues/268)).
+  Fixed in 0.9.1 (requires engine `^0.5.0`); the consumer smoke script now
+  type-checks as well as runs.

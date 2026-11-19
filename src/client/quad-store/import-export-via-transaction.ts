@@ -1,4 +1,4 @@
-import type * as rdfjs from "@rdfjs/types";
+import type { RdfjsStoreLike } from "./rdfjs-store-like.ts";
 
 import type {
   ExportRequest,
@@ -46,7 +46,7 @@ export async function importViaTransaction(
 /**
  * RdfjsExportSource is the minimal RDF/JS surface required for quad export.
  */
-export type RdfjsExportSource = Pick<rdfjs.Store, "match">;
+export type RdfjsExportSource = Pick<RdfjsStoreLike, "match">;
 
 /**
  * exportFromRdfjsStore streams all quads from an RDF/JS store and serializes the export response.

@@ -1,6 +1,16 @@
 # Changelog
 
-## Unreleased
+## 0.9.1
+
+### Fixed
+
+- Type-check under `@wazoo/sparql-engine` 0.5
+  ([#268](https://github.com/wazootech/worlds-sdk-ts/issues/268)):
+  `RdfjsQuadStore`, `RdfjsSearchIndex`, and the commit helpers now take the new
+  `RdfjsStoreLike` (exported from `@worlds/sdk/quad-store`), which accepts every
+  RDF/JS `Store` and the engine 0.5 `MemoryStore`, whose mutations no longer
+  return a Node `EventEmitter`. The `@wazoo/sparql-engine` requirement is now
+  `^0.5.0`.
 
 ### Added
 

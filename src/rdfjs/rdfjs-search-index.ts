@@ -9,6 +9,7 @@ import type {
 } from "@/client/search-index/mod.ts";
 import { buildSearchResultId } from "@/client/search-index/build-search-result-id.ts";
 import { filterQuads, isTextualLiteral } from "@/client/quad-store/mod.ts";
+import type { RdfjsStoreLike } from "@/client/quad-store/rdfjs-store-like.ts";
 
 /**
  * RdfjsSearchIndex is the implementation of SearchIndexInterface that uses an RDF/JS store.
@@ -21,7 +22,7 @@ export class RdfjsSearchIndex implements SearchIndexInterface {
    * N3-specific surface needed.
    */
   public constructor(
-    private readonly store: rdfjs.Store & { size: number },
+    private readonly store: RdfjsStoreLike & { size: number },
   ) {}
 
   public async search(request: SearchRequest): Promise<SearchResponse> {

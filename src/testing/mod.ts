@@ -15,3 +15,11 @@
  */
 export * from "./parity-fixtures.ts";
 export * from "./run-parity-suite.ts";
+export * from "./run-commit-conformance.ts";
+export type {
+  CommitConformanceContract,
+  CommitConformanceCreateOptions,
+  CommitConformanceFactory,
+  CommitConformanceSubject,
+  CommitConformanceSuiteOptions,
+} from "./commit-conformance-types.ts";

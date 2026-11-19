@@ -1,0 +1,33 @@
+name: Consumer smoke
+
+# Installs the published @worlds/sdk from JSR's npm layer and runs the
+# hello-world flow on Node.js and Bun. It tests what is on JSR, not this
+# checkout, so it runs after Publish rather than on pull requests.
+on:
+  workflow_run:
+    workflows: [Publish]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [node, bun]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.11.1
+      - name: Install Bun
+        if: matrix.runtime == 'bun'
+        run: npm install -g bun@1.3.14
+      - name: Run consumer smoke
+        run: node scripts/consumer-smoke.mjs ${{ matrix.runtime }}

@@ -31,6 +31,9 @@ deno add jsr:@worlds/sdk
 npx jsr add @worlds/sdk
 ```
 
+See [docs/runtime-compatibility.md](docs/runtime-compatibility.md) for what is
+verified on Node.js, Bun, and Deno, and the known limitations.
+
 ### CDN (browser / no build step)
 
 [esm.sh](https://esm.sh) serves JSR packages as ES modules — no install, no

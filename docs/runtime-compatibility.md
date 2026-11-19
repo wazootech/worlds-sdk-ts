@@ -13,19 +13,27 @@ a throwaway project and runs import, search and SPARQL.
 
 ## Matrix
 
-| Toolchain          | Install                         | Core + `/rdfjs` (import, search, SPARQL) | Every subpath imports | TypeScript types     |
-| ------------------ | ------------------------------- | ---------------------------------------- | --------------------- | -------------------- |
-| Deno               | `deno add jsr:@worlds/sdk`      | Yes (repo CI)                            | Yes (repo CI)         | Yes (`deno task ci`) |
-| Node.js + npm      | `npx jsr add @worlds/sdk`       | Yes                                      | 11 of 12, see below   | Fails, see below     |
-| Bun                | `bunx jsr add @worlds/sdk`      | Yes                                      | 12 of 12              | Not tested           |
-| pnpm, Yarn         | `pnpm dlx jsr add` / `yarn dlx` | Not tested                               | Not tested            | Not tested           |
-| Cloudflare Workers | n/a                             | Not tested                               | Not tested            | Not tested           |
+| Toolchain          | Install                        | Core + `/rdfjs` (import, search, SPARQL) | Every subpath imports | TypeScript types     |
+| ------------------ | ------------------------------ | ---------------------------------------- | --------------------- | -------------------- |
+| Deno               | `deno add jsr:@worlds/sdk`     | Yes (repo CI)                            | Yes (repo CI)         | Yes (`deno task ci`) |
+| Node.js + npm      | `npx jsr add @worlds/sdk`      | Yes                                      | 11 of 12, see below   | Fails, see below     |
+| Bun                | `bunx jsr add @worlds/sdk`     | Yes                                      | 12 of 12              | Not tested           |
+| pnpm 12            | `pnpm dlx jsr add @worlds/sdk` | Yes                                      | 12 of 12              | Not tested           |
+| Yarn               | `yarn dlx jsr add @worlds/sdk` | Not tested                               | Not tested            | Not tested           |
+| Cloudflare Workers | n/a                            | Not tested                               | Not tested            | Not tested           |
 
 "Every subpath" means a bare `import("@worlds/sdk/<subpath>")` for each key in
 `deno.json` `exports`. The Deno KV backend named in older docs is not an export
 of `@worlds/sdk` 0.9.0.
 
 ## Known limitations
+
+- **`pnpm dlx jsr add` exits 1 on pnpm 12.** The packages are installed and the
+  hello-world flow and all 12 subpaths work, but pnpm reports
+  `ERR_PNPM_IGNORED_BUILDS` for `core-js@3.29.1` (a build script pulled in
+  through the TensorFlow.js dependency) and fails the command. Run
+  `pnpm approve-builds` or allow that build in the project's pnpm settings. pnpm
+  also installed `zod`, so the `ai-sdk` subpath imports there.
 
 - **`@worlds/sdk/ai-sdk` on npm needs `zod`.** The import fails with
   `Cannot find package 'zod'` from `ai/dist/index.mjs`: `ai` declares `zod` as a

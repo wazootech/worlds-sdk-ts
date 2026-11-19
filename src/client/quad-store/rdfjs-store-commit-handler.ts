@@ -1,5 +1,6 @@
 import type * as rdfjs from "@rdfjs/types";
 import type { TransactionContext } from "@/client/quad-store/mod.ts";
+import type { RdfjsStoreLike } from "./rdfjs-store-like.ts";
 
 /**
  * createRdfjsStoreCommitHandler returns a commit function that applies Patches
@@ -7,7 +8,7 @@ import type { TransactionContext } from "@/client/quad-store/mod.ts";
  * For robust usage, the underlying store should support synchronous add/delete.
  */
 export function createRdfjsStoreCommitHandler(
-  store: rdfjs.Store,
+  store: RdfjsStoreLike,
 ): (
   patch: import("./patch.ts").Patch,
   context?: TransactionContext,

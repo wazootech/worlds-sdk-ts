@@ -16,6 +16,7 @@ import {
   Transaction,
 } from "@/client/quad-store/mod.ts";
 import { MemoryStore } from "@wazoo/sparql-engine";
+import type { RdfjsStoreLike } from "@/client/quad-store/rdfjs-store-like.ts";
 import type {
   ProvenanceQueryRequest,
   ProvenanceQueryResponse,
@@ -31,7 +32,7 @@ export type { RecordPatchProvenanceOptions } from "./rdfjs-quad-store-provenance
  */
 export interface RdfjsQuadStoreOptions {
   /** store is the active in-memory quad backend. */
-  store?: rdfjs.Store;
+  store?: RdfjsStoreLike;
 
   /** commit optionally overrides how transactions are persisted. */
   commit?: (
@@ -56,7 +57,7 @@ export interface RdfjsQuadStoreOptions {
 export class RdfjsQuadStore implements QuadStoreInterface {
   public readonly provenanceStore: ProvenanceStore;
 
-  private readonly store: rdfjs.Store;
+  private readonly store: RdfjsStoreLike;
 
   public constructor(private readonly options?: RdfjsQuadStoreOptions) {
     this.store = options?.store ?? new MemoryStore();
@@ -130,6 +131,6 @@ export class RdfjsQuadStore implements QuadStoreInterface {
 /**
  * collectAllQuads drains every quad currently in the store.
  */
-async function collectAllQuads(store: rdfjs.Store): Promise<rdfjs.Quad[]> {
+async function collectAllQuads(store: RdfjsStoreLike): Promise<rdfjs.Quad[]> {
   return await collectQuadsFromStream(store.match(null, null, null, null));
 }

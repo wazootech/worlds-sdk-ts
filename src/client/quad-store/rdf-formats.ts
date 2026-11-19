@@ -1,3 +1,4 @@
+import type { RdfjsStoreLike } from "./rdfjs-store-like.ts";
 import type * as rdfjs from "@rdfjs/types";
 import {
   MemoryStream,
@@ -123,11 +124,11 @@ export function exportQuadsResponse(
  * honor isReplaceImportCommit in their commit patch handlers.
  */
 export function awaitDrainRemoveMatches(
-  store: rdfjs.Store,
+  store: RdfjsStoreLike,
 ): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     const removalStream = store.removeMatches(null, null, null, null);
-    removalStream.on("end", resolve);
-    removalStream.on("error", reject);
+    removalStream.on("end", () => resolve());
+    removalStream.on("error", (error) => reject(error));
   });
 }

@@ -33,7 +33,8 @@ const failedCases = (report: ParityReport) =>
 
 Deno.test("conformance suite - the reference pipeline passes every case", async () => {
   const report = await run();
-  assertEquals(report.results.length, 9);
+  assertEquals(report.results.length, 10);
+  assertEquals(report.notes, undefined);
   assertEquals(report.ok, true, describe(report));
 });
 
@@ -88,4 +89,54 @@ Deno.test("conformance suite - a failed replace import that wiped the graph pass
   ]);
   const declared = await run(wiping, { replaceImportFailure: "empties-graph" });
   assertEquals(declared.ok, true, describe(declared));
+});
+
+Deno.test("conformance suite - a subject without failLaterWrite keeps its nine cases and gets a note", async () => {
+  const report = await runCommitConformanceSuite({
+    contract,
+    create: (create) => {
+      const { failLaterWrite: _, ...legacy } = createReferenceCommitStore(
+        create,
+      );
+      return legacy;
+    },
+  });
+  assertEquals(report.ok, true, describe(report));
+  assertEquals(report.results.length, 9);
+  assertEquals(report.notes?.length, 1);
+  assertEquals(
+    report.notes?.[0]?.startsWith("later-write failure follows the contract: "),
+    true,
+  );
+});
+
+Deno.test("conformance suite - a later-write failure that leaves quads behind passes only when declared", async () => {
+  const keeping = { bug: "keep-quads-on-later-failure" } as const;
+  const later = "later-write failure follows the contract";
+  for (const declared of [{}, { atomic: false }]) {
+    assertEquals(failedCases(await run(keeping, declared)), [later]);
+  }
+  const limits = {
+    atomic: false,
+    laterWriteFailure: "keeps-written-quads",
+  } as const;
+  assertEquals((await run(keeping, limits)).ok, true);
+  // A non-atomic backend that cleans up passes with the default declaration.
+  assertEquals((await run({}, { atomic: false })).ok, true);
+});
+
+Deno.test("conformance suite - catches orphan chunk rows left by a failed later write", async () => {
+  const bug = { bug: "orphan-chunks-on-failure" } as const;
+  const keeps = {
+    atomic: false,
+    laterWriteFailure: "keeps-written-quads",
+  } as const;
+  for (const declared of [{}, keeps]) {
+    assertEquals(
+      failedCases(await run(bug, declared)).includes(
+        "later-write failure follows the contract",
+      ),
+      true,
+    );
+  }
 });

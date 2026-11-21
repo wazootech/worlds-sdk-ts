@@ -32,6 +32,19 @@ export interface CommitConformanceContract {
 
   /** defaultSearchIndexOnImport is the mode used when `searchIndexOnImport` is unset. */
   defaultSearchIndexOnImport: SearchIndexOnImport;
+
+  /**
+   * laterWriteFailure is what a commit leaves behind when a write that comes
+   * after its quad writes fails (see `failLaterWrite`). Optional; the default is
+   * "restores-prior-state". An atomic backend always restores the prior state, so
+   * the field is ignored when `atomic` is true.
+   *
+   * - "restores-prior-state": the failed commit's quads and chunk rows are gone
+   *   (rolled back, or removed by a cleanup).
+   * - "keeps-written-quads": the quads already written stay stored. The backend
+   *   still promises no chunk row refers to a quad that is not stored.
+   */
+  laterWriteFailure?: "restores-prior-state" | "keeps-written-quads";
 }
 
 /** CommitConformanceCreateOptions is what the suite configures on each fresh subject. */
@@ -65,6 +78,21 @@ export interface CommitConformanceSubject {
    * embedding has finished. Earlier and later writes are unaffected.
    */
   failNextWrite(): void;
+
+  /**
+   * failLaterWrite is optional. It makes the next commit fail on a write that
+   * comes after that commit's quad writes have been applied, once: a chunk-row
+   * write inside the same transaction or batch, or a later batch of a chunked
+   * commit. `failNextWrite` hits the first write, so it cannot tell an atomic
+   * backend (which rolls the quad writes back) from a non-atomic one (which must
+   * clean them up, or declare `laterWriteFailure: "keeps-written-quads"`).
+   * Without this hook the suite skips the later-write case and says so in
+   * `report.notes`. The commit that fails must insert at least two novel textual
+   * quads under `searchIndexOnImport: "incremental"`, so a chunk write follows
+   * the quad writes; a backend whose commit is chunked should size its batches
+   * so the failing write is not the first batch.
+   */
+  failLaterWrite?(): void;
 
   /** fullRebuildCount returns how many full search-index rebuilds have run. */
   fullRebuildCount(): number;

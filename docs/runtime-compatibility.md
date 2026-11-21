@@ -1,15 +1,16 @@
 # Runtime compatibility
 
-`@worlds/sdk` is authored for Deno and published to JSR. Node.js/npm, pnpm and
-Bun consume the same release through JSR's npm compatibility layer
-(`npx jsr add @worlds/sdk`, `bunx jsr add @worlds/sdk`). Deno stays first-class;
-it is not the only supported path.
+`@worlds/sdk` is authored for Deno and published to JSR. Node.js/npm, pnpm, Yarn
+and Bun consume the same release through JSR's npm compatibility layer
+(`npx jsr add @worlds/sdk`, `bunx jsr add @worlds/sdk`,
+`yarn dlx jsr add @worlds/sdk`). Deno stays first-class; it is not the only
+supported path.
 
 Measured 2026-11-18 against `@worlds/sdk` 0.9.0 on Node 24.11, npm 11.6, Bun
-1.3.14. Re-run after each publish with
-`node scripts/consumer-smoke.mjs <node|bun>`, which the `Consumer smoke`
-workflow also runs after each `Publish`; it installs the published package into
-a throwaway project and runs import, search and SPARQL.
+1.3.14; Yarn 4.9.2 measured 2026-11-20 against 0.9.1. Re-run after each publish
+with `node scripts/consumer-smoke.mjs <node|bun|yarn>`, which the
+`Consumer smoke` workflow also runs after each `Publish`; it installs the
+published package into a throwaway project and runs import, search and SPARQL.
 
 ## Matrix
 
@@ -19,8 +20,17 @@ a throwaway project and runs import, search and SPARQL.
 | Node.js + npm      | `npx jsr add @worlds/sdk`      | Yes                                      | 11 of 12, see below   | Fails, see below     |
 | Bun                | `bunx jsr add @worlds/sdk`     | Yes                                      | 12 of 12              | Not tested           |
 | pnpm 12            | `pnpm dlx jsr add @worlds/sdk` | Yes                                      | 12 of 12              | Not tested           |
-| Yarn               | `yarn dlx jsr add @worlds/sdk` | Not tested                               | Not tested            | Not tested           |
-| Cloudflare Workers | n/a                            | Not tested                               | Not tested            | Not tested           |
+| Yarn 4             | `yarn dlx jsr add @worlds/sdk` | Yes                                      | Not tested            | Yes                  |
+| Cloudflare Workers | n/a                            | Not tested, see below                    | Not tested            | Not tested           |
+
+Yarn is Yarn 4 (Berry) through Corepack with `nodeLinker: node-modules`;
+`yarn dlx jsr add` registers the `@jsr` scope and installs
+`@worlds/sdk@npm:@jsr/worlds__sdk`. The consumer smoke runs it with the same
+`tsc` type-check as Node.js. Yarn Classic (1.x) and Plug'n'Play were not tried.
+
+Cloudflare Workers is deliberately untested until someone needs it: a Workers
+check needs a `wrangler` project and a deploy target that nothing here uses yet.
+Open an issue with the use case to change that.
 
 "Every subpath" means a bare `import("@worlds/sdk/<subpath>")` for each key in
 `deno.json` `exports`. The Deno KV backend named in older docs is not an export

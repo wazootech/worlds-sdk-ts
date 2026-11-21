@@ -1,10 +1,11 @@
 // Consumer smoke test: installs the PUBLISHED @worlds/sdk from JSR's npm
 // compatibility layer into a throwaway project and runs the hello-world flow
-// (import, search, SPARQL) under Node.js/npm or Bun, then type-checks the same
+// (import, search, SPARQL) under Node.js/npm, Bun or Yarn, then type-checks the same
 // file with tsc as a consumer would.
 //
 //   node scripts/consumer-smoke.mjs node
 //   node scripts/consumer-smoke.mjs bun
+//   node scripts/consumer-smoke.mjs yarn
 //
 // It tests what is on JSR, not this checkout, so run it after a publish.
 import { execSync } from "node:child_process";
@@ -26,10 +27,21 @@ const plans = {
     addDev: ["bun", "add", "-d", "typescript@5", "@types/node@24"],
     tsc: ["bunx", "tsc"],
   },
+  // Yarn 4 (Berry) through Corepack, with the node-modules linker so the
+  // hello-world and tsc resolve packages the way they do under npm.
+  // `yarn dlx jsr add` registers the @jsr scope and adds the package.
+  yarn: {
+    packageManager: "yarn@4.9.2",
+    yarnrc: "nodeLinker: node-modules\n",
+    add: ["corepack", "yarn", "dlx", "jsr", "add"],
+    run: ["node", "smoke.mjs"],
+    addDev: ["corepack", "yarn", "add", "-D", "typescript@5", "@types/node@24"],
+    tsc: ["corepack", "yarn", "tsc"],
+  },
 };
 const plan = plans[runtime];
 if (!plan) {
-  console.error("usage: consumer-smoke.mjs <node|bun>");
+  console.error("usage: consumer-smoke.mjs <node|bun|yarn>");
   process.exit(2);
 }
 
@@ -72,8 +84,14 @@ const sh = (cmd) => execSync(cmd.join(" "), { cwd: dir, stdio: "inherit" });
 try {
   writeFileSync(
     join(dir, "package.json"),
-    JSON.stringify({ name: "consumer", private: true, type: "module" }),
+    JSON.stringify({
+      name: "consumer",
+      private: true,
+      type: "module",
+      ...(plan.packageManager && { packageManager: plan.packageManager }),
+    }),
   );
+  if (plan.yarnrc) writeFileSync(join(dir, ".yarnrc.yml"), plan.yarnrc);
   writeFileSync(join(dir, "smoke.mjs"), SMOKE);
   writeFileSync(join(dir, "smoke.ts"), SMOKE);
   writeFileSync(join(dir, "tsconfig.json"), TSCONFIG);

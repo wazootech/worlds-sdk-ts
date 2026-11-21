@@ -17,11 +17,11 @@ export interface CommitConformanceContract {
   atomic: boolean;
 
   /**
-   * embeddingFailure is "throws" when an embedding error rejects the commit
-   * before anything is written, or "degrades" when the commit succeeds and the
-   * chunks are stored without vectors (repaired by a reindex).
+   * embeddingFailure is "throws": an embedding error rejects the commit before
+   * anything is written, on every backend. It is the only value; the field
+   * stays so existing contracts compile.
    */
-  embeddingFailure: "throws" | "degrades";
+  embeddingFailure: "throws";
 
   /**
    * replaceImportFailure is what a replace-mode import that fails during its

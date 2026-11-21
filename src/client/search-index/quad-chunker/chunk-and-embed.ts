@@ -35,30 +35,20 @@ export interface ChunkAndEmbedOptions {
 
   /** vectorDimensions rejects an embedding of any other length. Unchecked when omitted. */
   vectorDimensions?: number;
-
-  /**
-   * onEmbeddingFailure picks what an embedding error does. "throw" (default)
-   * rejects before the caller writes anything. "degrade" returns the rows
-   * without vectors plus `embeddingError`, for backends that store keyword-only
-   * chunks and repair vectors on reindex.
-   */
-  onEmbeddingFailure?: "throw" | "degrade";
 }
 
 /** ChunkAndEmbedResult is what a backend writes for a set of novel quads. */
 export interface ChunkAndEmbedResult {
   /** rows are the chunk rows to write; empty when no quad has textual content. */
   rows: EmbeddedChunk[];
-
-  /** embeddingError is set only when `onEmbeddingFailure` is "degrade" and embedding failed. */
-  embeddingError?: unknown;
 }
 
 /**
  * chunkAndEmbedQuads chunks the textual literals of `quads` and embeds them,
  * entirely before the caller opens a write. Chunking and embedding call out to
  * a splitter and an external service, so doing them first means a failure
- * writes nothing. The embedding call receives the de-duplicated chunk texts, as
+ * writes nothing. An embedding failure always rejects, so the caller can retry;
+ * there is no keyword-only fallback. The embedding call receives the de-duplicated chunk texts, as
  * in `@worlds/libsql`, the reference backend.
  */
 export async function chunkAndEmbedQuads(
@@ -84,9 +74,6 @@ export async function chunkAndEmbedQuads(
       rows: rows.map((row) => ({ ...row, vector: vectors.get(row.ftsValue) })),
     };
   } catch (cause) {
-    if (options.onEmbeddingFailure === "degrade") {
-      return { rows, embeddingError: cause };
-    }
     throw new Error("failed to vectorize literal chunk blocks", { cause });
   }
 }

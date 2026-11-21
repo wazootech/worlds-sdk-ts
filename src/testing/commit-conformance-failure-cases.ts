@@ -12,7 +12,7 @@ import {
   workingEmbeddings,
 } from "./commit-conformance-support.ts";
 
-/** an embedding failure either writes nothing or stores keyword-only chunks, as declared. */
+/** an embedding failure rejects the commit and writes nothing. */
 export async function embeddingFailureCase(ctx: CaseContext): Promise<void> {
   const subject = await ctx.create({
     searchIndexOnImport: "incremental",
@@ -23,16 +23,10 @@ export async function embeddingFailureCase(ctx: CaseContext): Promise<void> {
   );
   const stored = (await subject.storedQuads()).length;
   const chunks = (await subject.chunkedQuadIds()).length;
-  if (ctx.contract.embeddingFailure === "throws") {
-    if (!failed) ctx.fail("embedding failure: expected the commit to reject");
-    if (stored !== 0 || chunks !== 0) {
-      ctx.fail(
-        `embedding failure: nothing may be written, found ${stored} quads and ${chunks} chunks`,
-      );
-    }
-  } else if (failed || stored !== 1 || chunks !== 1) {
+  if (!failed) ctx.fail("embedding failure: expected the commit to reject");
+  if (stored !== 0 || chunks !== 0) {
     ctx.fail(
-      "embedding failure: expected the quad and a keyword-only chunk to be stored",
+      `embedding failure: nothing may be written, found ${stored} quads and ${chunks} chunks`,
     );
   }
 }

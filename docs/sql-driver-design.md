@@ -74,7 +74,7 @@ changed and what stays.
 | 2  | Replace-import wipe              | first statements of the commit's batch                                                         | first statements of the commit's batch                                | first statements of the commit's batch; a commit over the batch size takes the fallback          | first statement of the commit's SQL transaction                                           |
 | 3  | Default `searchIndexOnImport`    | `incremental`                                                                                  | `incremental`                                                         | `deferred`, set explicitly (`D1_DEFAULT_SEARCH_INDEX_ON_IMPORT`)                                 | `incremental` (option `searchIndexOnImport`)                                              |
 | 4  | Write order                      | chunk and embed, then write                                                                    | chunk and embed, then write                                           | chunk and embed, then write                                                                      | chunk and embed, then write                                                               |
-| 5  | Embedding failure                | throws                                                                                         | throws                                                                | throws                                                                                           | throws (the projection options fix `onEmbeddingFailure: "throw"`)                         |
+| 5  | Embedding failure                | throws                                                                                         | throws                                                                | throws                                                                                           | throws                                                                                    |
 | 6  | Embedding de-duplication         | shared helper                                                                                  | shared helper                                                         | shared helper                                                                                    | shared helper                                                                             |
 | 7  | Vector length check              | yes (`vectorDimensions` from the query builder)                                                | yes (same)                                                            | yes (same)                                                                                       | yes (`vectorDimensions`, default 1536)                                                    |
 | 8  | Keyword text normalisation       | shared `buildChunkFtsValue`                                                                    | shared `buildChunkFtsValue`                                           | shared `buildChunkFtsValue`                                                                      | generated `tsvector` column                                                               |
@@ -90,8 +90,8 @@ IndexedDB, for completeness: layer 1 helpers, quads, deletions, replace wipe and
 chunk rows in one readwrite transaction (`atomic: true`, a failed write keeps
 the old graph), embedding before that transaction because it auto-commits across
 an await of a non-IndexedDB promise, default `incremental`, embedding failure
-throws unless the factory option `onEmbeddingFailure: "degrade"` is set, and a
-deferred import reindexes once afterwards.
+throws (the option `onEmbeddingFailure` no longer exists), and a deferred import
+reindexes once afterwards.
 
 Facts that bound the design:
 
@@ -129,8 +129,7 @@ here is exported from `@worlds/sdk`.
   limits, never raise them), `rebuildPageSize`, and `afterWrite(summary)` for
   work that cannot join the batch.
 - `commitSqlPatch` returns a `SqlCommitSummary` (`novelQuads`, `chunkRows`,
-  `rebuilt`, `embeddingError`). `embeddingError` is set only under
-  `onEmbeddingFailure: "degrade"`.
+  `rebuilt`).
 
 ## 4. The commit sequence and the atomicity contract
 
@@ -144,8 +143,7 @@ here is exported from `@worlds/sdk`.
 3. `planSearchIndexing` decides whether to project chunks in this commit and
    whether a full rebuild follows.
 4. `chunkAndEmbedQuads` for the novel quads, only when step 3 says to project.
-   An embedding failure follows `onEmbeddingFailure` (default `"throw"`) and
-   writes nothing on either path.
+   An embedding failure always throws and writes nothing on either path.
 5. Build one statement list: wipe (replace imports), deletions, deletes and
    inserts for the novel quads, chunk rows.
 6. Write it:
@@ -254,7 +252,7 @@ and each vector dialect stay backend-local; this design keeps that.
 | 2  | Replace-import wipe      | Converged: the wipe joins the commit's statement list everywhere                                            | Above the atomic limit (D1 over 100, libsql and sqlite over 10,000) the fallback applies and a failed replace leaves an empty graph (`empties-graph`).                             |
 | 3  | Default mode             | Converged on `incremental` for libsql, sqlite, Postgres and IndexedDB. Kept: D1 `deferred`                  | D1 keeps `deferred` explicitly because hosted consumers depend on quads first, then one rebuild. Whether Workers limits force it is not measured; the flip is a separate decision. |
 | 4  | Write order              | Converged: embed before any write (sqlite and D1 used to write quads first)                                 | None                                                                                                                                                                               |
-| 5  | Embedding failure        | Converged: throws, nothing written, on every backend (D1 flipped from `degrades`, decision 2026-11-20)      | `onEmbeddingFailure: "degrade"` survives in `chunkAndEmbedQuads` and as an IndexedDB factory option (section 10).                                                                  |
+| 5  | Embedding failure        | Converged: throws, nothing written, on every backend (D1 flipped from `degrades`, decision 2026-11-20)      | None. `onEmbeddingFailure: "degrade"` and `embeddingError` were removed from `chunkAndEmbedQuads` (worlds-sdk-ts#280).                                                             |
 | 6  | De-duplication           | Converged on the shared helper                                                                              | None                                                                                                                                                                               |
 | 7  | Vector length check      | Converged: every backend passes `vectorDimensions` to the shared helper                                     | None                                                                                                                                                                               |
 | 8  | Keyword text             | Kept                                                                                                        | Postgres uses a generated column; the others use `buildChunkFtsValue`. Dialect-specific.                                                                                           |
@@ -326,12 +324,13 @@ Still open:
 
 - **D1 `deferred`**: needs a measurement of whether Workers limits force it,
   then a decision to flip or document it as forced.
-- **Removing `onEmbeddingFailure: "degrade"`** from `chunkAndEmbedQuads` is a
-  deliberate later `@worlds/sdk` release. The 2026-11-20 decision said it has no
-  user once D1 flips, but IndexedDB still exposes the option
-  (`create-indexeddb-sdk.ts`, default `"throw"`), and the core's
-  `SqlCommitSummary.embeddingError` depends on it. IndexedDB would drop the
-  option first.
+- **`onEmbeddingFailure: "degrade"` is removed** from `chunkAndEmbedQuads`
+  (worlds-sdk-ts#280), along with `ChunkAndEmbedResult.embeddingError`. The
+  IndexedDB option went first (worlds-indexeddb#37). Still to do downstream:
+  `@worlds/sqlite`'s `commitSqlPatch` reads `embeddingError` into
+  `SqlCommitSummary.embeddingError`, and `@worlds/postgres` passes
+  `onEmbeddingFailure: "throw"`; both drop it when they take the SDK release
+  that removes the option.
 - **libsql `reindex()`** still uses its own rebuild instead of
   `rebuildSqlSearchIndex` (row 14).
 - Request-size limits for a 10,000-statement batch against remote Turso: not

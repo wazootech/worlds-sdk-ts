@@ -1,6 +1,6 @@
 {
   "name": "@worlds/sdk",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "nodeModulesDir": "auto",
   "exports": {
     ".": "./src/mod.ts",

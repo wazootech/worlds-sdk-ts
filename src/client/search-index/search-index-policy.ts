@@ -4,8 +4,8 @@ import type { SearchIndexOnImport } from "./search-index-interface.ts";
 
 /**
  * DEFAULT_SEARCH_INDEX_ON_IMPORT is the mode a backend uses when the option is
- * unset: project chunks as quads are written. `@worlds/cloudflare` defaults to
- * "deferred" instead and passes that as `defaultMode` below.
+ * unset: project chunks as quads are written. Every backend, `@worlds/cloudflare`
+ * included, takes it.
  */
 export const DEFAULT_SEARCH_INDEX_ON_IMPORT: SearchIndexOnImport =
   "incremental";

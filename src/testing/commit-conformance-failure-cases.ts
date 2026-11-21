@@ -4,22 +4,13 @@ import {
   fixtureQuads as f,
   insertPatch,
   mergeImport,
+  rejects,
   replaceImport,
   sameIds,
   sortedIds,
   storedIds,
   workingEmbeddings,
 } from "./commit-conformance-support.ts";
-
-/** rejects reports whether `run` rejected, without letting the error escape. */
-async function rejects(run: () => Promise<void>): Promise<boolean> {
-  try {
-    await run();
-    return false;
-  } catch {
-    return true;
-  }
-}
 
 /** an embedding failure either writes nothing or stores keyword-only chunks, as declared. */
 export async function embeddingFailureCase(ctx: CaseContext): Promise<void> {

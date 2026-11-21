@@ -51,4 +51,6 @@ export interface ParityReport {
   ok: boolean;
   /** results is one entry per fixture and replace case. */
   results: ParityCaseResult[];
+  /** notes records run-level observations, such as an optional case that was skipped. */
+  notes?: string[];
 }

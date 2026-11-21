@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased (next patch)
+
+### Added
+
+- `@worlds/sdk/testing`: an optional `failLaterWrite()` hook on
+  `CommitConformanceSubject`, an optional `laterWriteFailure` field on
+  `CommitConformanceContract`, and an optional `notes` field on the report. With
+  the hook, `runCommitConformanceSuite` runs a tenth case that fails a write
+  after the commit's quad writes, so atomic backends (nothing left behind) and
+  non-atomic backends (cleaned up, or declared with
+  `laterWriteFailure: "keeps-written-quads"`) are told apart
+  ([#265](https://github.com/wazootech/worlds-sdk-ts/issues/265)). Without the
+  hook the case is skipped, `results` is unchanged, and the reason is in
+  `report.notes`. All additive.
+
 ## 0.9.1
 
 ### Fixed

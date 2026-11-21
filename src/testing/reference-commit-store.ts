@@ -42,7 +42,8 @@ export interface ReferenceStoreOptions extends CommitConformanceCreateOptions {
   bug?:
     | "write-before-embed"
     | "orphan-chunks-on-failure"
-    | "wipe-before-failure";
+    | "wipe-before-failure"
+    | "keep-quads-on-later-failure";
 }
 
 /**
@@ -58,6 +59,7 @@ export function createReferenceCommitStore(
   let chunks: string[] = [];
   let rebuilds = 0;
   let failArmed = false;
+  let laterFailArmed = false;
 
   const textChunks = async (batch: rdfjs.Quad[]) =>
     (await chunkAndEmbedQuads(batch, batch.map(hashQuad), {
@@ -87,6 +89,15 @@ export function createReferenceCommitStore(
       ? await textChunks(novelInsertions)
       : [];
 
+    if (laterFailArmed) {
+      // The quad writes landed; a later write (chunk rows) fails.
+      laterFailArmed = false;
+      if (options.bug === "keep-quads-on-later-failure") {
+        novelInsertions.forEach(store);
+      }
+      if (options.bug === "orphan-chunks-on-failure") chunks.push(...rows);
+      throw new Error("injected later write failure");
+    }
     if (failArmed) {
       failArmed = false;
       if (options.bug === "orphan-chunks-on-failure") chunks.push(...rows);
@@ -119,6 +130,9 @@ export function createReferenceCommitStore(
     chunkedQuadIds: () => Promise.resolve([...chunks]),
     failNextWrite: () => {
       failArmed = true;
+    },
+    failLaterWrite: () => {
+      laterFailArmed = true;
     },
     fullRebuildCount: () => rebuilds,
   };

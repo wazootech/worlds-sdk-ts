@@ -33,6 +33,8 @@ export const failingEmbeddings: EmbeddingService = {
 export type CaseContext = CommitConformanceSuiteOptions & {
   /** fail records a failed expectation. */
   fail: (message: string) => void;
+  /** skip records that the case could not run, with the reason; the report notes it. */
+  skip: (note: string) => void;
 };
 
 /** ids returns the content hash of each quad, sorted for set comparison. */
@@ -62,3 +64,13 @@ export const mergeImport = { importMode: "merge" } as const;
 
 /** replaceImport is the context of a replace-mode import. */
 export const replaceImport = { importMode: "replace" } as const;
+
+/** rejects reports whether `run` rejected, without letting the error escape. */
+export async function rejects(run: () => Promise<void>): Promise<boolean> {
+  try {
+    await run();
+    return false;
+  } catch {
+    return true;
+  }
+}

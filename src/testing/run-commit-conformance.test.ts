@@ -50,17 +50,6 @@ Deno.test("conformance suite - a declared default that does not match fails the 
   assertEquals(failedCases(report), ["default mode matches the contract"]);
 });
 
-Deno.test("conformance suite - a degrading backend passes only when it declares degrading", async () => {
-  const degrading = { degradeOnEmbeddingFailure: true };
-  assertEquals(
-    (await run(degrading, { embeddingFailure: "degrades" })).ok,
-    true,
-  );
-  assertEquals(failedCases(await run(degrading)), [
-    "embedding failure follows the contract",
-  ]);
-});
-
 Deno.test("conformance suite - catches a store that writes quads before embedding", async () => {
   const report = await run({ bug: "write-before-embed" });
   assertEquals(report.ok, false);

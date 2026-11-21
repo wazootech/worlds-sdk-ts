@@ -96,17 +96,6 @@ Deno.test("chunkAndEmbedQuads - an embedding failure throws by default", async (
   );
 });
 
-Deno.test("chunkAndEmbedQuads - degrade keeps the rows without vectors and reports the error", async () => {
-  const result = await chunkAndEmbedQuads([text], ids([text]), {
-    textSplitter: splitter,
-    embeddingService: failing,
-    onEmbeddingFailure: "degrade",
-  });
-  assertEquals(result.rows.length, 1);
-  assertEquals(result.rows[0]!.vector, undefined);
-  assertEquals((result.embeddingError as Error).message, "quota");
-});
-
 Deno.test("chunkAndEmbedQuads - a failing splitter rejects", async () => {
   await assertRejects(
     () =>

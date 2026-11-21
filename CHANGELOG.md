@@ -1,6 +1,23 @@
 # Changelog
 
-## Unreleased (next patch)
+## Unreleased (breaking: next minor)
+
+### Removed
+
+- **Breaking:** `ChunkAndEmbedOptions.onEmbeddingFailure` and
+  `ChunkAndEmbedResult.embeddingError` are removed from `chunkAndEmbedQuads`
+  (`@worlds/sdk/search-index/quad-chunker`). An embedding failure now always
+  rejects with "failed to vectorize literal chunk blocks" before anything is
+  written, so the caller can retry; there is no keyword-only "degrade" mode.
+  Callers that passed `onEmbeddingFailure` (the option is now an excess
+  property) or read `embeddingError` must drop them
+  ([#280](https://github.com/wazootech/worlds-sdk-ts/issues/280), decided in
+  [#265](https://github.com/wazootech/worlds-sdk-ts/issues/265)).
+- **Breaking:** `@worlds/sdk/testing`:
+  `CommitConformanceContract.embeddingFailure` narrows from
+  `"throws" | "degrades"` to `"throws"` and the suite no longer accepts a
+  degrading backend. `ReferenceStoreOptions.degradeOnEmbeddingFailure` is
+  removed.
 
 ### Added
 
@@ -39,7 +56,7 @@
     `DEFAULT_SEARCH_INDEX_ON_IMPORT` (the `searchIndexOnImport` policy, with a
     per-backend default).
   - `@worlds/sdk/search-index/quad-chunker`: `chunkAndEmbedQuads` (chunk and
-    embed before any write; throw or degrade on an embedding failure).
+    embed before any write; throw on an embedding failure).
   - `@worlds/sdk/testing`: `runCommitConformanceSuite`, failure-path conformance
     cases a backend runs against its own commit path.
 

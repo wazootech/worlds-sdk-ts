@@ -35,9 +35,6 @@ export interface ReferenceStoreOptions extends CommitConformanceCreateOptions {
   /** defaultMode is the backend's default `searchIndexOnImport`. */
   defaultMode?: SearchIndexOnImport;
 
-  /** degradeOnEmbeddingFailure stores keyword-only chunks instead of rejecting. */
-  degradeOnEmbeddingFailure?: boolean;
-
   /** bug makes the pipeline violate one rule, so the suite can be shown to catch it. */
   bug?:
     | "write-before-embed"
@@ -66,9 +63,6 @@ export function createReferenceCommitStore(
       textSplitter: wholeLiteral,
       embeddingService: options.embeddingService,
       vectorDimensions: 32,
-      onEmbeddingFailure: options.degradeOnEmbeddingFailure
-        ? "degrade"
-        : "throw",
     })).rows.map((row) => row.chunk.quad_id);
 
   const store = (quad: rdfjs.Quad) => quads.set(hashQuad(quad), quad);

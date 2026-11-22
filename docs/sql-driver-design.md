@@ -169,6 +169,22 @@ is its write batch size (100), so a larger D1 commit takes the fallback, and a
 backend that declares `atomic: false` in the conformance suite promises the
 weaker contract the suite checks.
 
+### Shared prepare step
+
+Steps 1 to 4 were still copied into each backend (`commitSqlPatch` and
+IndexedDB's `createProjectingCommit`), so the SDK now owns them as
+`prepareCommit(patch, options)` in `@worlds/sdk/search-index`. It takes the
+filter, the transaction context, the mode and the backend default, `keyOf` and
+`lookupExisting`, and the `projection` options, and returns
+`{ prepared, plan, novel, rows, replacing }`. A backend writes `prepared`
+deletions, `novel` insertions and `rows` (wiping first when `replacing`) and
+reindexes when `plan.reindexAfterCommit`. The filter applies to what is stored
+and what is projected. A deferred import returns empty `rows`, and an embedding
+failure rejects before anything is written. IndexedDB passes
+`selectNovel: "when-projecting"`, because its store deduplicates writes itself.
+The conformance reference store already uses it. It is unreleased: adopting it
+in `@worlds/sqlite` and `@worlds/indexeddb` waits on the next SDK release.
+
 ### Conformance suite
 
 `runCommitConformanceSuite` (`@worlds/sdk/testing`) checks a backend's declared

@@ -68,23 +68,23 @@ Divergences. Items 1 to 9 were found while building #271; items 10 to 15 while
 designing this core. The table states what is true today; section 8 records what
 changed and what stays.
 
-| #  | Divergence                       | libsql                                                                                         | sqlite                                                                | D1                                                                                               | Postgres                                                                                  |
-| -- | -------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| 1  | Identity for the presence lookup | content hash                                                                                   | term key (`skey, pkey, okey, gkey`)                                   | content hash, scoped by `worldId`; asserted rows only when inference is on                       | term key; one `json_to_recordset` join, so nothing to chunk                               |
-| 2  | Replace-import wipe              | first statements of the commit's batch                                                         | first statements of the commit's batch                                | first statements of the commit's batch; a commit over the batch size takes the fallback          | first statement of the commit's SQL transaction                                           |
-| 3  | Default `searchIndexOnImport`    | `incremental`                                                                                  | `incremental`                                                         | `incremental` (option `searchIndexOnImport`)                                                     | `incremental` (option `searchIndexOnImport`)                                              |
-| 4  | Write order                      | chunk and embed, then write                                                                    | chunk and embed, then write                                           | chunk and embed, then write                                                                      | chunk and embed, then write                                                               |
-| 5  | Embedding failure                | throws                                                                                         | throws                                                                | throws                                                                                           | throws                                                                                    |
-| 6  | Embedding de-duplication         | shared helper                                                                                  | shared helper                                                         | shared helper                                                                                    | shared helper                                                                             |
-| 7  | Vector length check              | yes (`vectorDimensions` from the query builder)                                                | yes (same)                                                            | yes (same)                                                                                       | yes (`vectorDimensions`, default 1536)                                                    |
-| 8  | Keyword text normalisation       | shared `buildChunkFtsValue`                                                                    | shared `buildChunkFtsValue`                                           | shared `buildChunkFtsValue`                                                                      | generated `tsvector` column                                                               |
-| 9  | Vector support                   | in-DB vector column                                                                            | no embedding service when the vector table is unsupported             | external Vectorize index                                                                         | pgvector column                                                                           |
-| 10 | What one batch holds             | `maxAtomicStatements` 10,000, then batches of `maxWriteBatchSize` 500                          | same limits (`connection.batch` is one `BEGIN IMMEDIATE` transaction) | one `batch()` call; `maxWriteBatchSize` 100 is both the atomic limit and the fallback batch size | one SQL transaction of any size (`maxAtomicStatements` is `Number.MAX_SAFE_INTEGER`)      |
-| 11 | Cleanup after a failed fallback  | shared: removes the novel quads and their chunks                                               | shared: same                                                          | shared: removes the novel quads and their chunks                                                 | not reachable (the fallback is never taken)                                               |
-| 12 | Out-of-store vector index        | none                                                                                           | none                                                                  | Vectorize sync after the D1 write (`afterWrite`), purge after a replace or deferred rebuild      | none                                                                                      |
-| 13 | Tenancy and derived data         | none                                                                                           | none                                                                  | `worldId` on every statement; the inference planner adds and removes derived quads               | none                                                                                      |
-| 14 | Full rebuild                     | deferred import uses the core; `reindex()` uses `rebuildLibsqlSearchIndexFromQuads` (own code) | `rebuildSqlSearchIndex`                                               | `rebuildSqlSearchIndex`                                                                          | `rebuildSqlSearchIndex`, one SQL transaction per page; keyset paging                      |
-| 15 | Write serialisation              | remote batch                                                                                   | `BEGIN IMMEDIATE`                                                     | remote batch                                                                                     | `sql.begin` per batch; `PostgresRdfjsStore` also keeps an in-process `enqueueWrite` queue |
+| #  | Divergence                       | libsql                                                                                        | sqlite                                                                | D1                                                                                               | Postgres                                                                                  |
+| -- | -------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| 1  | Identity for the presence lookup | content hash                                                                                  | term key (`skey, pkey, okey, gkey`)                                   | content hash, scoped by `worldId`; asserted rows only when inference is on                       | term key; one `json_to_recordset` join, so nothing to chunk                               |
+| 2  | Replace-import wipe              | first statements of the commit's batch                                                        | first statements of the commit's batch                                | first statements of the commit's batch; a commit over the batch size takes the fallback          | first statement of the commit's SQL transaction                                           |
+| 3  | Default `searchIndexOnImport`    | `incremental`                                                                                 | `incremental`                                                         | `incremental` (option `searchIndexOnImport`)                                                     | `incremental` (option `searchIndexOnImport`)                                              |
+| 4  | Write order                      | chunk and embed, then write                                                                   | chunk and embed, then write                                           | chunk and embed, then write                                                                      | chunk and embed, then write                                                               |
+| 5  | Embedding failure                | throws                                                                                        | throws                                                                | throws                                                                                           | throws                                                                                    |
+| 6  | Embedding de-duplication         | shared helper                                                                                 | shared helper                                                         | shared helper                                                                                    | shared helper                                                                             |
+| 7  | Vector length check              | yes (`vectorDimensions` from the query builder)                                               | yes (same)                                                            | yes (same)                                                                                       | yes (`vectorDimensions`, default 1536)                                                    |
+| 8  | Keyword text normalisation       | shared `buildChunkFtsValue`                                                                   | shared `buildChunkFtsValue`                                           | shared `buildChunkFtsValue`                                                                      | generated `tsvector` column                                                               |
+| 9  | Vector support                   | in-DB vector column                                                                           | no embedding service when the vector table is unsupported             | external Vectorize index                                                                         | pgvector column                                                                           |
+| 10 | What one batch holds             | `maxAtomicStatements` 10,000, then batches of `maxWriteBatchSize` 500                         | same limits (`connection.batch` is one `BEGIN IMMEDIATE` transaction) | one `batch()` call; `maxWriteBatchSize` 100 is both the atomic limit and the fallback batch size | one SQL transaction of any size (`maxAtomicStatements` is `Number.MAX_SAFE_INTEGER`)      |
+| 11 | Cleanup after a failed fallback  | shared: removes the novel quads and their chunks                                              | shared: same                                                          | shared: removes the novel quads and their chunks                                                 | not reachable (the fallback is never taken)                                               |
+| 12 | Out-of-store vector index        | none                                                                                          | none                                                                  | Vectorize sync after the D1 write (`afterWrite`), purge after a replace or deferred rebuild      | none                                                                                      |
+| 13 | Tenancy and derived data         | none                                                                                          | none                                                                  | `worldId` on every statement; the inference planner adds and removes derived quads               | none                                                                                      |
+| 14 | Full rebuild                     | `rebuildSqlSearchIndexWithCounts`, scoped when `include`/`exclude` are set (worlds-libsql#72) | `rebuildSqlSearchIndex`                                               | `rebuildSqlSearchIndex`                                                                          | `rebuildSqlSearchIndex`, one SQL transaction per page; keyset paging                      |
+| 15 | Write serialisation              | remote batch                                                                                  | `BEGIN IMMEDIATE`                                                     | remote batch                                                                                     | `sql.begin` per batch; `PostgresRdfjsStore` also keeps an in-process `enqueueWrite` queue |
 
 IndexedDB, for completeness: layer 1 helpers, quads, deletions, replace wipe and
 chunk rows in one readwrite transaction (`atomic: true`, a failed write keeps
@@ -261,7 +261,7 @@ layout and each vector dialect stay backend-local; this design keeps that.
 | 11 | Cleanup after failure    | Converged: the shared fallback removes the novel quads and their chunks (D1 used to remove chunk rows only) | None                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | 12 | External vector index    | Kept, via `afterWrite`                                                                                      | Platform-forced: Vectorize is not transactional with D1, so vector sync after the D1 write is never atomic with it. A failure is logged drift that a reindex repairs.                                                                                                                                                                                                                                                    |
 | 13 | Tenancy and derived data | Kept, inside the dialect                                                                                    | Product feature of the hosted D1 backend.                                                                                                                                                                                                                                                                                                                                                                                |
-| 14 | Full rebuild             | Converged for sqlite, D1 and Postgres (`rebuildSqlSearchIndex`)                                             | libsql's `reindex()` still runs its own `rebuildLibsqlSearchIndexFromQuads`; only a deferred import's rebuild uses the core. Drift to remove, not forced.                                                                                                                                                                                                                                                                |
+| 14 | Full rebuild             | Converged for sqlite, libsql, D1 and Postgres (`rebuildSqlSearchIndex`; libsql in worlds-libsql#72)         | None for the SQL backends. IndexedDB keeps its own page loop because it has no SQL.                                                                                                                                                                                                                                                                                                                                      |
 | 15 | Write serialisation      | Kept                                                                                                        | Per-transport mechanics (remote batch, `BEGIN IMMEDIATE`, `sql.begin`).                                                                                                                                                                                                                                                                                                                                                  |
 
 Converged defaults, in one line: `searchIndexOnImport` `incremental`, embedding
@@ -280,7 +280,9 @@ adoptions (worlds-libsql#69, worlds-sqlite#56, worlds-cloudflare#89,
 worlds-indexeddb#34, worlds-postgres#52); the core (worlds-sqlite#57, published
 as 0.7.4) and its adoptions (worlds-sqlite#59, worlds-libsql#70,
 worlds-cloudflare#91); then Postgres on the core (worlds-postgres#54) and
-IndexedDB convergence (worlds-indexeddb#36).
+IndexedDB convergence (worlds-indexeddb#36). Released 2026-11-21: `@worlds/sdk`
+0.10.0, `@worlds/sqlite` 0.8.0, `@worlds/indexeddb` 0.3.0, `@worlds/postgres`
+0.4.0, `@worlds/libsql` 0.7.0, `@worlds/cloudflare` 0.15.0.
 
 A new backend adopting the core, or a change to an existing one, should:
 
@@ -291,18 +293,25 @@ A new backend adopting the core, or a change to an existing one, should:
   observe (a real Turso or D1 deployment, real embedding services), and avoid
   load tests against real Cloudflare (use miniflare).
 
-Which backends already have a later-write test of their own (read from their
-test files on 2026-11-21), to make adopting `failLaterWrite` cheap:
+Every backend now provides `failLaterWrite` through its conformance subject, so
+the tenth case ("later-write failure follows the contract") runs everywhere
+(worlds-sqlite#63, worlds-libsql#73, worlds-postgres#57, worlds-cloudflare#95,
+worlds-indexeddb#39; tests only, no release, no divergence found). What each
+injected failure hits:
 
-| Backend   | Existing test                                                                                                                                                                        |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| IndexedDB | `idb-commit-conformance.test.ts` runs the suite a second time with `failInsideTransaction`, failing a chunk put after the quad puts. Wire that to `failLaterWrite`.                  |
-| D1        | `d1-commit-conformance.test.ts`: "a failed write after the first batch removes the novel quads and their chunk rows" (`failWriteAfter(1)`, batch size 2). The fallback path.         |
-| libsql    | `commit-patch-fallback.test.ts`: "fallback: a mid-commit failure deletes the quads written so far". The fallback path.                                                               |
-| sqlite    | `commit-core-failure.test.ts`: "a later fallback failure cleans up the novel quads already written"; `sqlite-commit.test.ts`: "a failed write rolls back quads and chunks together". |
-| Postgres  | `commit-atomicity.test.ts`: a failed commit rolls back every write in the patch (via `failNextTransaction`). Not checked whether the injected failure follows the quad writes.       |
+| Backend   | Injected failure                                                                                                                           | Contract                                                      |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| sqlite    | The first `chunks` insert after the quad insert in the batch fails inside the real `BEGIN IMMEDIATE` transaction, which rolls back.        | atomic, `restores-prior-state`                                |
+| libsql    | The first `chunks` insert of the next `batch()` is rewritten to hit a missing table; the real atomic batch rolls back.                     | atomic. The chunked fallback is not exercised by this subject |
+| D1        | The first `chunks` insert in a write batch fails on miniflare's D1: rollback on the atomic path, compensating cleanup on the chunked path. | `restores-prior-state` on both paths; real D1 not verified    |
+| Postgres  | The first `worlds_search_chunks` insert after a `worlds_quads` insert throws inside the open PGlite transaction, which rolls back.         | atomic, `restores-prior-state`; real Postgres not verified    |
+| IndexedDB | The next `put` into the chunk store throws inside the single readwrite transaction after the quad puts, so the transaction aborts.         | atomic, `restores-prior-state`                                |
 
-None of them exposes `failLaterWrite` through its conformance subject yet.
+Each backend also pins the injection with a statement-order test so the case
+cannot pass vacuously. One suite still skips the case:
+`src/sqlite/commit-core/commit-core-conformance.test.ts`, whose fake store
+validates a batch before applying it and so cannot model a later write failing.
+The real-database sqlite suite covers it.
 
 ## 10. Open and resolved
 
@@ -317,19 +326,17 @@ Resolved since the first version:
   size. D1's `batch()` atomicity is asserted by the source and exercised only
   through an injected failure wrapper; it was not verified against a real D1 or
   Cloudflare's documentation.
+- Embedding failure: **throws on every backend**. `onEmbeddingFailure` and
+  `ChunkAndEmbedResult.embeddingError` are gone (worlds-sdk-ts#280, released in
+  `@worlds/sdk` 0.10.0; worlds-indexeddb#37, worlds-sqlite#61,
+  worlds-postgres#55).
+- D1's `searchIndexOnImport` default: **`incremental`**, like every other
+  backend (worlds-cloudflare#93).
+- libsql `reindex()`: **on the shared scoped rebuild** (worlds-libsql#72).
 
 Still open:
 
-- **`onEmbeddingFailure: "degrade"` is removed** from `chunkAndEmbedQuads`
-  (worlds-sdk-ts#280), along with `ChunkAndEmbedResult.embeddingError`. The
-  IndexedDB option went first (worlds-indexeddb#37). Still to do downstream:
-  `@worlds/sqlite`'s `commitSqlPatch` reads `embeddingError` into
-  `SqlCommitSummary.embeddingError`, and `@worlds/postgres` passes
-  `onEmbeddingFailure: "throw"`; both drop it when they take the SDK release
-  that removes the option.
-- **libsql `reindex()`** still uses its own rebuild instead of
-  `rebuildSqlSearchIndex` (row 14).
 - Request-size limits for a 10,000-statement batch against remote Turso: not
   measured.
-- Adoption of `failLaterWrite` by each backend (section 9), which needs an
-  `@worlds/sdk` release that contains it.
+- The later-write case against the chunked fallback of libsql, and against a
+  real D1 and a real Postgres server (section 9): not exercised.

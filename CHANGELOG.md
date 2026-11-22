@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.11.0 (2026-11-22)
 
 ### Added
 
@@ -295,7 +295,7 @@ packages (see workspace#86 for the full mapping).
   `its:dir` literal direction, and collapse `SparqlRequest.query`/`update` into
   a single required `query` field.
 
-## Unreleased
+## 0.11.0 (2026-11-22)
 
 ### Breaking
 

@@ -16,6 +16,17 @@
   and `@worlds/sdk/testing`'s reference commit store now uses it
   ([#265](https://github.com/wazootech/worlds-sdk-ts/issues/265)).
 
+- `@worlds/sdk/search-index`: `rebuildSearchIndex(driver, projection, options)`
+  is the page loop every durable backend shares for a full or scoped rebuild. It
+  pages quads through a `ChunkRebuildDriver` (`pageQuads`, `writePage`, optional
+  `finish`), filters by an include/exclude scope (a scope with no criteria is
+  unscoped), chunks and embeds each page before `writePage`, and returns
+  `{ processedQuadCount, chunkRowCount }`. Unscoped, the first write clears
+  every old row; scoped, each write replaces only its in-scope quads' rows. An
+  embedding failure rejects before that page is written. Additive; adoption in
+  the backends follows a release
+  ([#265](https://github.com/wazootech/worlds-sdk-ts/issues/265)).
+
 ## 0.10.0 (2026-11-21)
 
 ### Removed

@@ -79,7 +79,7 @@ changed and what stays.
 | 7  | Vector length check              | yes (`vectorDimensions` from the query builder)                                               | yes (same)                                                            | yes (same)                                                                                       | yes (`vectorDimensions`, default 1536)                                                    |
 | 8  | Keyword text normalisation       | shared `buildChunkFtsValue`                                                                   | shared `buildChunkFtsValue`                                           | shared `buildChunkFtsValue`                                                                      | generated `tsvector` column                                                               |
 | 9  | Vector support                   | in-DB vector column                                                                           | no embedding service when the vector table is unsupported             | external Vectorize index                                                                         | pgvector column                                                                           |
-| 10 | What one batch holds             | `maxAtomicStatements` 10,000, then batches of `maxWriteBatchSize` 500                         | same limits (`connection.batch` is one `BEGIN IMMEDIATE` transaction) | one `batch()` call; `maxWriteBatchSize` 100 is both the atomic limit and the fallback batch size | one SQL transaction of any size (`maxAtomicStatements` is `Number.MAX_SAFE_INTEGER`)      |
+| 10 | What one batch holds             | `maxAtomicStatements` 10,000, then batches of `maxWriteBatchSize` 500                         | same limits (`connection.batch` is one `BEGIN IMMEDIATE` transaction) | one `batch()` call; `maxWriteBatchSize` 750 is both the atomic limit and the fallback batch size | one SQL transaction of any size (`maxAtomicStatements` is `Number.MAX_SAFE_INTEGER`)      |
 | 11 | Cleanup after a failed fallback  | shared: removes the novel quads and their chunks                                              | shared: same                                                          | shared: removes the novel quads and their chunks                                                 | not reachable (the fallback is never taken)                                               |
 | 12 | Out-of-store vector index        | none                                                                                          | none                                                                  | Vectorize sync after the D1 write (`afterWrite`), purge after a replace or deferred rebuild      | none                                                                                      |
 | 13 | Tenancy and derived data         | none                                                                                          | none                                                                  | `worldId` on every statement; the inference planner adds and removes derived quads               | none                                                                                      |
@@ -98,10 +98,18 @@ Facts that bound the design:
 - **SQLite can do the atomic path.** `SqliteConnectionDriver.batch` is a real
   transaction, which answered the question left open in the sqlite adoption
   issue.
-- **D1's atomic unit is one `batch()` call, and its size is a choice.** The
-  source says Cloudflare documents no per-batch statement cap, so 100 is a
-  chosen chunk size (100 is D1's bound-parameter limit per statement), not a
-  documented limit. Vectorize writes are outside D1 altogether.
+- **D1's atomic unit is one `batch()` call, and its size is a measured choice.**
+  Cloudflare documents no per-batch statement cap (the 100 this repo used first
+  was D1's bound-parameter limit per statement, a different constraint).
+  Measured on a throwaway real D1 on 2026-11-22 (worlds-cloudflare#96): no
+  statement-count cap and no time problem (every accepted batch finished in
+  under 3.3 s against the documented 30 s), but the Worker-to-D1 call rejects a
+  `batch()` whose serialized arguments exceed 32 MiB (an undocumented byte cap).
+  A 1,536-dim chunk row serializes to about 22 KB, so 2,000 statements of them
+  fail and the default is 750 (about 16.7 MB worst case, 2x under the cap).
+  Rollback on a mid-batch failure left zero rows on the real D1. A byte-aware
+  limit would raise the ceiling further. Vectorize writes are outside D1
+  altogether.
 - **Postgres needs no batch machinery.** `executeBatch` is one transaction, so
   `commitSqlPatch` always takes its single-batch path.
 - **`D1BatchExecutor` is off the commit path.** D1 commits no longer use it; it
@@ -165,7 +173,7 @@ here is exported from `@worlds/sdk`.
    but the rebuild as a whole is not, so a rerun repairs a partial one).
 
 A backend that cannot be atomic at all sets `maxAtomicStatements: 0`. D1's limit
-is its write batch size (100), so a larger D1 commit takes the fallback, and a
+is its write batch size (750), so a larger D1 commit takes the fallback, and a
 backend that declares `atomic: false` in the conformance suite promises the
 weaker contract the suite checks.
 
@@ -298,7 +306,7 @@ layout and each vector dialect stay backend-local; this design keeps that.
 | #  | Divergence               | Outcome                                                                                                     | Still different, and why                                                                                                                                                                                                                                                                                                                                                                                                 |
 | -- | ------------------------ | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1  | Lookup identity          | Kept, behind `dialect.keyOf`                                                                                | Hash (libsql, D1) versus term key (sqlite, Postgres) follows each table layout; not observable through the suite. A choice, not a platform limit.                                                                                                                                                                                                                                                                        |
-| 2  | Replace-import wipe      | Converged: the wipe joins the commit's statement list everywhere                                            | Above the atomic limit (D1 over 100, libsql and sqlite over 10,000) the fallback applies and a failed replace leaves an empty graph (`empties-graph`).                                                                                                                                                                                                                                                                   |
+| 2  | Replace-import wipe      | Converged: the wipe joins the commit's statement list everywhere                                            | Above the atomic limit (D1 over 750, libsql and sqlite over 10,000) the fallback applies and a failed replace leaves an empty graph (`empties-graph`).                                                                                                                                                                                                                                                                   |
 | 3  | Default mode             | Converged on `incremental` everywhere, D1 included (worlds-cloudflare#93)                                   | None. Measured on miniflare (worlds-cloudflare#92): `incremental` issues the same statements, one fewer `batch()` call and fewer reads than `deferred`, embeds only the novel quads, and writes nothing when embedding fails. Workers limits do not force `deferred`: its rebuild runs in the same invocation and spends more of the same per-invocation subrequest budget. `"deferred"` stays an option, not a default. |
 | 4  | Write order              | Converged: embed before any write (sqlite and D1 used to write quads first)                                 | None                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | 5  | Embedding failure        | Converged: throws, nothing written, on every backend (D1 flipped from `degrades`, decision 2026-11-20)      | None. `onEmbeddingFailure: "degrade"` and `embeddingError` were removed from `chunkAndEmbedQuads` (worlds-sdk-ts#280).                                                                                                                                                                                                                                                                                                   |
@@ -306,7 +314,7 @@ layout and each vector dialect stay backend-local; this design keeps that.
 | 7  | Vector length check      | Converged: every backend passes `vectorDimensions` to the shared helper                                     | None                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | 8  | Keyword text             | Kept                                                                                                        | Postgres uses a generated column; the others use `buildChunkFtsValue`. Dialect-specific.                                                                                                                                                                                                                                                                                                                                 |
 | 9  | Vector support           | Kept                                                                                                        | Platform-forced: in-DB column, sqlite-vec, pgvector or Vectorize.                                                                                                                                                                                                                                                                                                                                                        |
-| 10 | Batch capacity           | Converged on one policy (atomic to the limit, then chunked); the limits are driver values                   | libsql and sqlite 10,000/500; D1 100/100 (a chosen chunk size); Postgres unlimited (one transaction). The sqlite 10,000-statement flush is gone.                                                                                                                                                                                                                                                                         |
+| 10 | Batch capacity           | Converged on one policy (atomic to the limit, then chunked); the limits are driver values                   | libsql and sqlite 10,000/500; D1 750/750 (measured on a real D1, see section 10); Postgres unlimited (one transaction). The sqlite 10,000-statement flush is gone.                                                                                                                                                                                                                                                       |
 | 11 | Cleanup after failure    | Converged: the shared fallback removes the novel quads and their chunks (D1 used to remove chunk rows only) | None                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | 12 | External vector index    | Kept, via `afterWrite`                                                                                      | Platform-forced: Vectorize is not transactional with D1, so vector sync after the D1 write is never atomic with it. A failure is logged drift that a reindex repairs.                                                                                                                                                                                                                                                    |
 | 13 | Tenancy and derived data | Kept, inside the dialect                                                                                    | Product feature of the hosted D1 backend.                                                                                                                                                                                                                                                                                                                                                                                |
@@ -319,7 +327,7 @@ atomic replace import on the atomic path.
 
 Remaining deliberate divergences, from the table above:
 
-1. **D1 over 100 statements** takes the non-atomic chunked fallback (with
+1. **D1 over 750 statements** takes the non-atomic chunked fallback (with
    cleanup), and **Vectorize sync is never atomic with D1** (platform-forced).
 
 ## 9. Rollout (done) and adopter checklist
@@ -371,10 +379,15 @@ Resolved since the first version:
   `searchIndexOnImport` option (worlds-postgres#54).
 - D1's cleanup (chunks only, or novel quads and chunks): **shared, novel quads
   and chunks**.
-- Whether D1's 100-statement cap is documented: **no**; it is a chosen chunk
-  size. D1's `batch()` atomicity is asserted by the source and exercised only
-  through an injected failure wrapper; it was not verified against a real D1 or
-  Cloudflare's documentation.
+- Whether D1's batch cap is documented: **no statement cap is**. Measured on a
+  real D1 (2026-11-22, worlds-cloudflare#96): an undocumented 32 MiB serialized
+  limit on `batch()` arguments, so the default is a statement count (750) chosen
+  for the heaviest row shape. `batch()` atomicity was verified on the same real
+  D1: a failing last statement after 500 and after 2,000 statements, at 384 and
+  1,536 dimensions, left zero rows in `quads` and `chunks`. Not measured:
+  concurrent writers, production latency, chunk text much longer than 200
+  characters, databases with large existing tables, and the per-invocation
+  request limit.
 - Embedding failure: **throws on every backend**. `onEmbeddingFailure` and
   `ChunkAndEmbedResult.embeddingError` are gone (worlds-sdk-ts#280, released in
   `@worlds/sdk` 0.10.0; worlds-indexeddb#37, worlds-sqlite#61,

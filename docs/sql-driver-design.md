@@ -308,10 +308,10 @@ injected failure hits:
 | IndexedDB | The next `put` into the chunk store throws inside the single readwrite transaction after the quad puts, so the transaction aborts.         | atomic, `restores-prior-state`                                |
 
 Each backend also pins the injection with a statement-order test so the case
-cannot pass vacuously. One suite still skips the case:
-`src/sqlite/commit-core/commit-core-conformance.test.ts`, whose fake store
-validates a batch before applying it and so cannot model a later write failing.
-The real-database sqlite suite covers it.
+cannot pass vacuously. The sqlite core's own suite
+(`src/sqlite/commit-core/commit-core-conformance.test.ts`) also runs it now,
+over a fake store that applies statements in order, for both an atomic driver
+and a chunked-fallback driver (worlds-sqlite#64).
 
 ## 10. Open and resolved
 
@@ -333,6 +333,19 @@ Resolved since the first version:
 - D1's `searchIndexOnImport` default: **`incremental`**, like every other
   backend (worlds-cloudflare#93).
 - libsql `reindex()`: **on the shared scoped rebuild** (worlds-libsql#72).
+- Reindex parity, found by writing the same tests against every backend (merged,
+  not yet released): sqlite did not pass `scope`, so an `include` or `exclude`
+  reindex deleted every out-of-scope chunk row (worlds-sqlite#65); IndexedDB had
+  the same bug plus a commit that ignored `include`/`exclude`, orphan chunk rows
+  when indexing was off, and a `processedQuadCount` that counted only matching
+  quads (worlds-indexeddb#40); Postgres counted only filtered quads
+  (worlds-postgres#58); D1 left the stale chunk row of a deleted quad after an
+  unscoped reindex (worlds-cloudflare#97). All five now agree: scoped replaces
+  only in-scope rows, an empty scope is unscoped, `processedQuadCount` is every
+  quad scanned.
+- The core's later-write failure path (compensating cleanup in the chunked
+  fallback) is exercised through the shared case by sqlite's fake store
+  (worlds-sqlite#64). Cleanup that itself fails (`AggregateError`) is not.
 
 Still open:
 

@@ -182,8 +182,10 @@ reindexes when `plan.reindexAfterCommit`. The filter applies to what is stored
 and what is projected. A deferred import returns empty `rows`, and an embedding
 failure rejects before anything is written. IndexedDB passes
 `selectNovel: "when-projecting"`, because its store deduplicates writes itself.
-The conformance reference store already uses it. It is unreleased: adopting it
-in `@worlds/sqlite` and `@worlds/indexeddb` waits on the next SDK release.
+The conformance reference store uses it too. Released in `@worlds/sdk` 0.11.0
+and adopted by `commitSqlPatch` (`@worlds/sqlite` 0.8.1, so libsql, D1 and
+Postgres inherit it through the core) and by IndexedDB's commit
+(`@worlds/indexeddb` 0.3.1).
 
 ### Shared rebuild loop
 
@@ -208,10 +210,13 @@ supplies a `ChunkRebuildDriver`:
   failure. IndexedDB buffers rows in `writePage` and does its one-transaction
   swap here, keeping its all-or-nothing write.
 
-It is unreleased: adopting it in `@worlds/sqlite` and `@worlds/indexeddb` waits
-on the next SDK release. IndexedDB then pages its scanned quads by offset, so
-its embedding batches follow the unfiltered page rather than the in-scope slice;
-the stored rows and the counts are unchanged.
+Released in `@worlds/sdk` 0.11.0 and adopted by
+`rebuildSqlSearchIndexWithCounts` (`@worlds/sqlite` 0.8.1) and `reindexChunks`
+(`@worlds/indexeddb` 0.3.1). IndexedDB pages `IndexeddbStore` with a cursor over
+the primary key (one short readonly transaction per page, so a page sees the
+store as committed at that moment); any other store is read once and sliced. Its
+embedding batches follow the unfiltered page rather than the in-scope slice; the
+stored rows and the counts are unchanged.
 
 ### Conformance suite
 

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (breaking: next minor)
+## 0.10.0 (2026-11-21)
 
 ### Removed
 

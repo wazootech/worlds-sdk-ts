@@ -185,6 +185,34 @@ failure rejects before anything is written. IndexedDB passes
 The conformance reference store already uses it. It is unreleased: adopting it
 in `@worlds/sqlite` and `@worlds/indexeddb` waits on the next SDK release.
 
+### Shared rebuild loop
+
+`rebuildSqlSearchIndexWithCounts` (sqlite) and `reindexChunks` (IndexedDB) each
+carried the same loop, so the SDK owns it as
+`rebuildSearchIndex(driver, projection, { pageSize, scope })` in
+`@worlds/sdk/search-index`. It pages quads, keeps the in-scope ones, hashes,
+chunks and embeds each page before it is written (an embedding failure rejects,
+so that page writes nothing), and returns
+`{ processedQuadCount, chunkRowCount }` (`processedQuadCount` counts every quad
+scanned, in scope or not). A scope with no criteria is unscoped. The backend
+supplies a `ChunkRebuildDriver`:
+
+- `pageQuads({ after, pageSize })` returns `{ quads, next }`; `next: undefined`
+  ends the rebuild. The page size default stays the backend's choice.
+- `writePage(scope, rows, first)` writes one page that held in-scope quads (rows
+  may be empty). `{ all: true }`: the first call clears every old row, later
+  calls add. `{ hashes }`: replace only those quads' rows (scoped rebuilds clear
+  nothing). An unscoped rebuild over no quads still calls it once with no rows,
+  so the clear happens. SQL turns each call into one per-page, rerunnable batch.
+- `finish()` is optional and runs once after the last page, never after a
+  failure. IndexedDB buffers rows in `writePage` and does its one-transaction
+  swap here, keeping its all-or-nothing write.
+
+It is unreleased: adopting it in `@worlds/sqlite` and `@worlds/indexeddb` waits
+on the next SDK release. IndexedDB then pages its scanned quads by offset, so
+its embedding batches follow the unfiltered page rather than the in-scope slice;
+the stored rows and the counts are unchanged.
+
 ### Conformance suite
 
 `runCommitConformanceSuite` (`@worlds/sdk/testing`) checks a backend's declared

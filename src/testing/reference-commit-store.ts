@@ -1,19 +1,15 @@
 import type * as rdfjs from "@rdfjs/types";
-import {
-  hashQuad,
-  isReplaceImportCommit,
-  preparePatch,
-  selectNovelQuads,
-} from "@/client/quad-store/mod.ts";
+import { hashQuad } from "@/client/quad-store/mod.ts";
 import type { Patch, TransactionContext } from "@/client/quad-store/mod.ts";
 import {
-  planSearchIndexing,
+  prepareCommit,
   type SearchIndexOnImport,
 } from "@/client/search-index/mod.ts";
 import {
   chunkAndEmbedQuads,
   type TextSplitterInterface,
 } from "@/client/search-index/quad-chunker/mod.ts";
+import type { EmbeddingService } from "@/client/search-index/embedding-service/mod.ts";
 import type {
   CommitConformanceCreateOptions,
   CommitConformanceSubject,
@@ -45,7 +41,7 @@ export interface ReferenceStoreOptions extends CommitConformanceCreateOptions {
 
 /**
  * createReferenceCommitStore is the shared commit pipeline over in-memory maps:
- * prepare, select novel quads, plan indexing, chunk and embed, then one write
+ * `prepareCommit` (filter, plan, novel quads, chunk and embed), then one write
  * that applies everything or nothing. It exists to prove the conformance suite
  * runs against the shared helpers; a backend replaces the maps with its SQL.
  */
@@ -68,20 +64,31 @@ export function createReferenceCommitStore(
   const store = (quad: rdfjs.Quad) => quads.set(hashQuad(quad), quad);
 
   async function commit(patch: Patch, context?: TransactionContext) {
-    const replacing = isReplaceImportCommit(context);
-    const prepared = preparePatch(patch);
-    const { novelInsertions } = await selectNovelQuads(prepared, {
-      replacing,
-      lookupExisting: (keys) =>
-        Promise.resolve(new Set(keys.filter((key) => quads.has(key)))),
-    });
-    const plan = planSearchIndexing(options.searchIndexOnImport, context, {
-      defaultMode: options.defaultMode,
-    });
-    if (options.bug === "write-before-embed") novelInsertions.forEach(store);
-    const rows = plan.projectDuringCommit
-      ? await textChunks(novelInsertions)
-      : [];
+    const embeddingService: EmbeddingService =
+      options.bug === "write-before-embed"
+        ? {
+          embed: (texts) => {
+            // The injected bug: quads land before the embedding call.
+            patch.insertions?.forEach(store);
+            return options.embeddingService.embed(texts);
+          },
+        }
+        : options.embeddingService;
+    const { prepared, plan, novel, rows: chunkRows, replacing } =
+      await prepareCommit(patch, {
+        context,
+        searchIndexOnImport: options.searchIndexOnImport,
+        defaultMode: options.defaultMode,
+        lookupExisting: (keys) =>
+          Promise.resolve(new Set(keys.filter((key) => quads.has(key)))),
+        projection: {
+          textSplitter: wholeLiteral,
+          embeddingService,
+          vectorDimensions: 32,
+        },
+      });
+    const { novelInsertions } = novel;
+    const rows = chunkRows.map((row) => row.chunk.quad_id);
 
     if (laterFailArmed) {
       // The quad writes landed; a later write (chunk rows) fails.

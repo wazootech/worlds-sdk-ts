@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- `@worlds/sdk/search-index`: `prepareCommit(patch, options)` runs the whole
+  pre-write half of a durable commit in the order every backend shares:
+  `preparePatch` (filter and hash), `planSearchIndexing`, `selectNovelQuads`
+  (honoring a replace import and a backend `keyOf`), then `chunkAndEmbedQuads`,
+  all before any write. It returns `{ prepared, plan, novel, rows, replacing }`;
+  a deferred import or disabled mode returns empty `rows`, and an embedding
+  failure rejects before anything is written. `selectNovel: "when-projecting"`
+  lets a backend whose store deduplicates writes (IndexedDB) look up existing
+  quads only when it will project. Additive; the existing helpers are unchanged
+  and `@worlds/sdk/testing`'s reference commit store now uses it
+  ([#265](https://github.com/wazootech/worlds-sdk-ts/issues/265)).
+
 ## 0.10.0 (2026-11-21)
 
 ### Removed

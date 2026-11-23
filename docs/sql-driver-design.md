@@ -221,8 +221,11 @@ supplies a `ChunkRebuildDriver`:
   nothing). An unscoped rebuild over no quads still calls it once with no rows,
   so the clear happens. SQL turns each call into one per-page, rerunnable batch.
 - `finish()` is optional and runs once after the last page, never after a
-  failure. IndexedDB buffers rows in `writePage` and does its one-transaction
-  swap here, keeping its all-or-nothing write.
+  failure. No current backend needs it: since worlds-indexeddb#42 IndexedDB also
+  writes each page in its own transaction (unscoped page 1 clears and puts,
+  later pages put, scoped pages replace only their in-scope rows), so a failure
+  on page N leaves pages 1 to N-1 written and a rerun repairs it, like the SQL
+  backends.
 
 Released in `@worlds/sdk` 0.11.0 and adopted by
 `rebuildSqlSearchIndexWithCounts` (`@worlds/sqlite` 0.8.1) and `reindexChunks`
@@ -338,9 +341,10 @@ Remaining deliberate divergences, from the table above:
    real-D1 limit; the size estimate and the budget were measured only indirectly
    and not re-run on a real D1 after the byte-aware change.
 2. **Vectorize sync is never atomic with D1** (platform-forced).
-3. **IndexedDB's rebuild** is an all-or-nothing swap in one transaction (SQL
-   rebuilds are per-page and rerunnable), and a store that is not an
-   `IndexeddbStore` is read once and sliced.
+3. **IndexedDB reads a store that is not an `IndexeddbStore` once** and slices
+   it (an `IndexeddbStore` pages with a cursor). Its rebuild is per-page and
+   rerunnable like the SQL backends' since worlds-indexeddb#42 (unreleased: it
+   rides the next `@worlds/indexeddb` release).
 
 ## 9. Rollout (done) and adopter checklist
 

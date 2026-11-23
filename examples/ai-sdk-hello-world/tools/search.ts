@@ -14,41 +14,54 @@ export function createSearchWorldTool(client: WorldsSdkInterface) {
   return tool({
     description: SEARCH_WORLD_TOOL_DESCRIPTION,
     inputSchema: z.object({
-      query: z.string().describe(
-        "Exact label, keyword, or natural-language phrase to search for.",
-      ),
-      include: z.object({
-        subjects: z.array(z.string()).optional().describe(
-          "Restricts matching to specific subject IRIs.",
+      query: z
+        .string()
+        .describe(
+          "Exact label, keyword, or natural-language phrase to search for.",
         ),
-        predicates: z.array(z.string()).optional().describe(
-          "Restricts matching to specific predicate IRIs.",
+      include: z
+        .object({
+          subjects: z
+            .array(z.string())
+            .optional()
+            .describe("Restricts matching to specific subject IRIs."),
+          predicates: z
+            .array(z.string())
+            .optional()
+            .describe("Restricts matching to specific predicate IRIs."),
+          graphs: z
+            .array(z.string())
+            .optional()
+            .describe("Restricts matching to specific Named Graphs."),
+        })
+        .optional()
+        .describe(
+          "Positive boundary conditions. Facts MUST satisfy all declared constraints.",
         ),
-        graphs: z.array(z.string()).optional().describe(
-          "Restricts matching to specific Named Graphs.",
+      exclude: z
+        .object({
+          subjects: z
+            .array(z.string())
+            .optional()
+            .describe("Rejects specific subject IRIs."),
+          predicates: z
+            .array(z.string())
+            .optional()
+            .describe("Rejects specific predicate IRIs."),
+          graphs: z
+            .array(z.string())
+            .optional()
+            .describe("Rejects specific Named Graphs."),
+        })
+        .optional()
+        .describe(
+          "Negative boundary conditions. Facts matching ANY constraint are rejected.",
         ),
-      }).optional().describe(
-        "Positive boundary conditions. Facts MUST satisfy all declared constraints.",
-      ),
-      exclude: z.object({
-        subjects: z.array(z.string()).optional().describe(
-          "Rejects specific subject IRIs.",
-        ),
-        predicates: z.array(z.string()).optional().describe(
-          "Rejects specific predicate IRIs.",
-        ),
-        graphs: z.array(z.string()).optional().describe(
-          "Rejects specific Named Graphs.",
-        ),
-      }).optional().describe(
-        "Negative boundary conditions. Facts matching ANY constraint are rejected.",
-      ),
     }),
     execute: async (
       request: SearchRequest,
     ): Promise<
-      | ({ success: true } & SearchResponse)
-      | { success: false; error: string }
+      ({ success: true } & SearchResponse) | { success: false; error: string }
     > => {
       try {
         const response = await client.search(request);

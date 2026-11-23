@@ -13,7 +13,8 @@ const SEED_TURTLE = `
   <urn:acme> a <http://schema.org/Organization> ; <http://schema.org/name> "Acme Corp" .
 `;
 
-const MULTI_HOP_QUERY = "SELECT ?name ?org WHERE { " +
+const MULTI_HOP_QUERY =
+  "SELECT ?name ?org WHERE { " +
   '?a <http://schema.org/name> "Alice" ; <http://schema.org/knows> ?b . ' +
   "?b <http://schema.org/name> ?name ; <http://schema.org/worksFor> ?o . " +
   "?o <http://schema.org/name> ?org }";

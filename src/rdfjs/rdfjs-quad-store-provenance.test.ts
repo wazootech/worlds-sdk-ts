@@ -33,7 +33,9 @@ test("RdfjsQuadStore.import records write provenance for every quad", async () =
     expect(record.source).toStrictEqual("nightly-feed");
     expect(record.recordedAt !== undefined).toStrictEqual(true);
   }
-  expect(records.map((record) => record.quadId).sort()).toStrictEqual([hashQuad(fixtureQuad1), hashQuad(fixtureQuad2)].sort());
+  expect(records.map((record) => record.quadId).sort()).toStrictEqual(
+    [hashQuad(fixtureQuad1), hashQuad(fixtureQuad2)].sort(),
+  );
 });
 
 test("RdfjsQuadStore.import defaults recordedAt to write time when provenance is absent", async () => {
@@ -92,8 +94,8 @@ test("RdfjsQuadStore.replace import records removal tombstones for wiped quads",
   // Both imports' write records persist; the replace only tombstones the wipe.
   const written = await quadStore.provenanceStore.list({ type: "write" });
   expect(written.length).toStrictEqual(2);
-  const secondWrite = written.find((record) =>
-    record.quadId === hashQuad(fixtureQuad2)
+  const secondWrite = written.find(
+    (record) => record.quadId === hashQuad(fixtureQuad2),
   );
   expect(secondWrite?.writer).toStrictEqual("second-writer");
 });

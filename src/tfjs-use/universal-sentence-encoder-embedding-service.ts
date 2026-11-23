@@ -60,10 +60,7 @@ class UniversalSentenceEncoderLite {
   /**
    * load initializes the graph model and vocabulary tokenizer.
    */
-  public async load(
-    modelUrl?: string,
-    vocabUrl?: string,
-  ): Promise<void> {
+  public async load(modelUrl?: string, vocabUrl?: string): Promise<void> {
     const [model, vocabulary] = await Promise.all([
       this.loadModel(modelUrl),
       loadVocabulary(vocabUrl ?? `${BASE_PATH}/vocab.json`),
@@ -83,7 +80,7 @@ class UniversalSentenceEncoderLite {
     const encodings = inputs.map((text) => this.tokenizer.encode(text));
 
     const indicesArr = encodings.map((arr, i) =>
-      arr.map((_token, index) => [i, index])
+      arr.map((_token, index) => [i, index]),
     );
 
     let flattenedIndicesArr: Array<[number, number]> = [];
@@ -98,10 +95,7 @@ class UniversalSentenceEncoderLite {
       [flattenedIndicesArr.length, 2],
       "int32",
     );
-    const values = tf.tensor1d(
-      tf.util.flatten(encodings) as number[],
-      "int32",
-    );
+    const values = tf.tensor1d(tf.util.flatten(encodings) as number[], "int32");
 
     const modelInputs: ModelInputs = { indices, values };
 
@@ -141,16 +135,14 @@ function resolveModelResourcePath(pathOrUrl: string): string {
  * UniversalSentenceEncoderEmbeddingService provides 512-dimensional text
  * embeddings using TensorFlow.js Universal Sentence Encoder lite.
  */
-export class UniversalSentenceEncoderEmbeddingService
-  implements EmbeddingService {
+export class UniversalSentenceEncoderEmbeddingService implements EmbeddingService {
   private modelPromise: Promise<UniversalSentenceEncoderLite> | null = null;
 
   /**
    * options is the configuration for local or remote model resources.
    */
   public constructor(
-    private readonly options: UniversalSentenceEncoderEmbeddingServiceOptions =
-      {},
+    private readonly options: UniversalSentenceEncoderEmbeddingServiceOptions = {},
   ) {
     tf.setBackend("wasm").catch(console.error);
   }

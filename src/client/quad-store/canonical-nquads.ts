@@ -24,11 +24,19 @@ export function serializeQuadToCanonicalNQuads(quad: rdfjs.Quad): string {
   const subject = serializeTerm(quad.subject, "subject");
   const predicate = serializeTerm(quad.predicate, "predicate");
   const object = serializeTerm(quad.object, "object");
-  const graph = quad.graph.termType === "DefaultGraph"
-    ? ""
-    : serializeTerm(quad.graph, "graph");
-  return subject + " " + predicate + " " + object +
-    (graph ? " " + graph : "") + " .\n";
+  const graph =
+    quad.graph.termType === "DefaultGraph"
+      ? ""
+      : serializeTerm(quad.graph, "graph");
+  return (
+    subject +
+    " " +
+    predicate +
+    " " +
+    object +
+    (graph ? " " + graph : "") +
+    " .\n"
+  );
 }
 
 type QuadPosition = "subject" | "predicate" | "object" | "graph";
@@ -42,7 +50,8 @@ function serializeTerm(term: rdfjs.Term, position: QuadPosition): string {
     case "Literal":
       if (position !== "object") {
         throw new Error(
-          "N-Quads cannot serialize a Literal term in " + position +
+          "N-Quads cannot serialize a Literal term in " +
+            position +
             " position",
         );
       }
@@ -108,9 +117,16 @@ function escapeIri(value: string): string {
     }
     const code = ch.codePointAt(0) ?? 0;
     if (
-      code < 0x20 || code === 0x7f || ch === "<" || ch === ">" ||
-      ch === '"' || ch === "{" || ch === "}" || ch === "|" ||
-      ch === "^" || ch === "\u0060"
+      code < 0x20 ||
+      code === 0x7f ||
+      ch === "<" ||
+      ch === ">" ||
+      ch === '"' ||
+      ch === "{" ||
+      ch === "}" ||
+      ch === "|" ||
+      ch === "^" ||
+      ch === "\u0060"
     ) {
       out += escapeControlChar(ch);
     } else {

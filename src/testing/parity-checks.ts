@@ -17,12 +17,10 @@ export async function checkQuadCounts(
   expected: number,
   failures: string[],
 ): Promise<void> {
-  for (
-    const [label, sdk] of [
-      ["reference", ref],
-      ["candidate", cand],
-    ] as const
-  ) {
+  for (const [label, sdk] of [
+    ["reference", ref],
+    ["candidate", cand],
+  ] as const) {
     const quads = await exportQuads(sdk);
     if (quads.length !== expected) {
       failures.push(
@@ -107,9 +105,9 @@ export async function checkSearchCase(
   if (!equal) {
     failures.push(
       `[${fixtureName}] search case "${searchCase.name}": ` +
-        `candidate results differ from reference (query=${
-          JSON.stringify(searchCase.request.query)
-        })`,
+        `candidate results differ from reference (query=${JSON.stringify(
+          searchCase.request.query,
+        )})`,
     );
   }
 }

@@ -55,11 +55,13 @@ export function createReferenceCommitStore(
   let laterFailArmed = false;
 
   const textChunks = async (batch: rdfjs.Quad[]) =>
-    (await chunkAndEmbedQuads(batch, batch.map(hashQuad), {
-      textSplitter: wholeLiteral,
-      embeddingService: options.embeddingService,
-      vectorDimensions: 32,
-    })).rows.map((row) => row.chunk.quad_id);
+    (
+      await chunkAndEmbedQuads(batch, batch.map(hashQuad), {
+        textSplitter: wholeLiteral,
+        embeddingService: options.embeddingService,
+        vectorDimensions: 32,
+      })
+    ).rows.map((row) => row.chunk.quad_id);
 
   const store = (quad: rdfjs.Quad) => quads.set(hashQuad(quad), quad);
 
@@ -67,26 +69,31 @@ export function createReferenceCommitStore(
     const embeddingService: EmbeddingService =
       options.bug === "write-before-embed"
         ? {
-          embed: (texts) => {
-            // The injected bug: quads land before the embedding call.
-            patch.insertions?.forEach(store);
-            return options.embeddingService.embed(texts);
-          },
-        }
+            embed: (texts) => {
+              // The injected bug: quads land before the embedding call.
+              patch.insertions?.forEach(store);
+              return options.embeddingService.embed(texts);
+            },
+          }
         : options.embeddingService;
-    const { prepared, plan, novel, rows: chunkRows, replacing } =
-      await prepareCommit(patch, {
-        context,
-        searchIndexOnImport: options.searchIndexOnImport,
-        defaultMode: options.defaultMode,
-        lookupExisting: (keys) =>
-          Promise.resolve(new Set(keys.filter((key) => quads.has(key)))),
-        projection: {
-          textSplitter: wholeLiteral,
-          embeddingService,
-          vectorDimensions: 32,
-        },
-      });
+    const {
+      prepared,
+      plan,
+      novel,
+      rows: chunkRows,
+      replacing,
+    } = await prepareCommit(patch, {
+      context,
+      searchIndexOnImport: options.searchIndexOnImport,
+      defaultMode: options.defaultMode,
+      lookupExisting: (keys) =>
+        Promise.resolve(new Set(keys.filter((key) => quads.has(key)))),
+      projection: {
+        textSplitter: wholeLiteral,
+        embeddingService,
+        vectorDimensions: 32,
+      },
+    });
     const { novelInsertions } = novel;
     const rows = chunkRows.map((row) => row.chunk.quad_id);
 

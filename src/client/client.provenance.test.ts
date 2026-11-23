@@ -86,9 +86,8 @@ test("WorldsSdk.provenance walks the supersedes chain in both directions", async
   );
   // Simulate the applied patch: remove the old quad from the store, add the
   // corrected one, then record the sidecar provenance for the patch.
-  const { recordPatchProvenance } = await import(
-    "../rdfjs/rdfjs-quad-store.ts"
-  );
+  const { recordPatchProvenance } =
+    await import("../rdfjs/rdfjs-quad-store.ts");
   store.delete(fixtureQuad1);
   store.addQuad(corrected);
   await recordPatchProvenance({
@@ -116,7 +115,10 @@ test("WorldsSdk.provenance walks the supersedes chain in both directions", async
     quadId: hashQuad(fixtureQuad1),
   });
   expect(originalRecords.length).toStrictEqual(2); // write + remove tombstone
-  expect(originalRecords.map((record) => record.type).sort()).toStrictEqual(["remove", "write"]);
+  expect(originalRecords.map((record) => record.type).sort()).toStrictEqual([
+    "remove",
+    "write",
+  ]);
 });
 
 test("WorldsSdk.provenance prefers an explicit provenance handler", async () => {
@@ -149,5 +151,7 @@ test("WorldsSdk.provenance prefers an explicit provenance handler", async () => 
 test("WorldsSdk.provenance rejects when nothing can serve provenance", async () => {
   const client = new WorldsSdk({});
 
-  await expect(client.provenance({})).rejects.toThrow("Provenance is not configured.");
+  await expect(client.provenance({})).rejects.toThrow(
+    "Provenance is not configured.",
+  );
 });

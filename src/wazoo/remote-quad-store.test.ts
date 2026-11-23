@@ -95,7 +95,9 @@ test("RemoteQuadStore.export returns quads from API", async () => {
   if (result.kind === "quads") {
     expect(result.quads.length).toStrictEqual(1);
     expect(result.quads[0].subject.value).toStrictEqual("http://example.com/s");
-    expect(result.quads[0].predicate.value).toStrictEqual("http://example.com/p");
+    expect(result.quads[0].predicate.value).toStrictEqual(
+      "http://example.com/p",
+    );
     expect(result.quads[0].object.value).toStrictEqual("hello");
   }
 });
@@ -140,12 +142,14 @@ test("RemoteQuadStore.import throws on API error", async () => {
     "w_test",
   );
 
-  await expect(store.import({
-        mode: "merge",
-        source: {
-          kind: "serialized",
-          data: "bad data",
-          contentType: "text/turtle",
-        },
-      })).rejects.toThrow("Import failed");
+  await expect(
+    store.import({
+      mode: "merge",
+      source: {
+        kind: "serialized",
+        data: "bad data",
+        contentType: "text/turtle",
+      },
+    }),
+  ).rejects.toThrow("Import failed");
 });

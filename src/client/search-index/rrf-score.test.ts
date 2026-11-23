@@ -39,7 +39,9 @@ test("RRF.normalizeRrfScore - k edge cases", () => {
   expect(normalizeRrfScore(60, 60)).toStrictEqual(0.5);
   // Larger k flattens the curve: same rank scores higher with larger k.
   const rank = 60;
-  expect(normalizeRrfScore(rank, 120) > normalizeRrfScore(rank, 60)).toStrictEqual(true);
+  expect(
+    normalizeRrfScore(rank, 120) > normalizeRrfScore(rank, 60),
+  ).toStrictEqual(true);
 });
 
 test("RRF.normalizeRrfScore - asymptotic behavior approaches 0 but never reaches it", () => {

@@ -20,9 +20,7 @@ export interface AiSdkEmbeddingServiceOptions {
  * AiSdkEmbeddingService provides text embedding generation leveraging Vercel AI SDK's embedMany.
  */
 export class AiSdkEmbeddingService implements EmbeddingService {
-  public constructor(
-    private readonly options: AiSdkEmbeddingServiceOptions,
-  ) {}
+  public constructor(private readonly options: AiSdkEmbeddingServiceOptions) {}
 
   /**
    * embed converts text sequences into high-dimensional vector arrays using Vercel AI SDK.

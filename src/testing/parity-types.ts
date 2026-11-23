@@ -3,8 +3,7 @@ import type { ParityFixture, ParityReplaceCase } from "./parity-fixtures.ts";
 
 /** WorldsSdkFactory constructs a fresh WorldsSdk (quad store + search + SPARQL wired) for one case. */
 export type WorldsSdkFactory = () =>
-  | Promise<WorldsSdkInterface>
-  | WorldsSdkInterface;
+  Promise<WorldsSdkInterface> | WorldsSdkInterface;
 
 /** ParitySuiteOptions configures a parity run: the reference, the candidate, and the corpus. */
 export interface ParitySuiteOptions {

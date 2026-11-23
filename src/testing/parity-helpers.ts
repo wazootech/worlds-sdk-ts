@@ -64,9 +64,11 @@ export function searchResultKey(result: SearchResult): string {
 
 /** bindingKey canonicalizes a SPARQL binding (order-insensitive key comparison). */
 export function bindingKey(binding: SparqlBinding): string {
-  const entries = Object.keys(binding).sort().map((variable) => {
-    return `${variable}=${valueKey(binding[variable])}`;
-  });
+  const entries = Object.keys(binding)
+    .sort()
+    .map((variable) => {
+      return `${variable}=${valueKey(binding[variable])}`;
+    });
   return `{${entries.join(", ")}}`;
 }
 
@@ -85,8 +87,10 @@ function valueKey(value: SparqlValue): string {
       return key;
     }
     case "triple":
-      return `triple(${valueKey(value.value.subject)}, ` +
-        `${valueKey(value.value.predicate)}, ${valueKey(value.value.object)})`;
+      return (
+        `triple(${valueKey(value.value.subject)}, ` +
+        `${valueKey(value.value.predicate)}, ${valueKey(value.value.object)})`
+      );
   }
 }
 

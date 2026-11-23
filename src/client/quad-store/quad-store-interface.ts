@@ -33,9 +33,7 @@ export interface ImportRequest {
  */
 export interface ExportRequest {
   /** Desired output format. */
-  format:
-    | { kind: "quads" }
-    | { kind: "serialized"; contentType?: string };
+  format: { kind: "quads" } | { kind: "serialized"; contentType?: string };
 }
 
 /**

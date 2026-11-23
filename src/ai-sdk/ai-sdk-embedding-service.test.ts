@@ -6,7 +6,9 @@ test("AiSdkEmbeddingService.embed - generates mock embeddings correctly", async 
   const mockModel = new MockEmbeddingModelV3({
     doEmbed: ({ values }) =>
       Promise.resolve({
-        embeddings: values.map((value) => value === "first" ? [0, 1] : [1, 2]),
+        embeddings: values.map((value) =>
+          value === "first" ? [0, 1] : [1, 2],
+        ),
         usage: { tokens: 10 },
         warnings: [],
       }),

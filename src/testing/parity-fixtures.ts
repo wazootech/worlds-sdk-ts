@@ -154,9 +154,11 @@ export const multiGraphWorld: ParityFixture = {
         "SELECT (COUNT(*) AS ?c) WHERE { { ?s ?p ?o } UNION { GRAPH ?g { ?s ?p ?o } } }",
       expected: {
         kind: "select",
-        bindings: [{
-          c: { type: "literal", value: "5", datatype: XSD + "integer" },
-        }],
+        bindings: [
+          {
+            c: { type: "literal", value: "5", datatype: XSD + "integer" },
+          },
+        ],
       },
     },
   ],
@@ -265,9 +267,7 @@ export const rdfStarWorld: ParityFixture = {
 export const chunkBoundaryWorld: ParityFixture = {
   name: "chunkBoundaryWorld",
   nquads: [
-    '<urn:long> <urn:body> "' +
-    longParagraph() +
-    '" .',
+    '<urn:long> <urn:body> "' + longParagraph() + '" .',
     '<urn:long> <urn:tag> "needle" .',
   ].join("\n"),
   totalQuads: 2,
@@ -303,10 +303,7 @@ export const emptyWorld: ParityFixture = {
  */
 export const replaceModeCase: ParityReplaceCase = {
   name: "replaceModeCase",
-  first: [
-    '<urn:a> <urn:p> "one" .',
-    '<urn:b> <urn:p> "two" .',
-  ].join("\n"),
+  first: ['<urn:a> <urn:p> "one" .', '<urn:b> <urn:p> "two" .'].join("\n"),
   second: '<urn:c> <urn:p> "three" .',
   resultCount: 1,
 };

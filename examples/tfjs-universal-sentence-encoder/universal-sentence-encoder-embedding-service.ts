@@ -20,8 +20,7 @@ export class UniversalSentenceEncoderEmbeddingService {
   private modelPromise: Promise<UniversalSentenceEncoderLite> | null = null;
 
   public constructor(
-    private readonly options: UniversalSentenceEncoderEmbeddingServiceOptions =
-      {},
+    private readonly options: UniversalSentenceEncoderEmbeddingServiceOptions = {},
   ) {
     // Initialize backend immediately
     tf.setBackend("wasm").catch(console.error);

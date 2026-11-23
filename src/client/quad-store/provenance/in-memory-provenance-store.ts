@@ -36,9 +36,10 @@ export class InMemoryProvenanceStore implements ProvenanceStore {
     } else {
       matches = this.records;
     }
-    const filtered = query?.type !== undefined
-      ? matches.filter((record) => (record.type ?? "write") === query.type)
-      : matches;
+    const filtered =
+      query?.type !== undefined
+        ? matches.filter((record) => (record.type ?? "write") === query.type)
+        : matches;
     return Promise.resolve([...filtered]);
   }
 

@@ -84,8 +84,7 @@ test("RdfjsQuadStore.import - source: serialized parses Turtle successfully", as
 
 test("RdfjsQuadStore.import - source: serialized defaults to N-Quads", async () => {
   const store = new Store();
-  const nQuads =
-    `<http://example.org/s4> <http://example.org/p4> <http://example.org/o4> <http://example.org/g4> .`;
+  const nQuads = `<http://example.org/s4> <http://example.org/p4> <http://example.org/o4> <http://example.org/g4> .`;
   await new RdfjsQuadStore({ store }).import({
     source: { kind: "serialized", data: nQuads },
   });
@@ -111,16 +110,18 @@ test("RdfjsQuadStore.import - replace mode preserves existing data when serializ
   const store = new Store();
   store.add(fixtureQuad1);
 
-  await expect((async () => {
-    await new RdfjsQuadStore({ store }).import({
-      mode: "replace",
-      source: {
-        kind: "serialized",
-        data: "GARBAGE SNOT@@$",
-        contentType: "text/turtle",
-      },
-    });
-  })()).rejects.toThrow();
+  await expect(
+    (async () => {
+      await new RdfjsQuadStore({ store }).import({
+        mode: "replace",
+        source: {
+          kind: "serialized",
+          data: "GARBAGE SNOT@@$",
+          contentType: "text/turtle",
+        },
+      });
+    })(),
+  ).rejects.toThrow();
 
   expect(store.size).toStrictEqual(1);
   expect(store.has(fixtureQuad1)).toStrictEqual(true);
@@ -129,15 +130,17 @@ test("RdfjsQuadStore.import - replace mode preserves existing data when serializ
 test("RdfjsQuadStore.import - invalid serialization rejects properly", async () => {
   const store = new Store();
 
-  await expect((async () => {
-    await new RdfjsQuadStore({ store }).import({
-      source: {
-        kind: "serialized",
-        data: "GARBAGE SNOT@@$",
-        contentType: "text/turtle",
-      },
-    });
-  })()).rejects.toThrow();
+  await expect(
+    (async () => {
+      await new RdfjsQuadStore({ store }).import({
+        source: {
+          kind: "serialized",
+          data: "GARBAGE SNOT@@$",
+          contentType: "text/turtle",
+        },
+      });
+    })(),
+  ).rejects.toThrow();
 });
 
 test("RdfjsQuadStore.import - omitting mode defaults to merge", async () => {
@@ -232,21 +235,21 @@ test("RdfjsQuadStore.export - rejects invalid export format", async () => {
   const store = new Store();
   store.add(fixtureQuad1);
 
-  await expect(new RdfjsQuadStore({ store }).export(
-        {
-          format: { kind: "invalid" },
-        } as unknown as ExportRequest,
-      )).rejects.toThrow("Invalid format requested");
+  await expect(
+    new RdfjsQuadStore({ store }).export({
+      format: { kind: "invalid" },
+    } as unknown as ExportRequest),
+  ).rejects.toThrow("Invalid format requested");
 });
 
 test("RdfjsQuadStore.import - rejects unsupported import source kind", async () => {
   const store = new Store();
 
-  await expect(new RdfjsQuadStore({ store }).import(
-        {
-          source: { kind: "unknown" },
-        } as unknown as ImportRequest,
-      )).rejects.toThrow("Unsupported import source kind");
+  await expect(
+    new RdfjsQuadStore({ store }).import({
+      source: { kind: "unknown" },
+    } as unknown as ImportRequest),
+  ).rejects.toThrow("Unsupported import source kind");
 });
 
 test("RdfjsQuadStore.export - returns serialized dump", async () => {
@@ -304,19 +307,33 @@ test("RdfjsQuadStore - multi-graph import and export round-trip preserves all gr
   if (response.kind !== "quads") throw new Error("Expected kind quads");
 
   const graphValues = response.quads.map((q) => q.graph.value).sort();
-  expect(graphValues).toStrictEqual(["", "urn:graph:private", "urn:graph:public"]);
+  expect(graphValues).toStrictEqual([
+    "",
+    "urn:graph:private",
+    "urn:graph:public",
+  ]);
 
   // Verify each specific quad survived
-  expect(response.quads.some((q) =>
-      q.graph.value === "" && q.subject.value === "urn:alice" &&
-      q.object.value === "sailing"
-    )).toStrictEqual(true);
-  expect(response.quads.some((q) =>
-      q.graph.value === "urn:graph:public" &&
-      q.object.value === "alice wrote a public note"
-    )).toStrictEqual(true);
-  expect(response.quads.some((q) =>
-      q.graph.value === "urn:graph:private" &&
-      q.object.value === "confidential key material"
-    )).toStrictEqual(true);
+  expect(
+    response.quads.some(
+      (q) =>
+        q.graph.value === "" &&
+        q.subject.value === "urn:alice" &&
+        q.object.value === "sailing",
+    ),
+  ).toStrictEqual(true);
+  expect(
+    response.quads.some(
+      (q) =>
+        q.graph.value === "urn:graph:public" &&
+        q.object.value === "alice wrote a public note",
+    ),
+  ).toStrictEqual(true);
+  expect(
+    response.quads.some(
+      (q) =>
+        q.graph.value === "urn:graph:private" &&
+        q.object.value === "confidential key material",
+    ),
+  ).toStrictEqual(true);
 });

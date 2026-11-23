@@ -114,7 +114,9 @@ test("selectNovelQuads - passes duplicates to the lookup and keeps each novel co
 });
 
 test("selectNovelQuads - a failing lookup rejects", async () => {
-  await expect(selectNovelQuads(preparePatch({ insertions: [a], deletions: [] }), {
-        lookupExisting: () => Promise.reject(new Error("db down")),
-      })).rejects.toThrow("db down");
+  await expect(
+    selectNovelQuads(preparePatch({ insertions: [a], deletions: [] }), {
+      lookupExisting: () => Promise.reject(new Error("db down")),
+    }),
+  ).rejects.toThrow("db down");
 });

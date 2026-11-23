@@ -36,7 +36,9 @@ test("RemoteSparqlEngine.execute delegates to sparqlWorld", async () => {
     expect(result.data.head.vars).toStrictEqual(["p", "o"]);
     expect(result.data.results.bindings.length).toStrictEqual(1);
     expect(result.data.results.bindings[0].p.type).toStrictEqual("uri");
-    expect((result.data.results.bindings[0].p as { value: string }).value).toStrictEqual("http://example.com/p");
+    expect(
+      (result.data.results.bindings[0].p as { value: string }).value,
+    ).toStrictEqual("http://example.com/p");
   }
 });
 
@@ -89,7 +91,9 @@ test("RemoteSparqlEngine.execute handles CONSTRUCT responses", async () => {
   expect(result.kind).toStrictEqual("construct");
   if (result.kind === "construct") {
     expect(result.data.quads.length).toStrictEqual(1);
-    expect(result.data.quads[0].subject.value).toStrictEqual("http://example.com/s");
+    expect(result.data.quads[0].subject.value).toStrictEqual(
+      "http://example.com/s",
+    );
   }
 });
 
@@ -140,7 +144,9 @@ test("RemoteSparqlEngine.execute parses literal terms in CONSTRUCT", async () =>
     expect(typed.termType).toStrictEqual("Literal");
     expect(typed.value).toStrictEqual("hello");
     if (typed.termType === "Literal") {
-      expect(typed.datatype.value).toStrictEqual("http://www.w3.org/2001/XMLSchema#string");
+      expect(typed.datatype.value).toStrictEqual(
+        "http://www.w3.org/2001/XMLSchema#string",
+      );
     }
 
     // Language-tagged literal
@@ -173,5 +179,7 @@ test("RemoteSparqlEngine.execute throws on API error", async () => {
     "w_test",
   );
 
-  await expect(engine.execute({ query: "SELECT ?s WHERE { ?s ?p ?o }" })).rejects.toThrow("SPARQL failed");
+  await expect(
+    engine.execute({ query: "SELECT ?s WHERE { ?s ?p ?o }" }),
+  ).rejects.toThrow("SPARQL failed");
 });

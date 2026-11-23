@@ -83,7 +83,9 @@ export function registerQuadStoreContractTests(
         throw new Error("Expected quads response");
       }
       expect(response.quads.length).toStrictEqual(1);
-      expect(response.quads[0].subject.value).toStrictEqual(fixtureQuad2.subject.value);
+      expect(response.quads[0].subject.value).toStrictEqual(
+        fixtureQuad2.subject.value,
+      );
     } finally {
       if (cleanup) await cleanup();
     }

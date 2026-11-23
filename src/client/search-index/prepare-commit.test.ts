@@ -126,10 +126,7 @@ test("prepareCommit - the filter drops quads from storage and projection", async
 });
 
 test("prepareCommit - a quad deleted and re-added is novel even when stored", async () => {
-  const result = await prepareCommit(
-    patchOf([a, b], [a]),
-    options({}, [a, b]),
-  );
+  const result = await prepareCommit(patchOf([a, b], [a]), options({}, [a, b]));
   expect(result.novel.novelInsertions).toStrictEqual([a]);
   expect(rowIds(result.rows)).toStrictEqual(ids([a]));
   expect(result.prepared.deletionIds).toStrictEqual(ids([a]));
@@ -198,12 +195,15 @@ test("prepareCommit - embeds only the novel texts and attaches vectors", async (
   const calls: string[][] = [];
   const result = await prepareCommit(
     patchOf([a, b]),
-    options({
-      projection: {
-        textSplitter: wholeLiteral,
-        embeddingService: embedder(calls),
+    options(
+      {
+        projection: {
+          textSplitter: wholeLiteral,
+          embeddingService: embedder(calls),
+        },
       },
-    }, [a]),
+      [a],
+    ),
   );
   expect(calls).toStrictEqual([["b"]]);
   expect(result.rows[0]?.vector).toStrictEqual([1, 2]);
@@ -213,13 +213,15 @@ test("prepareCommit - an embedding failure rejects before returning", async () =
   const failing: EmbeddingService = {
     embed: () => Promise.reject(new Error("embedding service down")),
   };
-  await expect(prepareCommit(
-        patchOf([a]),
-        options({
-          projection: {
-            textSplitter: wholeLiteral,
-            embeddingService: failing,
-          },
-        }),
-      )).rejects.toThrow("failed to vectorize literal chunk blocks");
+  await expect(
+    prepareCommit(
+      patchOf([a]),
+      options({
+        projection: {
+          textSplitter: wholeLiteral,
+          embeddingService: failing,
+        },
+      }),
+    ),
+  ).rejects.toThrow("failed to vectorize literal chunk blocks");
 });

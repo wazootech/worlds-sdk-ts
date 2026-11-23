@@ -12,8 +12,7 @@ import { createWazooSdk } from "@worlds/sdk/wazoo";
  *   WORLDS_TOKEN=xxx WORLDS_WORLD_ID=w_xxx bun run example:wazoo-hello-world
  */
 if (import.meta.main) {
-  const baseUrl = process.env.WORLDS_BASE_URL ??
-    "https://data.wazoo.dev";
+  const baseUrl = process.env.WORLDS_BASE_URL ?? "https://data.wazoo.dev";
   const token = process.env.WORLDS_TOKEN;
   const worldId = process.env.WORLDS_WORLD_ID;
 
@@ -35,8 +34,7 @@ if (import.meta.main) {
   await sdk.import({
     source: {
       kind: "serialized",
-      data:
-        `<http://example.com/subject> <http://example.com/predicate> "Hello, Wazoo!" .`,
+      data: `<http://example.com/subject> <http://example.com/predicate> "Hello, Wazoo!" .`,
       contentType: "text/turtle",
     },
   });

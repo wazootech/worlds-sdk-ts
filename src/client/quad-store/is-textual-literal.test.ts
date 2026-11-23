@@ -9,9 +9,11 @@ test("isTextualLiteral - evaluates physical string and language variations corre
   expect(isTextualLiteral(literal("hello world"))).toStrictEqual(true);
 
   // 2. Explicit xsd:string
-  expect(isTextualLiteral(
+  expect(
+    isTextualLiteral(
       literal("explicit", namedNode("http://www.w3.org/2001/XMLSchema#string")),
-    )).toStrictEqual(true);
+    ),
+  ).toStrictEqual(true);
 
   // 3. Explicit rdf:langString
   expect(isTextualLiteral(literal("bonjour", "fr"))).toStrictEqual(true);
@@ -23,20 +25,26 @@ test("isTextualLiteral - rejects non-literal physical node terms", () => {
 
 test("isTextualLiteral - strictly suppresses structured numeric and boolean primitives", () => {
   // 1. Integer
-  expect(isTextualLiteral(
+  expect(
+    isTextualLiteral(
       literal("42", namedNode("http://www.w3.org/2001/XMLSchema#integer")),
-    )).toStrictEqual(false);
+    ),
+  ).toStrictEqual(false);
 
   // 2. Boolean
-  expect(isTextualLiteral(
+  expect(
+    isTextualLiteral(
       literal("true", namedNode("http://www.w3.org/2001/XMLSchema#boolean")),
-    )).toStrictEqual(false);
+    ),
+  ).toStrictEqual(false);
 
   // 3. DateTime
-  expect(isTextualLiteral(
+  expect(
+    isTextualLiteral(
       literal(
         "2026-05-12T12:00:00Z",
         namedNode("http://www.w3.org/2001/XMLSchema#dateTime"),
       ),
-    )).toStrictEqual(false);
+    ),
+  ).toStrictEqual(false);
 });

@@ -12,8 +12,10 @@ const fail = (message: string) => problems.push(message);
 
 /** expectedPackageSpec maps a jsr.json import specifier to package.json's. */
 function expectedPackageSpec(spec: string): string {
-  if (spec.startsWith("npm:")) return spec.slice("npm:".length).replace(/^.+?@/, "");
-  const [, scope, name, range] = /^jsr:@([^/]+)\/([^@]+)@(.+)$/.exec(spec) ?? [];
+  if (spec.startsWith("npm:"))
+    return spec.slice("npm:".length).replace(/^.+?@/, "");
+  const [, scope, name, range] =
+    /^jsr:@([^/]+)\/([^@]+)@(.+)$/.exec(spec) ?? [];
   return `npm:@jsr/${scope}__${name}@${range}`;
 }
 
@@ -33,7 +35,8 @@ for (const [alias, spec] of Object.entries(imports)) {
   }
 }
 for (const alias of Object.keys(deps)) {
-  if (!(alias in imports)) fail(`package.json depends on "${alias}" but jsr.json does not import it`);
+  if (!(alias in imports))
+    fail(`package.json depends on "${alias}" but jsr.json does not import it`);
 }
 
 if (problems.length > 0) {

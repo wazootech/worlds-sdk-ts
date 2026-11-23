@@ -17,9 +17,10 @@ export interface RdfjsEventSource {
  * is accepted alongside N3.Store, SqliteStore and LibsqlStore. Every
  * `rdfjs.Store` is also an RdfjsStoreLike.
  */
-export interface RdfjsStoreLike
-  extends
-    Omit<rdfjs.Store, "import" | "remove" | "removeMatches" | "deleteGraph"> {
+export interface RdfjsStoreLike extends Omit<
+  rdfjs.Store,
+  "import" | "remove" | "removeMatches" | "deleteGraph"
+> {
   import(stream: rdfjs.Stream<rdfjs.Quad>): RdfjsEventSource;
   remove(stream: rdfjs.Stream<rdfjs.Quad>): RdfjsEventSource;
   removeMatches(

@@ -39,33 +39,38 @@ function createN3WorldsSdk(): WorldsSdk {
   });
 }
 
-test(
-  "runParitySuite - engine MemoryStore and n3.Store agree on the full corpus",
-  async () => {
-    const report = await runParitySuite({
-      reference: () => createMemoryWorldsSdk(),
-      candidate: () => createN3WorldsSdk(),
-      strictSearchOrder: false,
-    });
+test("runParitySuite - engine MemoryStore and n3.Store agree on the full corpus", async () => {
+  const report = await runParitySuite({
+    reference: () => createMemoryWorldsSdk(),
+    candidate: () => createN3WorldsSdk(),
+    strictSearchOrder: false,
+  });
 
-    expect(report.results.length).toStrictEqual(parityCorpus.fixtures.length + parityCorpus.replaceCases.length);
-    // A failing parity suite reports every failed case, not just "false".
-    expect(report.ok ? "ok" : report.results
-      .map(
-        (r) =>
-          `${r.name}: ${r.failures.join("; ")}` +
-          `${r.notes ? ` [notes: ${r.notes.join("; ")}]` : ""}`,
-      )
-      .join("\n")).toBe("ok");
+  expect(report.results.length).toStrictEqual(
+    parityCorpus.fixtures.length + parityCorpus.replaceCases.length,
+  );
+  // A failing parity suite reports every failed case, not just "false".
+  expect(
+    report.ok
+      ? "ok"
+      : report.results
+          .map(
+            (r) =>
+              `${r.name}: ${r.failures.join("; ")}` +
+              `${r.notes ? ` [notes: ${r.notes.join("; ")}]` : ""}`,
+          )
+          .join("\n"),
+  ).toBe("ok");
 
-    // The reference-gate fixtures must be clean on both stores — any
-    // divergence there is a real parity break, not a declared-category note.
-    const referenceGated = report.results.filter((r) =>
-      r.name !== "rdfStarWorld"
-    );
-    for (const result of referenceGated) {
-      expect(result.ok ? "ok" : `${result.name}: ${result.failures.join("; ")}`).toBe("ok");
-      expect(result.notes).toStrictEqual(undefined);
-    }
-  },
-);
+  // The reference-gate fixtures must be clean on both stores — any
+  // divergence there is a real parity break, not a declared-category note.
+  const referenceGated = report.results.filter(
+    (r) => r.name !== "rdfStarWorld",
+  );
+  for (const result of referenceGated) {
+    expect(
+      result.ok ? "ok" : `${result.name}: ${result.failures.join("; ")}`,
+    ).toBe("ok");
+    expect(result.notes).toStrictEqual(undefined);
+  }
+});

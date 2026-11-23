@@ -9,7 +9,9 @@ test("InMemoryProvenanceStore.record defaults recordedAt to write time", async (
 
   expect(record.quadId).toStrictEqual("q2.abc");
   expect(record.type).toStrictEqual(undefined);
-  expect(record.recordedAt >= before && record.recordedAt <= after).toStrictEqual(true);
+  expect(
+    record.recordedAt >= before && record.recordedAt <= after,
+  ).toStrictEqual(true);
 });
 
 test("InMemoryProvenanceStore.record honors explicit recordedAt and metadata", async () => {
@@ -114,5 +116,7 @@ test("InMemoryProvenanceStore.history tolerates cyclic supersedes chains", async
 
   const history = await store.history("q2.a");
   // The walk terminates instead of looping forever; both edges are reachable.
-  expect(history.supersedes.length + history.supersededBy.length >= 1).toStrictEqual(true);
+  expect(
+    history.supersedes.length + history.supersededBy.length >= 1,
+  ).toStrictEqual(true);
 });

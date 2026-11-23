@@ -15,9 +15,11 @@ export function parseSparqlResponse(data: unknown): SparqlResponse {
 
   // SELECT results: { head: { vars }, results: { bindings } }
   if (
-    obj.head && typeof obj.head === "object" &&
+    obj.head &&
+    typeof obj.head === "object" &&
     "vars" in obj.head &&
-    obj.results && typeof obj.results === "object" &&
+    obj.results &&
+    typeof obj.results === "object" &&
     "bindings" in obj.results
   ) {
     const head = obj.head as { vars: string[]; link?: string[] };
@@ -30,11 +32,12 @@ export function parseSparqlResponse(data: unknown): SparqlResponse {
       data: {
         head: { vars: head.vars, link: head.link },
         results: {
-          bindings: results.bindings.map((b) =>
-            parseBindings(b) as Record<
-              string,
-              import("@wazoo/sparql-engine").SparqlValue
-            >
+          bindings: results.bindings.map(
+            (b) =>
+              parseBindings(b) as Record<
+                string,
+                import("@wazoo/sparql-engine").SparqlValue
+              >,
           ),
         },
       },
@@ -106,9 +109,7 @@ function sparqlValueFromApi(
         predicate: sparqlValueFromApi(
           tripleVal.predicate as Record<string, unknown>,
         ),
-        object: sparqlValueFromApi(
-          tripleVal.object as Record<string, unknown>,
-        ),
+        object: sparqlValueFromApi(tripleVal.object as Record<string, unknown>),
       },
     };
   }
@@ -128,9 +129,11 @@ function quadFromApi(q: Record<string, unknown>): rdfjs.Quad {
       : { termType: "DefaultGraph", value: "" },
     equals(other: rdfjs.Term): boolean {
       if (other.termType !== "Quad") return false;
-      return this.subject.equals(other.subject) &&
+      return (
+        this.subject.equals(other.subject) &&
         this.predicate.equals(other.predicate) &&
-        this.object.equals(other.object);
+        this.object.equals(other.object)
+      );
     },
   } as rdfjs.Quad;
 }

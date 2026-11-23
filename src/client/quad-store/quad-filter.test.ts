@@ -66,61 +66,55 @@ test("QuadFilter - restricts matching by negative (exclude) scope", () => {
   expect(matcher(fail)).toStrictEqual(false);
 });
 
-test(
-  "QuadFilter - restricts matching by positive (include) predicate scope",
-  () => {
-    const matcher = filterQuads({
-      include: {
-        predicates: ["http://p-allowed"],
-      },
-    });
+test("QuadFilter - restricts matching by positive (include) predicate scope", () => {
+  const matcher = filterQuads({
+    include: {
+      predicates: ["http://p-allowed"],
+    },
+  });
 
-    const pass = quad(
-      namedNode("http://s"),
-      namedNode("http://p-allowed"),
-      namedNode("http://o"),
-      defaultGraph(),
-    );
+  const pass = quad(
+    namedNode("http://s"),
+    namedNode("http://p-allowed"),
+    namedNode("http://o"),
+    defaultGraph(),
+  );
 
-    const fail = quad(
-      namedNode("http://s"),
-      namedNode("http://p-other"),
-      namedNode("http://o"),
-      defaultGraph(),
-    );
+  const fail = quad(
+    namedNode("http://s"),
+    namedNode("http://p-other"),
+    namedNode("http://o"),
+    defaultGraph(),
+  );
 
-    expect(matcher(pass)).toStrictEqual(true);
-    expect(matcher(fail)).toStrictEqual(false);
-  },
-);
+  expect(matcher(pass)).toStrictEqual(true);
+  expect(matcher(fail)).toStrictEqual(false);
+});
 
-test(
-  "QuadFilter - restricts matching by negative (exclude) subject scope",
-  () => {
-    const matcher = filterQuads({
-      exclude: {
-        subjects: ["http://s-blocked"],
-      },
-    });
+test("QuadFilter - restricts matching by negative (exclude) subject scope", () => {
+  const matcher = filterQuads({
+    exclude: {
+      subjects: ["http://s-blocked"],
+    },
+  });
 
-    const pass = quad(
-      namedNode("http://s-allowed"),
-      namedNode("http://p"),
-      namedNode("http://o"),
-      defaultGraph(),
-    );
+  const pass = quad(
+    namedNode("http://s-allowed"),
+    namedNode("http://p"),
+    namedNode("http://o"),
+    defaultGraph(),
+  );
 
-    const fail = quad(
-      namedNode("http://s-blocked"),
-      namedNode("http://p"),
-      namedNode("http://o"),
-      defaultGraph(),
-    );
+  const fail = quad(
+    namedNode("http://s-blocked"),
+    namedNode("http://p"),
+    namedNode("http://o"),
+    defaultGraph(),
+  );
 
-    expect(matcher(pass)).toStrictEqual(true);
-    expect(matcher(fail)).toStrictEqual(false);
-  },
-);
+  expect(matcher(pass)).toStrictEqual(true);
+  expect(matcher(fail)).toStrictEqual(false);
+});
 
 test("QuadFilter - intersects multiple combined inclusion/exclusion criteria", () => {
   const matcher = filterQuads({

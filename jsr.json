@@ -16,12 +16,7 @@
     "./wazoo": "./src/wazoo/mod.ts"
   },
   "publish": {
-    "exclude": [
-      "bun.lock",
-      "bunfig.toml",
-      "package.json",
-      "tsconfig.json"
-    ]
+    "exclude": ["bun.lock", "bunfig.toml", "package.json", "tsconfig.json"]
   },
   "imports": {
     "@/": "./src/",

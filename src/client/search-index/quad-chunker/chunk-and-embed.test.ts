@@ -72,26 +72,32 @@ test("chunkAndEmbedQuads - embeds the de-duplicated texts once", async () => {
 });
 
 test("chunkAndEmbedQuads - a wrong vector length rejects before returning rows", async () => {
-  await expect(chunkAndEmbedQuads([text], ids([text]), {
-        textSplitter: splitter,
-        embeddingService: vectorsOf(3),
-        vectorDimensions: 2,
-      })).rejects.toThrow("failed to vectorize literal chunk blocks");
+  await expect(
+    chunkAndEmbedQuads([text], ids([text]), {
+      textSplitter: splitter,
+      embeddingService: vectorsOf(3),
+      vectorDimensions: 2,
+    }),
+  ).rejects.toThrow("failed to vectorize literal chunk blocks");
 });
 
 test("chunkAndEmbedQuads - an embedding failure throws by default", async () => {
-  await expect(chunkAndEmbedQuads([text], ids([text]), {
-        textSplitter: splitter,
-        embeddingService: failing,
-      })).rejects.toThrow("failed to vectorize literal chunk blocks");
+  await expect(
+    chunkAndEmbedQuads([text], ids([text]), {
+      textSplitter: splitter,
+      embeddingService: failing,
+    }),
+  ).rejects.toThrow("failed to vectorize literal chunk blocks");
 });
 
 test("chunkAndEmbedQuads - a failing splitter rejects", async () => {
-  await expect(chunkAndEmbedQuads([text], ids([text]), {
-        textSplitter: {
-          createDocuments: () => Promise.reject(new Error("bad splitter")),
-        },
-      })).rejects.toThrow("failed to chunk novel textual facts");
+  await expect(
+    chunkAndEmbedQuads([text], ids([text]), {
+      textSplitter: {
+        createDocuments: () => Promise.reject(new Error("bad splitter")),
+      },
+    }),
+  ).rejects.toThrow("failed to chunk novel textual facts");
 });
 
 test("chunkAndEmbedQuads - ftsValueOf sets the keyword text and the text that is embedded", async () => {

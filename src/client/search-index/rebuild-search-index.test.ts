@@ -100,19 +100,28 @@ test("rebuildSearchIndex - scoped clears nothing and replaces only in-scope rows
     scope: scopeA,
   });
   expect(result).toStrictEqual({ processedQuadCount: 3, chunkRowCount: 2 });
-  expect(driver.writes[0].scope).toStrictEqual({ hashes: [a, c].map(hashQuad) });
-  expect(driver.rows).toStrictEqual(["orphan", hashQuad(b), hashQuad(a), hashQuad(c)]);
+  expect(driver.writes[0].scope).toStrictEqual({
+    hashes: [a, c].map(hashQuad),
+  });
+  expect(driver.rows).toStrictEqual([
+    "orphan",
+    hashQuad(b),
+    hashQuad(a),
+    hashQuad(c),
+  ]);
 });
 
 test("rebuildSearchIndex - a scope with no criteria is unscoped", async () => {
   for (const scope of [{}, { include: {} }, { include: { subjects: [] } }]) {
     const driver = new FakeDriver([a]);
     await rebuildSearchIndex(driver, projection, { pageSize: 5, scope });
-    expect(driver.writes).toStrictEqual([{
-      scope: { all: true },
-      rows: 1,
-      first: true,
-    }]);
+    expect(driver.writes).toStrictEqual([
+      {
+        scope: { all: true },
+        rows: 1,
+        first: true,
+      },
+    ]);
     expect(driver.rows).toStrictEqual([hashQuad(a)]);
   }
 });
@@ -143,11 +152,13 @@ test("rebuildSearchIndex - an empty store still clears once, unscoped only", asy
     pageSize: 5,
   });
   expect(result).toStrictEqual({ processedQuadCount: 0, chunkRowCount: 0 });
-  expect(unscoped.writes).toStrictEqual([{
-    scope: { all: true },
-    rows: 0,
-    first: true,
-  }]);
+  expect(unscoped.writes).toStrictEqual([
+    {
+      scope: { all: true },
+      rows: 0,
+      first: true,
+    },
+  ]);
   expect(unscoped.rows).toStrictEqual([]);
   const scoped = new FakeDriver([]);
   await rebuildSearchIndex(scoped, projection, { pageSize: 5, scope: scopeA });
@@ -157,20 +168,32 @@ test("rebuildSearchIndex - an empty store still clears once, unscoped only", asy
 
 test("rebuildSearchIndex - an embedding failure on page 1 writes nothing", async () => {
   const driver = new FakeDriver([a, b, c]);
-  await expect(rebuildSearchIndex(driver, {
+  await expect(
+    rebuildSearchIndex(
+      driver,
+      {
         ...projection,
         embeddingService: embedder(1),
-      }, { pageSize: 2 })).rejects.toThrow("failed to vectorize");
+      },
+      { pageSize: 2 },
+    ),
+  ).rejects.toThrow("failed to vectorize");
   expect(driver.writes).toStrictEqual([]);
   expect(driver.rows).toStrictEqual(["orphan"]);
 });
 
 test("rebuildSearchIndex - a failure on page 2 leaves page 1 written", async () => {
   const driver = withFinish(new FakeDriver([a, b, c]));
-  await expect(rebuildSearchIndex(driver, {
+  await expect(
+    rebuildSearchIndex(
+      driver,
+      {
         ...projection,
         embeddingService: embedder(2),
-      }, { pageSize: 2 })).rejects.toThrow("failed to vectorize");
+      },
+      { pageSize: 2 },
+    ),
+  ).rejects.toThrow("failed to vectorize");
   expect(driver.writes.length).toStrictEqual(1);
   expect(driver.rows).toStrictEqual([a, b].map(hashQuad));
   expect(driver.log).toStrictEqual(["write"]);
@@ -185,5 +208,7 @@ test("rebuildSearchIndex - finish runs once after every page", async () => {
 test("rebuildSearchIndex - finish is optional", async () => {
   const driver = new FakeDriver([a]);
   expect(driver.finish === undefined).toBeTruthy();
-  expect(await rebuildSearchIndex(driver, projection, { pageSize: 1 })).toStrictEqual({ processedQuadCount: 1, chunkRowCount: 1 });
+  expect(
+    await rebuildSearchIndex(driver, projection, { pageSize: 1 }),
+  ).toStrictEqual({ processedQuadCount: 1, chunkRowCount: 1 });
 });

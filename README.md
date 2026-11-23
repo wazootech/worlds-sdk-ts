@@ -47,14 +47,14 @@ With an import map:
 
 ```html
 <script type="importmap">
-{
-  "imports": {
-    "@worlds/sdk": "https://esm.sh/jsr/@worlds/sdk@0.5.0"
+  {
+    "imports": {
+      "@worlds/sdk": "https://esm.sh/jsr/@worlds/sdk@0.5.0"
+    }
   }
-}
 </script>
 <script type="module">
-import { WorldsSdk } from "@worlds/sdk";
+  import { WorldsSdk } from "@worlds/sdk";
 </script>
 ```
 
@@ -200,11 +200,11 @@ const client = new WorldsSdk({
 
 ## Examples
 
-| Example                          | Description                         | Command                                             |
-| -------------------------------- | ----------------------------------- | --------------------------------------------------- |
-| Hello world                      | In-memory graph with search         | `bun run example:hello-world`                      |
-| AI SDK                           | Vercel AI SDK tools with Gemini     | `bun run example:ai-sdk-hello-world`               |
-| TF.js Universal Sentence Encoder | Offline TF.js USE embedding service | `bun run example:tfjs-universal-sentence-encoder`  |
+| Example                          | Description                         | Command                                           |
+| -------------------------------- | ----------------------------------- | ------------------------------------------------- |
+| Hello world                      | In-memory graph with search         | `bun run example:hello-world`                     |
+| AI SDK                           | Vercel AI SDK tools with Gemini     | `bun run example:ai-sdk-hello-world`              |
+| TF.js Universal Sentence Encoder | Offline TF.js USE embedding service | `bun run example:tfjs-universal-sentence-encoder` |
 
 For LibSQL examples, see the
 [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) repository.
@@ -250,13 +250,13 @@ and comparison tables live in the
 
 All CI checks must pass before merging updates.
 
-| Command          | Description                                  |
-| ---------------- | -------------------------------------------- |
-| `bun run fmt`    | Format all code with `bun fmt`.              |
-| `bun run lint`   | Run static analysis (Oxlint).                |
-| `bun run check`  | Type-check with `bun check`.                 |
-| `bun run test`   | Execute the test suite with `bun test`.      |
-| `bun run ci`     | Run complete CI pipeline sequentially.       |
+| Command         | Description                             |
+| --------------- | --------------------------------------- |
+| `bun run fmt`   | Format all code with `bun fmt`.         |
+| `bun run lint`  | Run static analysis (Oxlint).           |
+| `bun run check` | Type-check with `bun check`.            |
+| `bun run test`  | Execute the test suite with `bun test`. |
+| `bun run ci`    | Run complete CI pipeline sequentially.  |
 
 Development uses [Bun](https://bun.com) 1.4.5 (`bun install` first). The package
 is still authored for JSR and consumed from Deno, Node.js and Bun alike.

@@ -123,9 +123,7 @@ export function exportQuadsResponse(
  * Used by createRdfjsStoreCommitHandler for replace import commits; durable backends
  * honor isReplaceImportCommit in their commit patch handlers.
  */
-export function awaitDrainRemoveMatches(
-  store: RdfjsStoreLike,
-): Promise<void> {
+export function awaitDrainRemoveMatches(store: RdfjsStoreLike): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     const removalStream = store.removeMatches(null, null, null, null);
     removalStream.on("end", () => resolve());

@@ -61,6 +61,4 @@ mkdirSync(fileURLToPath(new URL("../docs/", import.meta.url)), {
 });
 writeFileSync(outputPath, `${JSON.stringify(merged, null, 2)}\n`);
 
-console.log(
-  `Wrote ${merged.entryPoints.length} entry points to docs/api.json`,
-);
+console.log(`Wrote ${merged.entryPoints.length} entry points to docs/api.json`);

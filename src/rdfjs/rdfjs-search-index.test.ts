@@ -21,7 +21,9 @@ test("RdfjsSearchIndex.search - returns literal matching text locally", async ()
   });
 
   expect(response.results?.length).toStrictEqual(1);
-  expect(response.results?.[0].text).toStrictEqual("Found some delicious tacos for lunch");
+  expect(response.results?.[0].text).toStrictEqual(
+    "Found some delicious tacos for lunch",
+  );
 });
 
 test("RdfjsSearchIndex.search - inclusion filters strictly limit results to allowed subjects", async () => {

@@ -21,21 +21,29 @@ test("runParitySuite - passes the full corpus on identical in-memory Sdks", asyn
     candidate: memoryFactory,
   });
 
-  expect(report.results.length).toStrictEqual(parityCorpus.fixtures.length + parityCorpus.replaceCases.length);
+  expect(report.results.length).toStrictEqual(
+    parityCorpus.fixtures.length + parityCorpus.replaceCases.length,
+  );
   // A failing parity suite reports every failed case, not just "false".
-  expect(report.ok ? "ok" : report.results
-    .map(
-      (r) =>
-        `${r.name}: ${r.failures.join("; ")}` +
-        `${r.notes ? ` [notes: ${r.notes.join("; ")}]` : ""}`,
-    )
-    .join("\n")).toBe("ok");
+  expect(
+    report.ok
+      ? "ok"
+      : report.results
+          .map(
+            (r) =>
+              `${r.name}: ${r.failures.join("; ")}` +
+              `${r.notes ? ` [notes: ${r.notes.join("; ")}]` : ""}`,
+          )
+          .join("\n"),
+  ).toBe("ok");
 
   // The declared-gate RDF-star fixture must run clean through the in-memory
   // path (the SPARQL engine models quoted triples) and be reported, not skipped.
   const rdfStar = report.results.find((r) => r.name === "rdfStarWorld");
   expect(rdfStar?.ok).toStrictEqual(true);
-  expect(rdfStar?.notes ? JSON.stringify(rdfStar.notes) : undefined).toBeUndefined();
+  expect(
+    rdfStar?.notes ? JSON.stringify(rdfStar.notes) : undefined,
+  ).toBeUndefined();
 });
 
 test("runParitySuite - fails when the candidate reorders search results", async () => {
@@ -59,7 +67,11 @@ test("runParitySuite - fails when the candidate reorders search results", async 
 
   expect(report.ok).toBeFalsy();
   const searchFailures = report.results.flatMap((r) => r.failures);
-  expect(searchFailures.some((failure) => failure.includes("search case")) ? "ok" : searchFailures.join("\n")).toBe("ok");
+  expect(
+    searchFailures.some((failure) => failure.includes("search case"))
+      ? "ok"
+      : searchFailures.join("\n"),
+  ).toBe("ok");
 });
 
 test("runParitySuite - fails when the candidate's quad counts differ", async () => {
@@ -91,7 +103,11 @@ test("runParitySuite - fails when the candidate's quad counts differ", async () 
 
   expect(report.ok).toBeFalsy();
   const countFailures = report.results.flatMap((r) => r.failures);
-  expect(countFailures.some((failure) => failure.includes("quad count")) ? "ok" : countFailures.join("\n")).toBe("ok");
+  expect(
+    countFailures.some((failure) => failure.includes("quad count"))
+      ? "ok"
+      : countFailures.join("\n"),
+  ).toBe("ok");
 });
 
 test("runParitySuite - reports declared-gate notes without failing the suite", async () => {
@@ -121,5 +137,7 @@ test("runParitySuite - reports declared-gate notes without failing the suite", a
   expect(report.ok).toStrictEqual(true);
   const rdfStar = report.results[0];
   expect(rdfStar?.ok).toStrictEqual(true);
-  expect(rdfStar?.notes?.some((note) => note.includes("Unsupported term type"))).toStrictEqual(true);
+  expect(
+    rdfStar?.notes?.some((note) => note.includes("Unsupported term type")),
+  ).toStrictEqual(true);
 });

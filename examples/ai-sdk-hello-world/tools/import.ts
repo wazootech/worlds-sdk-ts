@@ -21,23 +21,28 @@ export function createImportRdfTool(client: WorldsSdkInterface) {
     description:
       "Import serialized RDF data (like Turtle or N-Triples) into the knowledge base. Useful for storing new factual statements or relations.",
     inputSchema: z.object({
-      mode: z.enum(["merge", "replace"]).optional().describe(
-        "Mode of import (defaults to 'merge').",
-      ),
+      mode: z
+        .enum(["merge", "replace"])
+        .optional()
+        .describe("Mode of import (defaults to 'merge')."),
       source: z.object({
-        kind: z.literal("serialized").describe(
-          "The kind of data source. Always use 'serialized'.",
-        ),
+        kind: z
+          .literal("serialized")
+          .describe("The kind of data source. Always use 'serialized'."),
         data: z.string().describe("The serialized RDF data to import."),
-        contentType: z.string().optional().describe(
-          "The MIME type of the data. Usually 'text/turtle' or 'application/n-triples'.",
-        ),
+        contentType: z
+          .string()
+          .optional()
+          .describe(
+            "The MIME type of the data. Usually 'text/turtle' or 'application/n-triples'.",
+          ),
       }),
     }),
     execute: async (request: SerializedImportRequest) => {
       try {
         if (
-          request.source.kind === "serialized" && !request.source.contentType
+          request.source.kind === "serialized" &&
+          !request.source.contentType
         ) {
           request.source.contentType = "text/turtle";
         }

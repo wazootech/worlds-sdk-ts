@@ -34,8 +34,7 @@ test("WorldsSdk.import delegates to quadStore.import", async () => {
     mode: "merge",
     source: {
       kind: "serialized",
-      data:
-        `<http://example.com/client> <http://example.com/action> "test_import" .`,
+      data: `<http://example.com/client> <http://example.com/action> "test_import" .`,
       contentType: "text/turtle",
     },
   });
@@ -72,7 +71,9 @@ test("WorldsSdk.sparql rejects when sparqlEngine is not configured", async () =>
     searchIndex: new RdfjsSearchIndex(store),
   });
 
-  await expect(client.sparql({ query: "ASK WHERE { ?s ?p ?o }" })).rejects.toThrow("SPARQL engine is not configured.");
+  await expect(
+    client.sparql({ query: "ASK WHERE { ?s ?p ?o }" }),
+  ).rejects.toThrow("SPARQL engine is not configured.");
 });
 
 test("WorldsSdk.import rejects when quadStore is not configured", async () => {
@@ -80,7 +81,8 @@ test("WorldsSdk.import rejects when quadStore is not configured", async () => {
     searchIndex: new RdfjsSearchIndex(new Store()),
   });
 
-  await expect((async () => {
+  await expect(
+    (async () => {
       await client.import({
         mode: "merge",
         source: {
@@ -89,7 +91,8 @@ test("WorldsSdk.import rejects when quadStore is not configured", async () => {
           contentType: "text/turtle",
         },
       });
-    })()).rejects.toThrow("Quad store is not configured.");
+    })(),
+  ).rejects.toThrow("Quad store is not configured.");
 });
 
 test("WorldsSdk.search rejects when searchIndex is not configured", async () => {
@@ -97,9 +100,11 @@ test("WorldsSdk.search rejects when searchIndex is not configured", async () => 
     quadStore: new RdfjsQuadStore({ store: new Store() }),
   });
 
-  await expect((async () => {
+  await expect(
+    (async () => {
       await client.search({ query: "test" });
-    })()).rejects.toThrow("Search index is not configured.");
+    })(),
+  ).rejects.toThrow("Search index is not configured.");
 });
 
 test("WorldsSdk.search delegates to searchIndex.search", async () => {

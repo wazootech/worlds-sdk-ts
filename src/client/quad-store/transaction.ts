@@ -40,9 +40,7 @@ export class Transaction {
   private insertBuffer: rdfjs.Quad[] = [];
   private deleteBuffer: rdfjs.Quad[] = [];
 
-  public constructor(
-    private readonly options: TransactionOptions,
-  ) {}
+  public constructor(private readonly options: TransactionOptions) {}
 
   /** add buffers a single quad for insertion on the next commit. */
   public add(quad: rdfjs.Quad): this {

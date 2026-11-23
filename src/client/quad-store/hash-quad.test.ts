@@ -50,7 +50,9 @@ test("hashQuad matches the golden RDFC-1.0-derived id", () => {
   );
   // q2. + base64url(sha256("<s> <p> \"hello\" .\n")) — the canonical
   // N-Quads form matches rdf-canonize RDFC-1.0 output byte-for-byte.
-  expect(hashQuad(fixture)).toStrictEqual("q2.Qadou5ZTTT9v7Qasbsrp2FBsAs9ydKVk3D4x_96G-W8");
+  expect(hashQuad(fixture)).toStrictEqual(
+    "q2.Qadou5ZTTT9v7Qasbsrp2FBsAs9ydKVk3D4x_96G-W8",
+  );
 });
 
 test("hashQuad equals q2. + base64url(sha256(canonical N-Quads)) per Web Crypto", async () => {
@@ -64,7 +66,9 @@ test("hashQuad equals q2. + base64url(sha256(canonical N-Quads)) per Web Crypto"
     "SHA-256",
     new TextEncoder().encode(canonical),
   );
-  expect(hashQuad(fixture)).toStrictEqual("q2." + encodeBase64Url(new Uint8Array(digest)));
+  expect(hashQuad(fixture)).toStrictEqual(
+    "q2." + encodeBase64Url(new Uint8Array(digest)),
+  );
 });
 
 test("hashQuad emits the q2. scheme tag and fixed-length URL-safe ids", () => {
@@ -82,19 +86,23 @@ test("hashQuad emits the q2. scheme tag and fixed-length URL-safe ids", () => {
   expect(hash.includes("+")).toStrictEqual(false);
 
   // distinct quads — including escaped values and named graphs — stay distinct
-  expect(hashQuad(
+  expect(
+    hashQuad(
       quad(
         namedNode("http://example.org/s"),
         namedNode("http://example.org/p"),
         literal("a|b"),
       ),
-    )).not.toStrictEqual(hash);
-  expect(hashQuad(
+    ),
+  ).not.toStrictEqual(hash);
+  expect(
+    hashQuad(
       quad(
         namedNode("http://example.org/s"),
         namedNode("http://example.org/p"),
         literal("hello"),
         namedNode("http://example.org/g"),
       ),
-    )).not.toStrictEqual(hash);
+    ),
+  ).not.toStrictEqual(hash);
 });

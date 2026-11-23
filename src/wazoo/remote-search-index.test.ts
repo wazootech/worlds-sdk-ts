@@ -70,9 +70,11 @@ test("RemoteSearchIndex.search throws on API error", async () => {
     "w_test",
   );
 
-  await expect(searchIndex.search({
-        query: "test",
-        include: {},
-        exclude: {},
-      })).rejects.toThrow("Search failed");
+  await expect(
+    searchIndex.search({
+      query: "test",
+      include: {},
+      exclude: {},
+    }),
+  ).rejects.toThrow("Search failed");
 });

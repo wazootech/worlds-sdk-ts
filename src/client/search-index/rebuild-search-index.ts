@@ -25,9 +25,10 @@ export interface RebuildPage {
 /** ChunkRebuildDriver is the storage half of a rebuild: it pages quads and writes chunk rows. */
 export interface ChunkRebuildDriver {
   /** pageQuads reads up to `pageSize` stored quads after the cursor (none on the first call). */
-  pageQuads(
-    request: { after?: unknown; pageSize: number },
-  ): Promise<RebuildPage>;
+  pageQuads(request: {
+    after?: unknown;
+    pageSize: number;
+  }): Promise<RebuildPage>;
 
   /**
    * writePage writes the chunk rows of one page that held in-scope quads. `rows`
@@ -97,7 +98,8 @@ export async function rebuildSearchIndex(
   options: RebuildSearchIndexOptions,
 ): Promise<RebuildSearchIndexResult> {
   const { scope } = options;
-  const scoped = scope !== undefined &&
+  const scoped =
+    scope !== undefined &&
     (hasCriteria(scope.include) || hasCriteria(scope.exclude));
   const inScope = scoped ? filterQuads(scope) : () => true;
   const pageSize = Math.max(1, options.pageSize);

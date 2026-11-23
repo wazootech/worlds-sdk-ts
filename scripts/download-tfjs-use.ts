@@ -14,48 +14,39 @@ const TARGET_DIR = new URL(
 const URLS = [
   {
     name: "model.json",
-    url:
-      "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/model.json?tfjs-format=file",
+    url: "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/model.json?tfjs-format=file",
   },
   {
     name: "vocab.json",
-    url:
-      "https://storage.googleapis.com/tfjs-models/savedmodel/universal_sentence_encoder/vocab.json",
+    url: "https://storage.googleapis.com/tfjs-models/savedmodel/universal_sentence_encoder/vocab.json",
   },
   {
     name: "group1-shard1of7",
-    url:
-      "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/group1-shard1of7?tfjs-format=file",
+    url: "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/group1-shard1of7?tfjs-format=file",
   },
   {
     name: "group1-shard2of7",
-    url:
-      "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/group1-shard2of7?tfjs-format=file",
+    url: "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/group1-shard2of7?tfjs-format=file",
   },
   {
     name: "group1-shard3of7",
-    url:
-      "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/group1-shard3of7?tfjs-format=file",
+    url: "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/group1-shard3of7?tfjs-format=file",
   },
   {
     name: "group1-shard4of7",
-    url:
-      "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/group1-shard4of7?tfjs-format=file",
+    url: "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/group1-shard4of7?tfjs-format=file",
   },
   {
     name: "group1-shard5of7",
-    url:
-      "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/group1-shard5of7?tfjs-format=file",
+    url: "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/group1-shard5of7?tfjs-format=file",
   },
   {
     name: "group1-shard6of7",
-    url:
-      "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/group1-shard6of7?tfjs-format=file",
+    url: "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/group1-shard6of7?tfjs-format=file",
   },
   {
     name: "group1-shard7of7",
-    url:
-      "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/group1-shard7of7?tfjs-format=file",
+    url: "https://tfhub.dev/tensorflow/tfjs-model/universal-sentence-encoder-lite/1/default/1/group1-shard7of7?tfjs-format=file",
   },
 ];
 

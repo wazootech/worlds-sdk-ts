@@ -52,9 +52,10 @@ export class RemoteQuadStore implements QuadStoreInterface {
   }
 
   async export(request: ExportRequest): Promise<ExportResponse> {
-    const format = request.format.kind === "serialized"
-      ? (request.format.contentType ?? "application/n-quads")
-      : undefined;
+    const format =
+      request.format.kind === "serialized"
+        ? (request.format.contentType ?? "application/n-quads")
+        : undefined;
 
     const result = await exportWorld({
       client: this.client,
@@ -84,9 +85,12 @@ export class RemoteQuadStore implements QuadStoreInterface {
 /**
  * apiQuadToRdfjs converts a Worlds API quad object into an RDF/JS Quad.
  */
-function apiQuadToRdfjs(
-  q: { subject: string; predicate: string; object: string; graph?: string },
-): rdfjs.Quad {
+function apiQuadToRdfjs(q: {
+  subject: string;
+  predicate: string;
+  object: string;
+  graph?: string;
+}): rdfjs.Quad {
   return {
     termType: "Quad" as const,
     value: "",
@@ -94,13 +98,18 @@ function apiQuadToRdfjs(
     predicate: parseNQuadsTerm(q.predicate) as rdfjs.Quad_Predicate,
     object: parseNQuadsTerm(q.object) as rdfjs.Quad_Object,
     graph: q.graph
-      ? parseNQuadsTerm(q.graph) as rdfjs.Quad_Graph
-      : { termType: "DefaultGraph" as const, value: "" } as rdfjs.DefaultGraph,
+      ? (parseNQuadsTerm(q.graph) as rdfjs.Quad_Graph)
+      : ({
+          termType: "DefaultGraph" as const,
+          value: "",
+        } as rdfjs.DefaultGraph),
     equals(other: rdfjs.Term): boolean {
       if (other.termType !== "Quad") return false;
-      return this.subject.equals(other.subject) &&
+      return (
+        this.subject.equals(other.subject) &&
         this.predicate.equals(other.predicate) &&
-        this.object.equals(other.object);
+        this.object.equals(other.object)
+      );
     },
   };
 }

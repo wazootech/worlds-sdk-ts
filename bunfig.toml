@@ -1,3 +1,9 @@
+[install]
+# Same one-day supply-chain delay deno.json's minimumDependencyAge enforced.
+# The two first-party packages are excluded so a just-published release resolves.
+minimumReleaseAge = 86400
+minimumReleaseAgeExcludes = ["@jsr/wazoo__sparql-engine", "@jsr/worlds__client"]
+
 [install.scopes]
 # JSR packages resolve through JSR's npm compatibility layer (npm:@jsr/<scope>__<name>).
 "@jsr" = "https://npm.jsr.io"

@@ -9,22 +9,22 @@ import { createWazooSdk } from "@worlds/sdk/wazoo";
  *   WORLDS_WORLD_ID  — Canonical world identifier, e.g. w_<ULID> (required)
  *
  * Usage:
- *   WORLDS_TOKEN=xxx WORLDS_WORLD_ID=w_xxx deno task example:wazoo-hello-world
+ *   WORLDS_TOKEN=xxx WORLDS_WORLD_ID=w_xxx bun run example:wazoo-hello-world
  */
 if (import.meta.main) {
-  const baseUrl = Deno.env.get("WORLDS_BASE_URL") ??
+  const baseUrl = process.env.WORLDS_BASE_URL ??
     "https://data.wazoo.dev";
-  const token = Deno.env.get("WORLDS_TOKEN");
-  const worldId = Deno.env.get("WORLDS_WORLD_ID");
+  const token = process.env.WORLDS_TOKEN;
+  const worldId = process.env.WORLDS_WORLD_ID;
 
   if (!token || !worldId) {
     console.error(
       "Missing required env vars: WORLDS_TOKEN and WORLDS_WORLD_ID",
     );
     console.error(
-      "Usage: WORLDS_TOKEN=xxx WORLDS_WORLD_ID=w_xxx deno task example:wazoo-hello-world",
+      "Usage: WORLDS_TOKEN=xxx WORLDS_WORLD_ID=w_xxx bun run example:wazoo-hello-world",
     );
-    Deno.exit(1);
+    process.exit(1);
   }
 
   // Create a remote WorldsSdk — same interface as every other backend

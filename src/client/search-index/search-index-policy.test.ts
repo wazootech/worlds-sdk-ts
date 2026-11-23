@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import {
   DEFAULT_SEARCH_INDEX_ON_IMPORT,
   planSearchIndexing,
@@ -11,41 +11,32 @@ const plan = (project: boolean, reindex: boolean) => ({
   reindexAfterCommit: reindex,
 });
 
-Deno.test("planSearchIndexing - incremental projects everywhere and never rebuilds", () => {
+test("planSearchIndexing - incremental projects everywhere and never rebuilds", () => {
   for (const context of [undefined, merge, replace]) {
-    assertEquals(planSearchIndexing("incremental", context), plan(true, false));
+    expect(planSearchIndexing("incremental", context)).toStrictEqual(plan(true, false));
   }
 });
 
-Deno.test("planSearchIndexing - disabled does nothing", () => {
+test("planSearchIndexing - disabled does nothing", () => {
   for (const context of [undefined, merge, replace]) {
-    assertEquals(planSearchIndexing("disabled", context), plan(false, false));
+    expect(planSearchIndexing("disabled", context)).toStrictEqual(plan(false, false));
   }
 });
 
-Deno.test("planSearchIndexing - deferred defers imports only", () => {
-  assertEquals(planSearchIndexing("deferred"), plan(true, false));
-  assertEquals(planSearchIndexing("deferred", merge), plan(false, true));
-  assertEquals(planSearchIndexing("deferred", replace), plan(false, true));
+test("planSearchIndexing - deferred defers imports only", () => {
+  expect(planSearchIndexing("deferred")).toStrictEqual(plan(true, false));
+  expect(planSearchIndexing("deferred", merge)).toStrictEqual(plan(false, true));
+  expect(planSearchIndexing("deferred", replace)).toStrictEqual(plan(false, true));
 });
 
-Deno.test("planSearchIndexing - unset mode uses incremental by default", () => {
-  assertEquals(DEFAULT_SEARCH_INDEX_ON_IMPORT, "incremental");
-  assertEquals(planSearchIndexing(undefined, merge), plan(true, false));
+test("planSearchIndexing - unset mode uses incremental by default", () => {
+  expect(DEFAULT_SEARCH_INDEX_ON_IMPORT).toStrictEqual("incremental");
+  expect(planSearchIndexing(undefined, merge)).toStrictEqual(plan(true, false));
 });
 
-Deno.test("planSearchIndexing - defaultMode overrides the default, not an explicit mode", () => {
+test("planSearchIndexing - defaultMode overrides the default, not an explicit mode", () => {
   const defaultMode = "deferred" as const;
-  assertEquals(
-    planSearchIndexing(undefined, merge, { defaultMode }),
-    plan(false, true),
-  );
-  assertEquals(
-    planSearchIndexing("incremental", merge, { defaultMode }),
-    plan(true, false),
-  );
-  assertEquals(
-    planSearchIndexing("disabled", merge, { defaultMode }),
-    plan(false, false),
-  );
+  expect(planSearchIndexing(undefined, merge, { defaultMode })).toStrictEqual(plan(false, true));
+  expect(planSearchIndexing("incremental", merge, { defaultMode })).toStrictEqual(plan(true, false));
+  expect(planSearchIndexing("disabled", merge, { defaultMode })).toStrictEqual(plan(false, false));
 });

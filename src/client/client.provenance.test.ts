@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from "@std/assert";
+import { expect, test } from "bun:test";
 import { DataFactory, Store } from "n3";
 import { WorldsSdk } from "./client.ts";
 import { RdfjsQuadStore } from "../rdfjs/mod.ts";
@@ -23,7 +23,7 @@ function createTestClient(store: Store): WorldsSdk {
   });
 }
 
-Deno.test("WorldsSdk.provenance returns records for matching quads", async () => {
+test("WorldsSdk.provenance returns records for matching quads", async () => {
   const store = new Store();
   const client = createTestClient(store);
 
@@ -36,15 +36,15 @@ Deno.test("WorldsSdk.provenance returns records for matching quads", async () =>
     subject: namedNode("http://example.org/s1"),
   });
 
-  assertEquals(response.results.length, 1);
-  assertEquals(response.results[0].quadId, hashQuad(fixtureQuad1));
-  assertEquals(response.results[0].records.length, 1);
-  assertEquals(response.results[0].records[0].writer, "agent-7");
-  assertEquals(response.results[0].records[0].source, "nightly-feed");
-  assertEquals(response.results[0].history.supersededBy.length, 0);
+  expect(response.results.length).toStrictEqual(1);
+  expect(response.results[0].quadId).toStrictEqual(hashQuad(fixtureQuad1));
+  expect(response.results[0].records.length).toStrictEqual(1);
+  expect(response.results[0].records[0].writer).toStrictEqual("agent-7");
+  expect(response.results[0].records[0].source).toStrictEqual("nightly-feed");
+  expect(response.results[0].history.supersededBy.length).toStrictEqual(0);
 });
 
-Deno.test("WorldsSdk.provenance with no pattern matches every quad", async () => {
+test("WorldsSdk.provenance with no pattern matches every quad", async () => {
   const store = new Store();
   const client = createTestClient(store);
 
@@ -53,23 +53,23 @@ Deno.test("WorldsSdk.provenance with no pattern matches every quad", async () =>
   });
 
   const response = await client.provenance({});
-  assertEquals(response.results.length, 2);
+  expect(response.results.length).toStrictEqual(2);
 });
 
-Deno.test("WorldsSdk.provenance returns empty records for pre-provenance quads", async () => {
+test("WorldsSdk.provenance returns empty records for pre-provenance quads", async () => {
   const store = new Store();
   store.add(fixtureQuad1);
   const client = createTestClient(store);
 
   const response = await client.provenance({});
 
-  assertEquals(response.results.length, 1);
-  assertEquals(response.results[0].records.length, 0);
-  assertEquals(response.results[0].history.supersedes.length, 0);
-  assertEquals(response.results[0].history.supersededBy.length, 0);
+  expect(response.results.length).toStrictEqual(1);
+  expect(response.results[0].records.length).toStrictEqual(0);
+  expect(response.results[0].history.supersedes.length).toStrictEqual(0);
+  expect(response.results[0].history.supersededBy.length).toStrictEqual(0);
 });
 
-Deno.test("WorldsSdk.provenance walks the supersedes chain in both directions", async () => {
+test("WorldsSdk.provenance walks the supersedes chain in both directions", async () => {
   const store = new Store();
   const quadStore = new RdfjsQuadStore({ store });
   const client = new WorldsSdk({ quadStore });
@@ -102,27 +102,24 @@ Deno.test("WorldsSdk.provenance walks the supersedes chain in both directions", 
   const successor = await client.provenance({
     subject: namedNode("http://example.org/s1"),
   });
-  assertEquals(successor.results.length, 1);
-  assertEquals(successor.results[0].quadId, hashQuad(corrected));
-  assertEquals(successor.results[0].records.length, 1);
-  assertEquals(successor.results[0].records[0].writer, "v2");
+  expect(successor.results.length).toStrictEqual(1);
+  expect(successor.results[0].quadId).toStrictEqual(hashQuad(corrected));
+  expect(successor.results[0].records.length).toStrictEqual(1);
+  expect(successor.results[0].records[0].writer).toStrictEqual("v2");
 
   const history = successor.results[0].history;
-  assertEquals(history.supersedes.length, 1);
-  assertEquals(history.supersedes[0].quadId, hashQuad(fixtureQuad1));
+  expect(history.supersedes.length).toStrictEqual(1);
+  expect(history.supersedes[0].quadId).toStrictEqual(hashQuad(fixtureQuad1));
 
   // The removed quad keeps both its write record and its removal tombstone.
   const originalRecords = await quadStore.provenanceStore.list({
     quadId: hashQuad(fixtureQuad1),
   });
-  assertEquals(originalRecords.length, 2); // write + remove tombstone
-  assertEquals(
-    originalRecords.map((record) => record.type).sort(),
-    ["remove", "write"],
-  );
+  expect(originalRecords.length).toStrictEqual(2); // write + remove tombstone
+  expect(originalRecords.map((record) => record.type).sort()).toStrictEqual(["remove", "write"]);
 });
 
-Deno.test("WorldsSdk.provenance prefers an explicit provenance handler", async () => {
+test("WorldsSdk.provenance prefers an explicit provenance handler", async () => {
   const client = new WorldsSdk({
     provenance: {
       provenanceQuery: () => {
@@ -145,16 +142,12 @@ Deno.test("WorldsSdk.provenance prefers an explicit provenance handler", async (
   });
 
   const response = await client.provenance({});
-  assertEquals(response.results.length, 1);
-  assertEquals(response.results[0].quadId, "q2.custom");
+  expect(response.results.length).toStrictEqual(1);
+  expect(response.results[0].quadId).toStrictEqual("q2.custom");
 });
 
-Deno.test("WorldsSdk.provenance rejects when nothing can serve provenance", async () => {
+test("WorldsSdk.provenance rejects when nothing can serve provenance", async () => {
   const client = new WorldsSdk({});
 
-  await assertRejects(
-    () => client.provenance({}),
-    Error,
-    "Provenance is not configured.",
-  );
+  await expect(client.provenance({})).rejects.toThrow("Provenance is not configured.");
 });

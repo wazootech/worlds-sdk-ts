@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from "@std/assert";
+import { expect, test } from "bun:test";
 import { DataFactory } from "n3";
 import { hashQuad } from "@/client/quad-store/mod.ts";
 import type { EmbeddingService } from "../embedding-service/embedding-service.ts";
@@ -28,7 +28,7 @@ const failing: EmbeddingService = {
 };
 const ids = (quads: Array<typeof text>) => quads.map(hashQuad);
 
-Deno.test("chunkAndEmbedQuads - no textual literals yields no rows and no embedding call", async () => {
+test("chunkAndEmbedQuads - no textual literals yields no rows and no embedding call", async () => {
   let calls = 0;
   const embeddingService: EmbeddingService = {
     embed: (texts) => {
@@ -40,21 +40,21 @@ Deno.test("chunkAndEmbedQuads - no textual literals yields no rows and no embedd
     textSplitter: splitter,
     embeddingService,
   });
-  assertEquals(result.rows, []);
-  assertEquals(calls, 0);
+  expect(result.rows).toStrictEqual([]);
+  expect(calls).toStrictEqual(0);
 });
 
-Deno.test("chunkAndEmbedQuads - without an embedding service rows carry no vectors", async () => {
+test("chunkAndEmbedQuads - without an embedding service rows carry no vectors", async () => {
   const { rows } = await chunkAndEmbedQuads([text], ids([text]), {
     textSplitter: splitter,
   });
-  assertEquals(rows.length, 1);
-  assertEquals(rows[0]!.ftsValue, "hello");
-  assertEquals(rows[0]!.chunk.quad_id, hashQuad(text));
-  assertEquals(rows[0]!.vector, undefined);
+  expect(rows.length).toStrictEqual(1);
+  expect(rows[0]!.ftsValue).toStrictEqual("hello");
+  expect(rows[0]!.chunk.quad_id).toStrictEqual(hashQuad(text));
+  expect(rows[0]!.vector).toStrictEqual(undefined);
 });
 
-Deno.test("chunkAndEmbedQuads - embeds the de-duplicated texts once", async () => {
+test("chunkAndEmbedQuads - embeds the de-duplicated texts once", async () => {
   const seen: string[][] = [];
   const embeddingService: EmbeddingService = {
     embed: (texts) => {
@@ -67,49 +67,34 @@ Deno.test("chunkAndEmbedQuads - embeds the de-duplicated texts once", async () =
     embeddingService,
     vectorDimensions: 2,
   });
-  assertEquals(seen, [["hello"]]);
-  assertEquals(rows.map((row) => row.vector?.length), [2, 2]);
+  expect(seen).toStrictEqual([["hello"]]);
+  expect(rows.map((row) => row.vector?.length)).toStrictEqual([2, 2]);
 });
 
-Deno.test("chunkAndEmbedQuads - a wrong vector length rejects before returning rows", async () => {
-  await assertRejects(
-    () =>
-      chunkAndEmbedQuads([text], ids([text]), {
+test("chunkAndEmbedQuads - a wrong vector length rejects before returning rows", async () => {
+  await expect(chunkAndEmbedQuads([text], ids([text]), {
         textSplitter: splitter,
         embeddingService: vectorsOf(3),
         vectorDimensions: 2,
-      }),
-    Error,
-    "failed to vectorize literal chunk blocks",
-  );
+      })).rejects.toThrow("failed to vectorize literal chunk blocks");
 });
 
-Deno.test("chunkAndEmbedQuads - an embedding failure throws by default", async () => {
-  await assertRejects(
-    () =>
-      chunkAndEmbedQuads([text], ids([text]), {
+test("chunkAndEmbedQuads - an embedding failure throws by default", async () => {
+  await expect(chunkAndEmbedQuads([text], ids([text]), {
         textSplitter: splitter,
         embeddingService: failing,
-      }),
-    Error,
-    "failed to vectorize literal chunk blocks",
-  );
+      })).rejects.toThrow("failed to vectorize literal chunk blocks");
 });
 
-Deno.test("chunkAndEmbedQuads - a failing splitter rejects", async () => {
-  await assertRejects(
-    () =>
-      chunkAndEmbedQuads([text], ids([text]), {
+test("chunkAndEmbedQuads - a failing splitter rejects", async () => {
+  await expect(chunkAndEmbedQuads([text], ids([text]), {
         textSplitter: {
           createDocuments: () => Promise.reject(new Error("bad splitter")),
         },
-      }),
-    Error,
-    "failed to chunk novel textual facts",
-  );
+      })).rejects.toThrow("failed to chunk novel textual facts");
 });
 
-Deno.test("chunkAndEmbedQuads - ftsValueOf sets the keyword text and the text that is embedded", async () => {
+test("chunkAndEmbedQuads - ftsValueOf sets the keyword text and the text that is embedded", async () => {
   const seen: string[][] = [];
   const embeddingService: EmbeddingService = {
     embed: (texts) => {
@@ -128,7 +113,7 @@ Deno.test("chunkAndEmbedQuads - ftsValueOf sets the keyword text and the text th
     embeddingService,
     ftsValueOf: (chunk) => chunk.value.toLowerCase(),
   });
-  assertEquals(rows[0]!.ftsValue, "hello");
-  assertEquals(rows[0]!.chunk.value, "HeLLo");
-  assertEquals(seen, [["hello", "HeLLo"]]);
+  expect(rows[0]!.ftsValue).toStrictEqual("hello");
+  expect(rows[0]!.chunk.value).toStrictEqual("HeLLo");
+  expect(seen).toStrictEqual([["hello", "HeLLo"]]);
 });

@@ -1,4 +1,4 @@
-import { assert, assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import { DataFactory, Store } from "n3";
 import type * as rdfjs from "@rdfjs/types";
 import { parseTurtleQuads, serializeTurtle } from "@wazoo/sparql-engine";
@@ -53,27 +53,27 @@ function assertSameQuadSet(
   actual: Iterable<rdfjs.Quad>,
   expected: Iterable<rdfjs.Quad>,
 ): void {
-  assertEquals(canonicalSet(actual), canonicalSet(expected));
+  expect(canonicalSet(actual)).toStrictEqual(canonicalSet(expected));
 }
 
-Deno.test("FORMATS maps content types to engine writer formats", () => {
-  assertEquals(FORMATS["text/turtle"].engineFormat, "turtle");
-  assertEquals(FORMATS["text/turtle"].contentType, "text/turtle");
-  assertEquals(FORMATS["application/n-quads"].engineFormat, "n-quads");
-  assertEquals(FORMATS["application/n-triples"].engineFormat, "n-triples");
-  assertEquals(FORMATS["text/n3"].engineFormat, "turtle");
+test("FORMATS maps content types to engine writer formats", () => {
+  expect(FORMATS["text/turtle"].engineFormat).toStrictEqual("turtle");
+  expect(FORMATS["text/turtle"].contentType).toStrictEqual("text/turtle");
+  expect(FORMATS["application/n-quads"].engineFormat).toStrictEqual("n-quads");
+  expect(FORMATS["application/n-triples"].engineFormat).toStrictEqual("n-triples");
+  expect(FORMATS["text/n3"].engineFormat).toStrictEqual("turtle");
 });
 
-Deno.test(
+test(
   "getFormat defaults to N-Quads and lowercases the content type",
   () => {
-    assertEquals(getFormat(undefined).engineFormat, "n-quads");
-    assertEquals(getFormat("TEXT/TURTLE").engineFormat, "turtle");
-    assertEquals(getFormat("application/unknown").engineFormat, "n-quads");
+    expect(getFormat(undefined).engineFormat).toStrictEqual("n-quads");
+    expect(getFormat("TEXT/TURTLE").engineFormat).toStrictEqual("turtle");
+    expect(getFormat("application/unknown").engineFormat).toStrictEqual("n-quads");
   },
 );
 
-Deno.test(
+test(
   "parseQuads + collectQuadsFromStream parse TriG named-graph blocks",
   async () => {
     const trig =
@@ -100,7 +100,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+test(
   "parseQuads + collectQuadsFromStream parse N-Quads graph terms",
   async () => {
     const nquads =
@@ -127,7 +127,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+test(
   "Turtle export round-trips quads through the engine writer and parser",
   () => {
     const turtle = serializeTurtle(fixtureQuads, { format: "turtle" });
@@ -136,18 +136,12 @@ Deno.test(
     assertSameQuadSet(roundTripped, fixtureQuads);
 
     // The turtle writer emits TriG named-graph block syntax for quads
-    assert(
-      turtle.includes("<urn:graph:public> {"),
-      "turtle output should contain TriG named-graph block syntax",
-    );
-    assert(
-      turtle.includes("<urn:graph:private> {"),
-      "turtle output should contain TriG named-graph block syntax for private graph",
-    );
+    expect(turtle.includes("<urn:graph:public> {")).toBeTruthy();
+    expect(turtle.includes("<urn:graph:private> {")).toBeTruthy();
   },
 );
 
-Deno.test(
+test(
   "exportQuadsResponse serializes quads that parse back to the same set",
   async () => {
     const response = exportQuadsResponse(fixtureQuads, {
@@ -158,7 +152,7 @@ Deno.test(
       throw new Error("expected serialized response");
     }
 
-    assertEquals(response.contentType, "text/turtle");
+    expect(response.contentType).toStrictEqual("text/turtle");
 
     const quads = await collectQuadsFromStream(
       parseQuads(response.data, response.contentType),
@@ -167,7 +161,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+test(
   "materializeImportQuads collects quads from a serialized TriG source",
   async () => {
     const trig =
@@ -196,7 +190,7 @@ Deno.test(
   },
 );
 
-Deno.test(
+test(
   "materializeImportQuads collects quads from a dataset source",
   async () => {
     const dataset = new Store();

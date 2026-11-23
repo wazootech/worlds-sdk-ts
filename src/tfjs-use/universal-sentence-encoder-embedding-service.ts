@@ -1,3 +1,4 @@
+import { realpathSync } from "node:fs";
 import "@tensorflow/tfjs-backend-wasm";
 import * as tf from "@tensorflow/tfjs";
 import type { GraphModel } from "@tensorflow/tfjs";
@@ -130,7 +131,7 @@ function resolveModelResourcePath(pathOrUrl: string): string {
   }
 
   try {
-    return toFileUrl(Deno.realPathSync(pathOrUrl)).toString();
+    return toFileUrl(realpathSync(pathOrUrl)).toString();
   } catch {
     return pathOrUrl;
   }

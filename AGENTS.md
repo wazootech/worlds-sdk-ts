@@ -137,11 +137,13 @@ mathematical brevity.
 
 ## Import path conventions
 
-[`deno.json`](deno.json) defines two surfaces:
+[`jsr.json`](jsr.json) defines two surfaces (`package.json` mirrors its
+`exports` and dependency ranges for Bun; `bun run check:manifests` fails CI on
+drift):
 
 - **`@/` (in-repo only):** `"@/": "./src/"` under `imports`. Use `@/client/...`
   inside `src/` for cross-domain imports. Never use the published package name
-  (`@worlds/sdk/...`) in `src/` — real `deno publish` resolves that as an
+  (`@worlds/sdk/...`) in `src/` — real `jsr publish` resolves that as an
   external JSR dependency and fails
   ([denoland/deno#25191](https://github.com/denoland/deno/issues/25191),
   [maintainer guidance](https://github.com/denoland/deno/issues/25191#issuecomment-2308790000)).
@@ -185,7 +187,7 @@ would cycle — e.g. `chunk-quads.ts` uses `@/client/quad-store/mod.ts`, not
 
 ### Public surface changes
 
-When adding a new importable subpath, add it to `exports` in `deno.json` for
+When adding a new importable subpath, add it to `exports` in `jsr.json` and `package.json` for
 `@worlds/sdk/...` consumers. Mirror the file path under `@/client/...` for
 in-repo imports (no duplicate `@worlds/sdk/*` entries in `imports`). Shared
 topology-agnostic patch buffering lives in `rdfjs-buffer/` (export
@@ -257,7 +259,7 @@ documentation files:
   segment documents. Let empty lines establish boundaries cleanly.
 - **No pinned JSR versions in docs:** Link and refer to `@worlds/sdk` (or
   `jsr:@worlds/sdk`) without `@x.y.z` suffixes in README, examples, benchmarks,
-  and AGENTS. Version lives only in `deno.json` for publish; consumers pin via
+  and AGENTS. Version lives only in `jsr.json` for publish; consumers pin via
   `deno add jsr:@worlds/sdk` or their own lockfile.
 
 ## Development constraints and CI hygiene
@@ -267,23 +269,23 @@ green-passing integration pipeline runs:
 
 - **Unix line endings (LF) enforcement:** All files in the repository MUST use
   standard Unix line endings (`LF` / `\n`). The use of Windows line endings
-  (`CRLF` / `\r\n`) is strictly prohibited. You MUST run `deno fmt` before
+  (`CRLF` / `\r\n`) is strictly prohibited. You MUST run `bun run fmt` before
   staging any changes to auto-format text line endings and keep the CI formatter
   checks green.
 
 - **Mandatory execution flags:**
   - **Environment variables:** Any execution task requiring remote endpoints or
-    API tokens must be executed with the `--env` flag to cleanly load `.env`
-    variables into the process.
+    API tokens rely on Bun loading `.env` from the working directory
+    automatically; run the example with `bun run example:<name>`.
 
 - **Local embedding model caching:** The TFJS Universal Sentence Encoder example
   at `examples/tfjs-universal-sentence-encoder/` vendors USE lite loading and
   tokenization (not `@tensorflow-models/universal-sentence-encoder`) so TF.js
   4.x peers stay aligned. To run the example offline, warm up the model cache
-  with `deno task download:tfjs-use`.
+  with `bun run download:tfjs-use`.
 
 - **Test-driven execution boundaries:** Always run local tests with
-  `deno task ci` or `deno test --allow-all` to verify that all code compiles,
+  `bun run ci` or `bun test` to verify that all code compiles,
   formats, and passes operational invariants without errors prior to opening
   pull requests.
 
@@ -293,21 +295,20 @@ green-passing integration pipeline runs:
   There is no CI benchmark regression gate in this repo.
 
 - **GitHub Actions CI:** Pull requests and pushes to `main` run
-  [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (`deno task ci`: fmt,
-  lint, check, test). Open PRs show the **CI** check before merge.
-- **JSR publish (`deno publish`):** The package is `@worlds/sdk` on JSR. Pushes
+  [`.github/workflows/ci.yml`](.github/workflows/ci.yml) (`bun run ci`: fmt,
+  lint, check, manifests, test). Open PRs show the **CI** check before merge.
+- **JSR publish (`bunx jsr publish`):** The package is `@worlds/sdk` on JSR. Pushes
   to `main` also run
   [`.github/workflows/publish.yml`](.github/workflows/publish.yml):
-  `deno task ci` → `deno task publish:dry` → `deno publish`. Before any release
+  `bun run ci` → `bun run publish:dry` → `bunx jsr publish`. Before any release
   or import/`exports` refactor, run the same sequence locally.
-  - **Version:** Bump `"version"` in `deno.json` for each JSR release (CI does
+  - **Version:** Bump `"version"` in `jsr.json` for each JSR release (CI does
     not auto-bump).
   - **In-repo imports:** Only `@/` under `src/` (see import conventions). Do not
     add `@worlds/sdk/*` to `imports`; `exports` alone defines the public package
     surface.
-  - **Dry-run smoke:** `deno task publish:dry`
-    (`deno publish --dry-run
-    --allow-dirty`) is required in CI before merge.
+  - **Dry-run smoke:** `bun run publish:dry`
+    (`jsr publish --dry-run --allow-dirty`) is required in CI before merge.
   - **If publish fails** with `export '…' not found in jsr:@worlds/sdk` or
     `unresolvable 'jsr:' dependency`, search `src/` for `@worlds/sdk` imports
     and replace them with `@/client/...` per
@@ -442,10 +443,11 @@ Family-wide rules live in the
 [wazootech workspace constitution](https://github.com/wazootech/workspace/blob/main/AGENTS.md#code-health-standards);
 this repo's specifics:
 
-- Before pushing, run `deno task ci` (fmt, lint, check, test).
-- `deno lint` keeps `no-explicit-any` on; use real types or `unknown`.
+- Before pushing, run `bun run ci` (fmt, lint, check, manifests, test).
+- `bun run lint` (Oxlint) keeps `typescript/no-explicit-any` on; use real types or `unknown`.
 - `@ts-ignore` is not used; prefer `@ts-expect-error` with a reason.
-- Actions are pinned to commit SHAs, and CI pins Deno to `v2.9.8`.
+- Actions are pinned to commit SHAs, and CI pins Bun to `1.4.5` (`.github/workflows/ci.yml`, `package.json`
+  `packageManager`).
 - `secret-scan.yml` (gitleaks) runs on every PR; `code-health.yml` fails any
   source file over 120 lines of code (300 for tests; blank, comment, and import
   lines excluded) unless it is on the short allowlist in the workflow (it may

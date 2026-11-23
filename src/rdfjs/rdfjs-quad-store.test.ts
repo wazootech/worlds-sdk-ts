@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from "@std/assert";
+import { expect, test } from "bun:test";
 import type { ExportRequest, ImportRequest } from "@/client/quad-store/mod.ts";
 import { DataFactory, Store } from "n3";
 import { RdfjsQuadStore } from "./rdfjs-quad-store.ts";
@@ -17,7 +17,7 @@ const fixtureQuad2 = quad(
   literal("value2"),
 );
 
-Deno.test("RdfjsQuadStore.import - merge mode combines quads without deleting existing", async () => {
+test("RdfjsQuadStore.import - merge mode combines quads without deleting existing", async () => {
   const store = new Store();
   store.add(fixtureQuad1);
 
@@ -29,12 +29,12 @@ Deno.test("RdfjsQuadStore.import - merge mode combines quads without deleting ex
     },
   });
 
-  assertEquals(store.size, 2);
-  assertEquals(store.has(fixtureQuad1), true);
-  assertEquals(store.has(fixtureQuad2), true);
+  expect(store.size).toStrictEqual(2);
+  expect(store.has(fixtureQuad1)).toStrictEqual(true);
+  expect(store.has(fixtureQuad2)).toStrictEqual(true);
 });
 
-Deno.test("RdfjsQuadStore.import - replace mode wipes existing data before importing", async () => {
+test("RdfjsQuadStore.import - replace mode wipes existing data before importing", async () => {
   const store = new Store();
   store.add(fixtureQuad1);
 
@@ -46,12 +46,12 @@ Deno.test("RdfjsQuadStore.import - replace mode wipes existing data before impor
     },
   });
 
-  assertEquals(store.size, 1);
-  assertEquals(store.has(fixtureQuad1), false);
-  assertEquals(store.has(fixtureQuad2), true);
+  expect(store.size).toStrictEqual(1);
+  expect(store.has(fixtureQuad1)).toStrictEqual(false);
+  expect(store.has(fixtureQuad2)).toStrictEqual(true);
 });
 
-Deno.test("RdfjsQuadStore.import - source: dataset handles DatasetCore objects", async () => {
+test("RdfjsQuadStore.import - source: dataset handles DatasetCore objects", async () => {
   const targetStore = new Store();
   const sourceDataset = new Store();
   sourceDataset.add(fixtureQuad1);
@@ -64,10 +64,10 @@ Deno.test("RdfjsQuadStore.import - source: dataset handles DatasetCore objects",
     },
   });
 
-  assertEquals(targetStore.size, 2);
+  expect(targetStore.size).toStrictEqual(2);
 });
 
-Deno.test("RdfjsQuadStore.import - source: serialized parses Turtle successfully", async () => {
+test("RdfjsQuadStore.import - source: serialized parses Turtle successfully", async () => {
   const store = new Store();
   const turtle = `<http://example.org/s3> <http://example.org/p3> "value" .`;
 
@@ -79,20 +79,20 @@ Deno.test("RdfjsQuadStore.import - source: serialized parses Turtle successfully
     },
   });
 
-  assertEquals(store.size, 1);
+  expect(store.size).toStrictEqual(1);
 });
 
-Deno.test("RdfjsQuadStore.import - source: serialized defaults to N-Quads", async () => {
+test("RdfjsQuadStore.import - source: serialized defaults to N-Quads", async () => {
   const store = new Store();
   const nQuads =
     `<http://example.org/s4> <http://example.org/p4> <http://example.org/o4> <http://example.org/g4> .`;
   await new RdfjsQuadStore({ store }).import({
     source: { kind: "serialized", data: nQuads },
   });
-  assertEquals(store.size, 1);
+  expect(store.size).toStrictEqual(1);
 });
 
-Deno.test("RdfjsQuadStore.import - replace mode combined with serialized data clears", async () => {
+test("RdfjsQuadStore.import - replace mode combined with serialized data clears", async () => {
   const store = new Store();
   store.add(fixtureQuad1);
   await new RdfjsQuadStore({ store }).import({
@@ -103,15 +103,15 @@ Deno.test("RdfjsQuadStore.import - replace mode combined with serialized data cl
       contentType: "text/turtle",
     },
   });
-  assertEquals(store.size, 1);
-  assertEquals(store.has(fixtureQuad1), false);
+  expect(store.size).toStrictEqual(1);
+  expect(store.has(fixtureQuad1)).toStrictEqual(false);
 });
 
-Deno.test("RdfjsQuadStore.import - replace mode preserves existing data when serialized import fails", async () => {
+test("RdfjsQuadStore.import - replace mode preserves existing data when serialized import fails", async () => {
   const store = new Store();
   store.add(fixtureQuad1);
 
-  await assertRejects(async () => {
+  await expect((async () => {
     await new RdfjsQuadStore({ store }).import({
       mode: "replace",
       source: {
@@ -120,16 +120,16 @@ Deno.test("RdfjsQuadStore.import - replace mode preserves existing data when ser
         contentType: "text/turtle",
       },
     });
-  });
+  })()).rejects.toThrow();
 
-  assertEquals(store.size, 1);
-  assertEquals(store.has(fixtureQuad1), true);
+  expect(store.size).toStrictEqual(1);
+  expect(store.has(fixtureQuad1)).toStrictEqual(true);
 });
 
-Deno.test("RdfjsQuadStore.import - invalid serialization rejects properly", async () => {
+test("RdfjsQuadStore.import - invalid serialization rejects properly", async () => {
   const store = new Store();
 
-  await assertRejects(async () => {
+  await expect((async () => {
     await new RdfjsQuadStore({ store }).import({
       source: {
         kind: "serialized",
@@ -137,10 +137,10 @@ Deno.test("RdfjsQuadStore.import - invalid serialization rejects properly", asyn
         contentType: "text/turtle",
       },
     });
-  });
+  })()).rejects.toThrow();
 });
 
-Deno.test("RdfjsQuadStore.import - omitting mode defaults to merge", async () => {
+test("RdfjsQuadStore.import - omitting mode defaults to merge", async () => {
   const store = new Store();
   store.add(fixtureQuad1);
 
@@ -151,10 +151,10 @@ Deno.test("RdfjsQuadStore.import - omitting mode defaults to merge", async () =>
     },
   });
 
-  assertEquals(store.size, 2);
+  expect(store.size).toStrictEqual(2);
 });
 
-Deno.test("RdfjsQuadStore.import - handles BlankNode subjects", async () => {
+test("RdfjsQuadStore.import - handles BlankNode subjects", async () => {
   const store = new Store();
   const bSubject = blankNode("b1");
   const testQuad = quad(
@@ -165,11 +165,11 @@ Deno.test("RdfjsQuadStore.import - handles BlankNode subjects", async () => {
   await new RdfjsQuadStore({ store }).import({
     source: { kind: "quads", quads: [testQuad] },
   });
-  assertEquals(store.size, 1);
-  assertEquals(store.has(testQuad), true);
+  expect(store.size).toStrictEqual(1);
+  expect(store.has(testQuad)).toStrictEqual(true);
 });
 
-Deno.test("RdfjsQuadStore.import - handles BlankNode objects", async () => {
+test("RdfjsQuadStore.import - handles BlankNode objects", async () => {
   const store = new Store();
   const bObject = blankNode("b2");
   const testQuad = quad(
@@ -180,11 +180,11 @@ Deno.test("RdfjsQuadStore.import - handles BlankNode objects", async () => {
   await new RdfjsQuadStore({ store }).import({
     source: { kind: "quads", quads: [testQuad] },
   });
-  assertEquals(store.size, 1);
-  assertEquals(store.has(testQuad), true);
+  expect(store.size).toStrictEqual(1);
+  expect(store.has(testQuad)).toStrictEqual(true);
 });
 
-Deno.test("RdfjsQuadStore.import - handles NamedNode graph context", async () => {
+test("RdfjsQuadStore.import - handles NamedNode graph context", async () => {
   const store = new Store();
   const graph = namedNode("http://example.org/g");
   const testQuad = quad(
@@ -196,11 +196,11 @@ Deno.test("RdfjsQuadStore.import - handles NamedNode graph context", async () =>
   await new RdfjsQuadStore({ store }).import({
     source: { kind: "quads", quads: [testQuad] },
   });
-  assertEquals(store.size, 1);
-  assertEquals(store.has(testQuad), true);
+  expect(store.size).toStrictEqual(1);
+  expect(store.has(testQuad)).toStrictEqual(true);
 });
 
-Deno.test("RdfjsQuadStore.import - handles BlankNode graph context", async () => {
+test("RdfjsQuadStore.import - handles BlankNode graph context", async () => {
   const store = new Store();
   const graph = blankNode("g1");
   const testQuad = quad(
@@ -212,11 +212,11 @@ Deno.test("RdfjsQuadStore.import - handles BlankNode graph context", async () =>
   await new RdfjsQuadStore({ store }).import({
     source: { kind: "quads", quads: [testQuad] },
   });
-  assertEquals(store.size, 1);
-  assertEquals(store.has(testQuad), true);
+  expect(store.size).toStrictEqual(1);
+  expect(store.has(testQuad)).toStrictEqual(true);
 });
 
-Deno.test("RdfjsQuadStore.export - returns all store quads directly", async () => {
+test("RdfjsQuadStore.export - returns all store quads directly", async () => {
   const store = new Store();
   store.add(fixtureQuad1);
 
@@ -225,41 +225,31 @@ Deno.test("RdfjsQuadStore.export - returns all store quads directly", async () =
   });
 
   if (response.kind !== "quads") throw new Error("Expected kind quads");
-  assertEquals(response.quads.length, 1);
+  expect(response.quads.length).toStrictEqual(1);
 });
 
-Deno.test("RdfjsQuadStore.export - rejects invalid export format", async () => {
+test("RdfjsQuadStore.export - rejects invalid export format", async () => {
   const store = new Store();
   store.add(fixtureQuad1);
 
-  await assertRejects(
-    () =>
-      new RdfjsQuadStore({ store }).export(
+  await expect(new RdfjsQuadStore({ store }).export(
         {
           format: { kind: "invalid" },
         } as unknown as ExportRequest,
-      ),
-    Error,
-    "Invalid format requested",
-  );
+      )).rejects.toThrow("Invalid format requested");
 });
 
-Deno.test("RdfjsQuadStore.import - rejects unsupported import source kind", async () => {
+test("RdfjsQuadStore.import - rejects unsupported import source kind", async () => {
   const store = new Store();
 
-  await assertRejects(
-    () =>
-      new RdfjsQuadStore({ store }).import(
+  await expect(new RdfjsQuadStore({ store }).import(
         {
           source: { kind: "unknown" },
         } as unknown as ImportRequest,
-      ),
-    Error,
-    "Unsupported import source kind",
-  );
+      )).rejects.toThrow("Unsupported import source kind");
 });
 
-Deno.test("RdfjsQuadStore.export - returns serialized dump", async () => {
+test("RdfjsQuadStore.export - returns serialized dump", async () => {
   const store = new Store();
   store.add(fixtureQuad1);
 
@@ -268,8 +258,8 @@ Deno.test("RdfjsQuadStore.export - returns serialized dump", async () => {
   });
 
   if (response.kind !== "serialized") throw new Error("Expected serialized");
-  assertEquals(response.contentType, "text/turtle");
-  assertEquals(response.data.includes("value1"), true);
+  expect(response.contentType).toStrictEqual("text/turtle");
+  expect(response.data.includes("value1")).toStrictEqual(true);
 });
 
 /**
@@ -277,7 +267,7 @@ Deno.test("RdfjsQuadStore.export - returns serialized dump", async () => {
  * world can hold the default graph plus multiple named graphs, and an
  * export round-trip preserves every graph membership.
  */
-Deno.test("RdfjsQuadStore - multi-graph import and export round-trip preserves all graphs", async () => {
+test("RdfjsQuadStore - multi-graph import and export round-trip preserves all graphs", async () => {
   const defaultGraphQuad = quad(
     namedNode("urn:alice"),
     namedNode("urn:likes"),
@@ -307,42 +297,26 @@ Deno.test("RdfjsQuadStore - multi-graph import and export round-trip preserves a
   });
 
   // All three quads imported across three distinct graphs
-  assertEquals(store.size, 3);
+  expect(store.size).toStrictEqual(3);
 
   // Export and verify every graph survives the round-trip
   const response = await rdfjsStore.export({ format: { kind: "quads" } });
   if (response.kind !== "quads") throw new Error("Expected kind quads");
 
   const graphValues = response.quads.map((q) => q.graph.value).sort();
-  assertEquals(
-    graphValues,
-    ["", "urn:graph:private", "urn:graph:public"],
-    "default graph + two named graphs preserved after round-trip",
-  );
+  expect(graphValues).toStrictEqual(["", "urn:graph:private", "urn:graph:public"]);
 
   // Verify each specific quad survived
-  assertEquals(
-    response.quads.some((q) =>
+  expect(response.quads.some((q) =>
       q.graph.value === "" && q.subject.value === "urn:alice" &&
       q.object.value === "sailing"
-    ),
-    true,
-    "default-graph quad survived",
-  );
-  assertEquals(
-    response.quads.some((q) =>
+    )).toStrictEqual(true);
+  expect(response.quads.some((q) =>
       q.graph.value === "urn:graph:public" &&
       q.object.value === "alice wrote a public note"
-    ),
-    true,
-    "public-graph quad survived",
-  );
-  assertEquals(
-    response.quads.some((q) =>
+    )).toStrictEqual(true);
+  expect(response.quads.some((q) =>
       q.graph.value === "urn:graph:private" &&
       q.object.value === "confidential key material"
-    ),
-    true,
-    "private-graph quad survived",
-  );
+    )).toStrictEqual(true);
 });

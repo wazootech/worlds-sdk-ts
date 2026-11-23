@@ -1,3 +1,4 @@
+import { realpathSync, statSync } from "node:fs";
 import * as tf from "@tensorflow/tfjs";
 import { isAbsolute, toFileUrl } from "@std/path";
 import {
@@ -40,7 +41,7 @@ export class UniversalSentenceEncoderEmbeddingService {
     }
 
     try {
-      return toFileUrl(Deno.realPathSync(pathOrUrl)).toString();
+      return toFileUrl(realpathSync(pathOrUrl)).toString();
     } catch {
       return pathOrUrl;
     }
@@ -60,8 +61,8 @@ export class UniversalSentenceEncoderEmbeddingService {
           const localModelUrl = new URL("./models/model.json", import.meta.url);
           const localVocabUrl = new URL("./models/vocab.json", import.meta.url);
 
-          Deno.statSync(localModelUrl);
-          Deno.statSync(localVocabUrl);
+          statSync(localModelUrl);
+          statSync(localVocabUrl);
           modelUrl = localModelUrl.href;
           vocabUrl = localVocabUrl.href;
           console.log(

@@ -1,70 +1,42 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import { DataFactory } from "n3";
 import { isTextualLiteral } from "./is-textual-literal.ts";
 
 const { literal, namedNode } = DataFactory;
 
-Deno.test("isTextualLiteral - evaluates physical string and language variations correctly", () => {
+test("isTextualLiteral - evaluates physical string and language variations correctly", () => {
   // 1. Untyped / Default Literal
-  assertEquals(
-    isTextualLiteral(literal("hello world")),
-    true,
-    "Should accept basic string payloads",
-  );
+  expect(isTextualLiteral(literal("hello world"))).toStrictEqual(true);
 
   // 2. Explicit xsd:string
-  assertEquals(
-    isTextualLiteral(
+  expect(isTextualLiteral(
       literal("explicit", namedNode("http://www.w3.org/2001/XMLSchema#string")),
-    ),
-    true,
-    "Should accept explicit schema strings",
-  );
+    )).toStrictEqual(true);
 
   // 3. Explicit rdf:langString
-  assertEquals(
-    isTextualLiteral(literal("bonjour", "fr")),
-    true,
-    "Should accept localized language strings",
-  );
+  expect(isTextualLiteral(literal("bonjour", "fr"))).toStrictEqual(true);
 });
 
-Deno.test("isTextualLiteral - rejects non-literal physical node terms", () => {
-  assertEquals(
-    isTextualLiteral(namedNode("urn:subject")),
-    false,
-    "Should reject NamedNodes",
-  );
+test("isTextualLiteral - rejects non-literal physical node terms", () => {
+  expect(isTextualLiteral(namedNode("urn:subject"))).toStrictEqual(false);
 });
 
-Deno.test("isTextualLiteral - strictly suppresses structured numeric and boolean primitives", () => {
+test("isTextualLiteral - strictly suppresses structured numeric and boolean primitives", () => {
   // 1. Integer
-  assertEquals(
-    isTextualLiteral(
+  expect(isTextualLiteral(
       literal("42", namedNode("http://www.w3.org/2001/XMLSchema#integer")),
-    ),
-    false,
-    "Should filter out xsd:integer noise",
-  );
+    )).toStrictEqual(false);
 
   // 2. Boolean
-  assertEquals(
-    isTextualLiteral(
+  expect(isTextualLiteral(
       literal("true", namedNode("http://www.w3.org/2001/XMLSchema#boolean")),
-    ),
-    false,
-    "Should filter out xsd:boolean noise",
-  );
+    )).toStrictEqual(false);
 
   // 3. DateTime
-  assertEquals(
-    isTextualLiteral(
+  expect(isTextualLiteral(
       literal(
         "2026-05-12T12:00:00Z",
         namedNode("http://www.w3.org/2001/XMLSchema#dateTime"),
       ),
-    ),
-    false,
-    "Should filter out xsd:dateTime noise",
-  );
+    )).toStrictEqual(false);
 });

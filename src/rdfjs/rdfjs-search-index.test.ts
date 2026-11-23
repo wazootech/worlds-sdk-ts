@@ -1,8 +1,8 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import { DataFactory, Store } from "n3";
 import { RdfjsSearchIndex } from "./rdfjs-search-index.ts";
 
-Deno.test("RdfjsSearchIndex.search - returns literal matching text locally", async () => {
+test("RdfjsSearchIndex.search - returns literal matching text locally", async () => {
   const store = new Store();
   store.addQuad(
     DataFactory.namedNode("http://example.com/entity1"),
@@ -20,14 +20,11 @@ Deno.test("RdfjsSearchIndex.search - returns literal matching text locally", asy
     query: "Tacos",
   });
 
-  assertEquals(response.results?.length, 1);
-  assertEquals(
-    response.results?.[0].text,
-    "Found some delicious tacos for lunch",
-  );
+  expect(response.results?.length).toStrictEqual(1);
+  expect(response.results?.[0].text).toStrictEqual("Found some delicious tacos for lunch");
 });
 
-Deno.test("RdfjsSearchIndex.search - inclusion filters strictly limit results to allowed subjects", async () => {
+test("RdfjsSearchIndex.search - inclusion filters strictly limit results to allowed subjects", async () => {
   const store = new Store();
   const targetSubject = "http://example.com/target";
   store.addQuad(
@@ -47,11 +44,11 @@ Deno.test("RdfjsSearchIndex.search - inclusion filters strictly limit results to
     include: { subjects: [targetSubject] },
   });
 
-  assertEquals(response.results?.length, 1);
-  assertEquals(response.results?.[0].subject, targetSubject);
+  expect(response.results?.length).toStrictEqual(1);
+  expect(response.results?.[0].subject).toStrictEqual(targetSubject);
 });
 
-Deno.test("RdfjsSearchIndex.search - exclusion filters correctly strip matching predicates", async () => {
+test("RdfjsSearchIndex.search - exclusion filters correctly strip matching predicates", async () => {
   const store = new Store();
   const excludePred = "http://example.com/hidden";
   store.addQuad(
@@ -66,14 +63,10 @@ Deno.test("RdfjsSearchIndex.search - exclusion filters correctly strip matching 
     exclude: { predicates: [excludePred] },
   });
 
-  assertEquals(
-    response.results?.length,
-    0,
-    "Excluded predicate hit should have been filtered out",
-  );
+  expect(response.results?.length).toStrictEqual(0);
 });
 
-Deno.test("RdfjsSearchIndex.search - graph-scoped include limits results to the named graph", async () => {
+test("RdfjsSearchIndex.search - graph-scoped include limits results to the named graph", async () => {
   const store = new Store();
   // Default graph: alice writes a public note
   store.addQuad(
@@ -105,9 +98,9 @@ Deno.test("RdfjsSearchIndex.search - graph-scoped include limits results to the 
     include: { graphs: ["urn:graph:public"] },
   });
   const publicHits = publicResults.results ?? [];
-  assertEquals(publicHits.length, 1);
-  assertEquals(publicHits[0].graph, "urn:graph:public");
-  assertEquals(publicHits[0].text, "alice wrote a public note");
+  expect(publicHits.length).toStrictEqual(1);
+  expect(publicHits[0].graph).toStrictEqual("urn:graph:public");
+  expect(publicHits[0].text).toStrictEqual("alice wrote a public note");
 
   // Scoping to private graph should return only private-graph results
   const privateResults = await searchIndex.search({
@@ -115,11 +108,11 @@ Deno.test("RdfjsSearchIndex.search - graph-scoped include limits results to the 
     include: { graphs: ["urn:graph:private"] },
   });
   const privateHits = privateResults.results ?? [];
-  assertEquals(privateHits.length, 1);
-  assertEquals(privateHits[0].graph, "urn:graph:private");
+  expect(privateHits.length).toStrictEqual(1);
+  expect(privateHits[0].graph).toStrictEqual("urn:graph:private");
 });
 
-Deno.test("RdfjsSearchIndex.search - graph-scoped exclude strips results from the named graph", async () => {
+test("RdfjsSearchIndex.search - graph-scoped exclude strips results from the named graph", async () => {
   const store = new Store();
   store.addQuad(
     DataFactory.namedNode("urn:alice"),
@@ -142,11 +135,11 @@ Deno.test("RdfjsSearchIndex.search - graph-scoped exclude strips results from th
     exclude: { graphs: ["urn:graph:private"] },
   });
   const hits = response.results ?? [];
-  assertEquals(hits.length, 1);
-  assertEquals(hits[0].graph, "urn:graph:public");
+  expect(hits.length).toStrictEqual(1);
+  expect(hits[0].graph).toStrictEqual("urn:graph:public");
 });
 
-Deno.test("RdfjsSearchIndex.search - ignores structured primitives to suppress search space noise", async () => {
+test("RdfjsSearchIndex.search - ignores structured primitives to suppress search space noise", async () => {
   const store = new Store();
 
   // 1. Insert a valid Searchable Literal (String)
@@ -172,13 +165,6 @@ Deno.test("RdfjsSearchIndex.search - ignores structured primitives to suppress s
   const response = await searchIndex.search({ query: "42" });
 
   // RED EXPECTATION: Should ignore the integer, returning ONLY the textual sentence.
-  assertEquals(
-    response.results?.length,
-    1,
-    "Expected raw integer literal to be completely ignored in search index matching",
-  );
-  assertEquals(
-    response.results?.[0].text,
-    "The magic number is 42",
-  );
+  expect(response.results?.length).toStrictEqual(1);
+  expect(response.results?.[0].text).toStrictEqual("The magic number is 42");
 });

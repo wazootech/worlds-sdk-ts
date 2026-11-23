@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertRejects } from "@std/assert";
+import { expect, test } from "bun:test";
 import type * as rdfjs from "@rdfjs/types";
 import { DataFactory } from "n3";
 import { hashQuad } from "@/client/quad-store/mod.ts";
@@ -49,40 +49,40 @@ const patchOf = (insertions: rdfjs.Quad[], deletions: rdfjs.Quad[] = []) => ({
   deletions,
 });
 
-Deno.test("prepareCommit - incremental projects the novel quads only", async () => {
+test("prepareCommit - incremental projects the novel quads only", async () => {
   const result = await prepareCommit(
     patchOf([a, b]),
     options({ searchIndexOnImport: "incremental" }, [a]),
   );
-  assertEquals(result.novel.novelInsertions, [b]);
-  assertEquals(rowIds(result.rows), ids([b]));
-  assertEquals(result.plan, {
+  expect(result.novel.novelInsertions).toStrictEqual([b]);
+  expect(rowIds(result.rows)).toStrictEqual(ids([b]));
+  expect(result.plan).toStrictEqual({
     projectDuringCommit: true,
     reindexAfterCommit: false,
   });
-  assertEquals(result.replacing, false);
+  expect(result.replacing).toStrictEqual(false);
 });
 
-Deno.test("prepareCommit - unset mode uses defaultMode, an explicit mode wins", async () => {
+test("prepareCommit - unset mode uses defaultMode, an explicit mode wins", async () => {
   const base = { context: merge, defaultMode: "deferred" } as const;
   const deferred = await prepareCommit(patchOf([a]), options(base));
-  assertEquals(deferred.rows, []);
-  assert(deferred.plan.reindexAfterCommit);
+  expect(deferred.rows).toStrictEqual([]);
+  expect(deferred.plan.reindexAfterCommit).toBeTruthy();
   const explicit = await prepareCommit(
     patchOf([a]),
     options({ ...base, searchIndexOnImport: "incremental" }),
   );
-  assertEquals(rowIds(explicit.rows), ids([a]));
+  expect(rowIds(explicit.rows)).toStrictEqual(ids([a]));
 });
 
-Deno.test("prepareCommit - a deferred import skips projection but still finds novel quads", async () => {
+test("prepareCommit - a deferred import skips projection but still finds novel quads", async () => {
   const result = await prepareCommit(
     patchOf([a, b]),
     options({ searchIndexOnImport: "deferred", context: merge }, [a]),
   );
-  assertEquals(result.rows, []);
-  assertEquals(result.novel.novelInsertions, [b]);
-  assertEquals(result.plan, {
+  expect(result.rows).toStrictEqual([]);
+  expect(result.novel.novelInsertions).toStrictEqual([b]);
+  expect(result.plan).toStrictEqual({
     projectDuringCommit: false,
     reindexAfterCommit: true,
   });
@@ -90,52 +90,52 @@ Deno.test("prepareCommit - a deferred import skips projection but still finds no
     patchOf([b]),
     options({ searchIndexOnImport: "deferred" }),
   );
-  assertEquals(rowIds(ordinary.rows), ids([b]));
-  assertEquals(ordinary.plan.reindexAfterCommit, false);
+  expect(rowIds(ordinary.rows)).toStrictEqual(ids([b]));
+  expect(ordinary.plan.reindexAfterCommit).toStrictEqual(false);
 });
 
-Deno.test("prepareCommit - disabled mode projects nothing and never reindexes", async () => {
+test("prepareCommit - disabled mode projects nothing and never reindexes", async () => {
   const result = await prepareCommit(
     patchOf([a]),
     options({ searchIndexOnImport: "disabled" }),
   );
-  assertEquals(result.rows, []);
-  assertEquals(result.novel.novelInsertions, [a]);
-  assertEquals(result.plan.reindexAfterCommit, false);
+  expect(result.rows).toStrictEqual([]);
+  expect(result.novel.novelInsertions).toStrictEqual([a]);
+  expect(result.plan.reindexAfterCommit).toStrictEqual(false);
 });
 
-Deno.test("prepareCommit - no projection means no rows", async () => {
+test("prepareCommit - no projection means no rows", async () => {
   const result = await prepareCommit(
     patchOf([a]),
     options({ projection: undefined }),
   );
-  assertEquals(result.rows, []);
-  assertEquals(result.novel.novelInsertions, [a]);
+  expect(result.rows).toStrictEqual([]);
+  expect(result.novel.novelInsertions).toStrictEqual([a]);
 });
 
-Deno.test("prepareCommit - the filter drops quads from storage and projection", async () => {
+test("prepareCommit - the filter drops quads from storage and projection", async () => {
   const result = await prepareCommit(
     patchOf([a, b], [c, b]),
     options({ exclude: { subjects: ["urn:b"] } }),
   );
-  assertEquals(result.prepared.insertions, [a]);
-  assertEquals(result.prepared.deletions, [c]);
-  assertEquals(result.prepared.deletionIds, ids([c]));
-  assertEquals(result.novel.novelInsertions, [a]);
-  assertEquals(rowIds(result.rows), ids([a]));
+  expect(result.prepared.insertions).toStrictEqual([a]);
+  expect(result.prepared.deletions).toStrictEqual([c]);
+  expect(result.prepared.deletionIds).toStrictEqual(ids([c]));
+  expect(result.novel.novelInsertions).toStrictEqual([a]);
+  expect(rowIds(result.rows)).toStrictEqual(ids([a]));
 });
 
-Deno.test("prepareCommit - a quad deleted and re-added is novel even when stored", async () => {
+test("prepareCommit - a quad deleted and re-added is novel even when stored", async () => {
   const result = await prepareCommit(
     patchOf([a, b], [a]),
     options({}, [a, b]),
   );
-  assertEquals(result.novel.novelInsertions, [a]);
-  assertEquals(rowIds(result.rows), ids([a]));
-  assertEquals(result.prepared.deletionIds, ids([a]));
+  expect(result.novel.novelInsertions).toStrictEqual([a]);
+  expect(rowIds(result.rows)).toStrictEqual(ids([a]));
+  expect(result.prepared.deletionIds).toStrictEqual(ids([a]));
 });
 
-Deno.test("prepareCommit - a replace import ignores stored quads and skips the lookup", async () => {
+test("prepareCommit - a replace import ignores stored quads and skips the lookup", async () => {
   let lookups = 0;
   const result = await prepareCommit(
     patchOf([a, b]),
@@ -147,13 +147,13 @@ Deno.test("prepareCommit - a replace import ignores stored quads and skips the l
       },
     }),
   );
-  assert(result.replacing);
-  assertEquals(lookups, 0);
-  assertEquals(result.novel.novelInsertions, [a, b]);
-  assertEquals(rowIds(result.rows), ids([a, b]));
+  expect(result.replacing).toBeTruthy();
+  expect(lookups).toStrictEqual(0);
+  expect(result.novel.novelInsertions).toStrictEqual([a, b]);
+  expect(rowIds(result.rows)).toStrictEqual(ids([a, b]));
 });
 
-Deno.test("prepareCommit - keyOf feeds the lookup and the novel check", async () => {
+test("prepareCommit - keyOf feeds the lookup and the novel check", async () => {
   const seen: string[][] = [];
   const result = await prepareCommit(
     patchOf([a, b]),
@@ -165,11 +165,11 @@ Deno.test("prepareCommit - keyOf feeds the lookup and the novel check", async ()
       },
     }),
   );
-  assertEquals(seen, [["urn:a", "urn:b"]]);
-  assertEquals(result.novel.novelInsertions, [b]);
+  expect(seen).toStrictEqual([["urn:a", "urn:b"]]);
+  expect(result.novel.novelInsertions).toStrictEqual([b]);
 });
 
-Deno.test("prepareCommit - when-projecting selects novel quads only to project them", async () => {
+test("prepareCommit - when-projecting selects novel quads only to project them", async () => {
   let lookups = 0;
   const counting = {
     selectNovel: "when-projecting",
@@ -186,15 +186,15 @@ Deno.test("prepareCommit - when-projecting selects novel quads only to project t
     patchOf([a]),
     options({ ...counting, projection: undefined }),
   );
-  assertEquals(off.novel.novelInsertions, []);
-  assertEquals(bare.novel.novelInsertions, []);
-  assertEquals(lookups, 0);
+  expect(off.novel.novelInsertions).toStrictEqual([]);
+  expect(bare.novel.novelInsertions).toStrictEqual([]);
+  expect(lookups).toStrictEqual(0);
   const on = await prepareCommit(patchOf([a]), options(counting));
-  assertEquals(lookups, 1);
-  assertEquals(on.novel.novelInsertions, [a]);
+  expect(lookups).toStrictEqual(1);
+  expect(on.novel.novelInsertions).toStrictEqual([a]);
 });
 
-Deno.test("prepareCommit - embeds only the novel texts and attaches vectors", async () => {
+test("prepareCommit - embeds only the novel texts and attaches vectors", async () => {
   const calls: string[][] = [];
   const result = await prepareCommit(
     patchOf([a, b]),
@@ -205,17 +205,15 @@ Deno.test("prepareCommit - embeds only the novel texts and attaches vectors", as
       },
     }, [a]),
   );
-  assertEquals(calls, [["b"]]);
-  assertEquals(result.rows[0]?.vector, [1, 2]);
+  expect(calls).toStrictEqual([["b"]]);
+  expect(result.rows[0]?.vector).toStrictEqual([1, 2]);
 });
 
-Deno.test("prepareCommit - an embedding failure rejects before returning", async () => {
+test("prepareCommit - an embedding failure rejects before returning", async () => {
   const failing: EmbeddingService = {
     embed: () => Promise.reject(new Error("embedding service down")),
   };
-  await assertRejects(
-    () =>
-      prepareCommit(
+  await expect(prepareCommit(
         patchOf([a]),
         options({
           projection: {
@@ -223,8 +221,5 @@ Deno.test("prepareCommit - an embedding failure rejects before returning", async
             embeddingService: failing,
           },
         }),
-      ),
-    Error,
-    "failed to vectorize literal chunk blocks",
-  );
+      )).rejects.toThrow("failed to vectorize literal chunk blocks");
 });

@@ -1,4 +1,5 @@
-import { ensureDir } from "@std/fs";
+import { mkdir, writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 
 /**
  * TARGET_DIR is the examples-local models directory resolved relative to the
@@ -60,7 +61,7 @@ const URLS = [
 
 async function downloadModels() {
   console.log(`Ensuring target directory exists: ${TARGET_DIR}`);
-  await ensureDir(TARGET_DIR);
+  await mkdir(fileURLToPath(TARGET_DIR), { recursive: true });
 
   for (const { name, url } of URLS) {
     const destUrl = new URL(name, TARGET_DIR);
@@ -70,7 +71,7 @@ async function downloadModels() {
       throw new Error(`Failed to download ${name}: ${response.statusText}`);
     }
     const buffer = await response.arrayBuffer();
-    await Deno.writeFile(destUrl, new Uint8Array(buffer));
+    await writeFile(destUrl, new Uint8Array(buffer));
     console.log(`Saved to ${destUrl}`);
   }
 

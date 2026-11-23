@@ -22,10 +22,10 @@ they are ready to proceed.
 
 ### Environment readiness check
 
-- Proactively check their Deno version by running `deno --version`.
-- Proactively run `deno install --allow-scripts` on their system to setup
+- Proactively check their Bun version by running `bun --version` (CI uses 1.4.5).
+- Proactively run `bun install` on their system to setup
   dependencies.
-- Proactively run `deno task download:tfjs-use` to download the offline search
+- Proactively run `bun run download:tfjs-use` to download the offline search
   model files.
 - **Validation**: From the workspace root, check whether
   `examples/tfjs-universal-sentence-encoder/models/` exists and contains `.bin`
@@ -34,7 +34,7 @@ they are ready to proceed.
 
 ### In-memory hello world execution
 
-- Inspect the workspace `deno.json` tasks at runtime (read `deno.json` from the
+- Inspect the workspace `package.json` scripts at runtime (read `package.json` from the
   workspace root with the Read tool).
 - Proactively run the basic in-memory hello-world task on their system.
 - Print the output and walk them through the printed results (Turtle data
@@ -54,7 +54,7 @@ they are ready to proceed.
 
 ### Environment verification
 
-- Proactively run the test suite using `deno task test`.
+- Proactively run the test suite using `bun run test`.
 - **Validation**: Ensure all tests pass with zero failures. If any tests fail,
   open and resolve the issue using [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 

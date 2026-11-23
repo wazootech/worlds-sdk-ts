@@ -1,0 +1,3 @@
+[install.scopes]
+# JSR packages resolve through JSR's npm compatibility layer (npm:@jsr/<scope>__<name>).
+"@jsr" = "https://npm.jsr.io"

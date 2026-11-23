@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import { DataFactory, Store } from "n3";
 import { hashQuad } from "@/client/quad-store/mod.ts";
 import { RdfjsQuadStore, recordPatchProvenance } from "./rdfjs-quad-store.ts";
@@ -16,7 +16,7 @@ const fixtureQuad2 = quad(
   literal("value2"),
 );
 
-Deno.test("RdfjsQuadStore.import records write provenance for every quad", async () => {
+test("RdfjsQuadStore.import records write provenance for every quad", async () => {
   const store = new Store();
   const quadStore = new RdfjsQuadStore({ store });
 
@@ -26,34 +26,31 @@ Deno.test("RdfjsQuadStore.import records write provenance for every quad", async
   });
 
   const records = await quadStore.provenanceStore.list();
-  assertEquals(records.length, 2);
+  expect(records.length).toStrictEqual(2);
   for (const record of records) {
-    assertEquals(record.type, "write");
-    assertEquals(record.writer, "agent-7");
-    assertEquals(record.source, "nightly-feed");
-    assertEquals(record.recordedAt !== undefined, true);
+    expect(record.type).toStrictEqual("write");
+    expect(record.writer).toStrictEqual("agent-7");
+    expect(record.source).toStrictEqual("nightly-feed");
+    expect(record.recordedAt !== undefined).toStrictEqual(true);
   }
-  assertEquals(
-    records.map((record) => record.quadId).sort(),
-    [hashQuad(fixtureQuad1), hashQuad(fixtureQuad2)].sort(),
-  );
+  expect(records.map((record) => record.quadId).sort()).toStrictEqual([hashQuad(fixtureQuad1), hashQuad(fixtureQuad2)].sort());
 });
 
-Deno.test("RdfjsQuadStore.import defaults recordedAt to write time when provenance is absent", async () => {
+test("RdfjsQuadStore.import defaults recordedAt to write time when provenance is absent", async () => {
   const store = new Store();
   const quadStore = new RdfjsQuadStore({ store });
 
   await quadStore.import({ source: { kind: "quads", quads: [fixtureQuad1] } });
 
   const records = await quadStore.provenanceStore.list();
-  assertEquals(records.length, 1);
-  assertEquals(records[0].type, "write");
-  assertEquals(records[0].writer, undefined);
-  assertEquals(records[0].source, undefined);
-  assertEquals(isNaN(Date.parse(records[0].recordedAt)), false);
+  expect(records.length).toStrictEqual(1);
+  expect(records[0].type).toStrictEqual("write");
+  expect(records[0].writer).toStrictEqual(undefined);
+  expect(records[0].source).toStrictEqual(undefined);
+  expect(isNaN(Date.parse(records[0].recordedAt))).toStrictEqual(false);
 });
 
-Deno.test("RdfjsQuadStore.import serialized source records provenance too", async () => {
+test("RdfjsQuadStore.import serialized source records provenance too", async () => {
   const store = new Store();
   const quadStore = new RdfjsQuadStore({ store });
 
@@ -67,11 +64,11 @@ Deno.test("RdfjsQuadStore.import serialized source records provenance too", asyn
   });
 
   const records = await quadStore.provenanceStore.list();
-  assertEquals(records.length, 1);
-  assertEquals(records[0].source, "turtle-upload");
+  expect(records.length).toStrictEqual(1);
+  expect(records[0].source).toStrictEqual("turtle-upload");
 });
 
-Deno.test("RdfjsQuadStore.replace import records removal tombstones for wiped quads", async () => {
+test("RdfjsQuadStore.replace import records removal tombstones for wiped quads", async () => {
   const store = new Store();
   const quadStore = new RdfjsQuadStore({ store });
   await quadStore.import({
@@ -86,22 +83,22 @@ Deno.test("RdfjsQuadStore.replace import records removal tombstones for wiped qu
   });
 
   const removed = await quadStore.provenanceStore.list({ type: "remove" });
-  assertEquals(removed.length, 1);
-  assertEquals(removed[0].quadId, hashQuad(fixtureQuad1));
+  expect(removed.length).toStrictEqual(1);
+  expect(removed[0].quadId).toStrictEqual(hashQuad(fixtureQuad1));
   // The tombstone records the removal event within the import that caused it,
   // so it carries that import's provenance metadata.
-  assertEquals(removed[0].writer, "second-writer");
+  expect(removed[0].writer).toStrictEqual("second-writer");
 
   // Both imports' write records persist; the replace only tombstones the wipe.
   const written = await quadStore.provenanceStore.list({ type: "write" });
-  assertEquals(written.length, 2);
+  expect(written.length).toStrictEqual(2);
   const secondWrite = written.find((record) =>
     record.quadId === hashQuad(fixtureQuad2)
   );
-  assertEquals(secondWrite?.writer, "second-writer");
+  expect(secondWrite?.writer).toStrictEqual("second-writer");
 });
 
-Deno.test("recordPatchProvenance links supersedesQuadId when a patch replaces a quad in place", async () => {
+test("recordPatchProvenance links supersedesQuadId when a patch replaces a quad in place", async () => {
   const original = quad(
     namedNode("http://example.org/s1"),
     namedNode("http://example.org/p1"),
@@ -124,23 +121,23 @@ Deno.test("recordPatchProvenance links supersedesQuadId when a patch replaces a 
   const writeRecord = await quadStore.provenanceStore.list({
     quadId: hashQuad(corrected),
   });
-  assertEquals(writeRecord.length, 1);
-  assertEquals(writeRecord[0].writer, "v2");
-  assertEquals(writeRecord[0].supersedesQuadId, hashQuad(original));
+  expect(writeRecord.length).toStrictEqual(1);
+  expect(writeRecord[0].writer).toStrictEqual("v2");
+  expect(writeRecord[0].supersedesQuadId).toStrictEqual(hashQuad(original));
 
   const tombstone = await quadStore.provenanceStore.list({
     quadId: hashQuad(original),
     type: "remove",
   });
-  assertEquals(tombstone.length, 1);
+  expect(tombstone.length).toStrictEqual(1);
 
   const history = await quadStore.provenanceStore.history(hashQuad(corrected));
-  assertEquals(history.supersedes.map((record) => record.quadId), [
+  expect(history.supersedes.map((record) => record.quadId)).toStrictEqual([
     hashQuad(original),
   ]);
 });
 
-Deno.test("RdfjsQuadStore.provenanceQuery pairs quads with records and history", async () => {
+test("RdfjsQuadStore.provenanceQuery pairs quads with records and history", async () => {
   const store = new Store();
   const quadStore = new RdfjsQuadStore({ store });
   await quadStore.import({
@@ -152,17 +149,17 @@ Deno.test("RdfjsQuadStore.provenanceQuery pairs quads with records and history",
     subject: namedNode("http://example.org/s1"),
   });
 
-  assertEquals(response.results.length, 1);
+  expect(response.results.length).toStrictEqual(1);
   const result = response.results[0];
-  assertEquals(result.quadId, hashQuad(fixtureQuad1));
-  assertEquals(result.quad.equals(fixtureQuad1), true);
-  assertEquals(result.records.length, 1);
-  assertEquals(result.records[0].writer, "agent-7");
-  assertEquals(result.history.supersedes.length, 0);
-  assertEquals(result.history.supersededBy.length, 0);
+  expect(result.quadId).toStrictEqual(hashQuad(fixtureQuad1));
+  expect(result.quad.equals(fixtureQuad1)).toStrictEqual(true);
+  expect(result.records.length).toStrictEqual(1);
+  expect(result.records[0].writer).toStrictEqual("agent-7");
+  expect(result.history.supersedes.length).toStrictEqual(0);
+  expect(result.history.supersededBy.length).toStrictEqual(0);
 });
 
-Deno.test("RdfjsQuadStore.provenanceQuery matches by object term", async () => {
+test("RdfjsQuadStore.provenanceQuery matches by object term", async () => {
   const store = new Store();
   const quadStore = new RdfjsQuadStore({ store });
   await quadStore.import({
@@ -172,24 +169,24 @@ Deno.test("RdfjsQuadStore.provenanceQuery matches by object term", async () => {
   const response = await quadStore.provenanceQuery({
     object: literal("value2"),
   });
-  assertEquals(response.results.length, 1);
-  assertEquals(response.results[0].quadId, hashQuad(fixtureQuad2));
+  expect(response.results.length).toStrictEqual(1);
+  expect(response.results[0].quadId).toStrictEqual(hashQuad(fixtureQuad2));
 });
 
-Deno.test("RdfjsQuadStore.provenanceQuery returns quads without records as written pre-provenance", async () => {
+test("RdfjsQuadStore.provenanceQuery returns quads without records as written pre-provenance", async () => {
   const store = new Store();
   store.add(fixtureQuad1);
   const quadStore = new RdfjsQuadStore({ store });
 
   const response = await quadStore.provenanceQuery({});
 
-  assertEquals(response.results.length, 1);
-  assertEquals(response.results[0].quadId, hashQuad(fixtureQuad1));
-  assertEquals(response.results[0].records.length, 0);
-  assertEquals(response.results[0].history.supersededBy.length, 0);
+  expect(response.results.length).toStrictEqual(1);
+  expect(response.results[0].quadId).toStrictEqual(hashQuad(fixtureQuad1));
+  expect(response.results[0].records.length).toStrictEqual(0);
+  expect(response.results[0].history.supersededBy.length).toStrictEqual(0);
 });
 
-Deno.test("RdfjsQuadStore.provenanceQuery returns both quads of a merge correction", async () => {
+test("RdfjsQuadStore.provenanceQuery returns both quads of a merge correction", async () => {
   const store = new Store();
   const quadStore = new RdfjsQuadStore({ store });
   const original = quad(
@@ -211,10 +208,10 @@ Deno.test("RdfjsQuadStore.provenanceQuery returns both quads of a merge correcti
   const response = await quadStore.provenanceQuery({
     subject: namedNode("http://example.org/s1"),
   });
-  assertEquals(response.results.length, 2);
+  expect(response.results.length).toStrictEqual(2);
 });
 
-Deno.test("RdfjsQuadStore records provenance for blank-node quads without failing", async () => {
+test("RdfjsQuadStore records provenance for blank-node quads without failing", async () => {
   const store = new Store();
   const quadStore = new RdfjsQuadStore({ store });
   const bnodeQuad = quad(
@@ -229,11 +226,11 @@ Deno.test("RdfjsQuadStore records provenance for blank-node quads without failin
   });
 
   const response = await quadStore.provenanceQuery({});
-  assertEquals(response.results.length, 1);
-  assertEquals(response.results[0].records.length, 1);
+  expect(response.results.length).toStrictEqual(1);
+  expect(response.results[0].records.length).toStrictEqual(1);
 });
 
-Deno.test("RdfjsQuadStore honors an injected provenanceStore", async () => {
+test("RdfjsQuadStore honors an injected provenanceStore", async () => {
   const store = new Store();
   const seen: string[] = [];
   const quadStore = new RdfjsQuadStore({
@@ -257,5 +254,5 @@ Deno.test("RdfjsQuadStore honors an injected provenanceStore", async () => {
   });
 
   await quadStore.import({ source: { kind: "quads", quads: [fixtureQuad1] } });
-  assertEquals(seen, [hashQuad(fixtureQuad1)]);
+  expect(seen).toStrictEqual([hashQuad(fixtureQuad1)]);
 });

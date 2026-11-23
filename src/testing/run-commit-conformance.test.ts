@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import { runCommitConformanceSuite } from "./run-commit-conformance.ts";
 import {
   createReferenceCommitStore,
@@ -31,56 +31,50 @@ const describe = (report: ParityReport) =>
 const failedCases = (report: ParityReport) =>
   report.results.filter((r) => !r.ok).map((r) => r.name);
 
-Deno.test("conformance suite - the reference pipeline passes every case", async () => {
+test("conformance suite - the reference pipeline passes every case", async () => {
   const report = await run();
-  assertEquals(report.results.length, 10);
-  assertEquals(report.notes, undefined);
-  assertEquals(report.ok, true, describe(report));
+  expect(report.results.length).toStrictEqual(10);
+  expect(report.notes).toStrictEqual(undefined);
+  expect(report.ok ? "ok" : describe(report)).toBe("ok");
 });
 
-Deno.test("conformance suite - a backend defaulting to deferred passes when it says so", async () => {
+test("conformance suite - a backend defaulting to deferred passes when it says so", async () => {
   const report = await run({ defaultMode: "deferred" }, {
     defaultSearchIndexOnImport: "deferred",
   });
-  assertEquals(report.ok, true, describe(report));
+  expect(report.ok ? "ok" : describe(report)).toBe("ok");
 });
 
-Deno.test("conformance suite - a declared default that does not match fails the default-mode case", async () => {
+test("conformance suite - a declared default that does not match fails the default-mode case", async () => {
   const report = await run({ defaultMode: "deferred" });
-  assertEquals(failedCases(report), ["default mode matches the contract"]);
+  expect(failedCases(report)).toStrictEqual(["default mode matches the contract"]);
 });
 
-Deno.test("conformance suite - catches a store that writes quads before embedding", async () => {
+test("conformance suite - catches a store that writes quads before embedding", async () => {
   const report = await run({ bug: "write-before-embed" });
-  assertEquals(report.ok, false);
-  assertEquals(
-    failedCases(report).includes("embedding failure follows the contract"),
-    true,
-  );
+  expect(report.ok).toStrictEqual(false);
+  expect(failedCases(report).includes("embedding failure follows the contract")).toStrictEqual(true);
 });
 
-Deno.test("conformance suite - catches orphan chunk rows left by a failed write, atomic or not", async () => {
+test("conformance suite - catches orphan chunk rows left by a failed write, atomic or not", async () => {
   const bug = { bug: "orphan-chunks-on-failure" } as const;
   for (const declared of [{}, { atomic: false }]) {
     const report = await run(bug, declared);
-    assertEquals(report.ok, false);
-    assertEquals(
-      failedCases(report).includes("write failure leaves no orphan chunks"),
-      true,
-    );
+    expect(report.ok).toStrictEqual(false);
+    expect(failedCases(report).includes("write failure leaves no orphan chunks")).toStrictEqual(true);
   }
 });
 
-Deno.test("conformance suite - a failed replace import that wiped the graph passes only when declared", async () => {
+test("conformance suite - a failed replace import that wiped the graph passes only when declared", async () => {
   const wiping = { bug: "wipe-before-failure" } as const;
-  assertEquals(failedCases(await run(wiping)), [
+  expect(failedCases(await run(wiping))).toStrictEqual([
     "replace-import failure follows the contract",
   ]);
   const declared = await run(wiping, { replaceImportFailure: "empties-graph" });
-  assertEquals(declared.ok, true, describe(declared));
+  expect(declared.ok ? "ok" : describe(declared)).toBe("ok");
 });
 
-Deno.test("conformance suite - a subject without failLaterWrite keeps its nine cases and gets a note", async () => {
+test("conformance suite - a subject without failLaterWrite keeps its nine cases and gets a note", async () => {
   const report = await runCommitConformanceSuite({
     contract,
     create: (create) => {
@@ -90,42 +84,36 @@ Deno.test("conformance suite - a subject without failLaterWrite keeps its nine c
       return legacy;
     },
   });
-  assertEquals(report.ok, true, describe(report));
-  assertEquals(report.results.length, 9);
-  assertEquals(report.notes?.length, 1);
-  assertEquals(
-    report.notes?.[0]?.startsWith("later-write failure follows the contract: "),
-    true,
-  );
+  expect(report.ok ? "ok" : describe(report)).toBe("ok");
+  expect(report.results.length).toStrictEqual(9);
+  expect(report.notes?.length).toStrictEqual(1);
+  expect(report.notes?.[0]?.startsWith("later-write failure follows the contract: ")).toStrictEqual(true);
 });
 
-Deno.test("conformance suite - a later-write failure that leaves quads behind passes only when declared", async () => {
+test("conformance suite - a later-write failure that leaves quads behind passes only when declared", async () => {
   const keeping = { bug: "keep-quads-on-later-failure" } as const;
   const later = "later-write failure follows the contract";
   for (const declared of [{}, { atomic: false }]) {
-    assertEquals(failedCases(await run(keeping, declared)), [later]);
+    expect(failedCases(await run(keeping, declared))).toStrictEqual([later]);
   }
   const limits = {
     atomic: false,
     laterWriteFailure: "keeps-written-quads",
   } as const;
-  assertEquals((await run(keeping, limits)).ok, true);
+  expect((await run(keeping, limits)).ok).toStrictEqual(true);
   // A non-atomic backend that cleans up passes with the default declaration.
-  assertEquals((await run({}, { atomic: false })).ok, true);
+  expect((await run({}, { atomic: false })).ok).toStrictEqual(true);
 });
 
-Deno.test("conformance suite - catches orphan chunk rows left by a failed later write", async () => {
+test("conformance suite - catches orphan chunk rows left by a failed later write", async () => {
   const bug = { bug: "orphan-chunks-on-failure" } as const;
   const keeps = {
     atomic: false,
     laterWriteFailure: "keeps-written-quads",
   } as const;
   for (const declared of [{}, keeps]) {
-    assertEquals(
-      failedCases(await run(bug, declared)).includes(
+    expect(failedCases(await run(bug, declared)).includes(
         "later-write failure follows the contract",
-      ),
-      true,
-    );
+      )).toStrictEqual(true);
   }
 });

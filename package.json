@@ -31,7 +31,7 @@
     "check:manifests": "bun ./scripts/check-manifests.ts",
     "test": "bun test",
     "publish:dry": "jsr publish --dry-run --allow-dirty",
-    "doc:json": "deno -A ./scripts/generate-doc-json.ts",
+    "doc:json": "bun ./scripts/generate-doc-json.ts",
     "ci": "bun run fmt:check && bun run lint && bun run check && bun run check:manifests && bun run test"
   },
   "dependencies": {

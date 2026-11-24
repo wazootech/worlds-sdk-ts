@@ -28,7 +28,7 @@ jobs:
           node-version: 24.11.1
       - name: Install Bun
         if: matrix.runtime == 'bun'
-        run: npm install -g bun@1.4.5
+        run: npm install -g bun@1
       - name: Enable Corepack
         if: matrix.runtime == 'yarn'
         run: corepack enable

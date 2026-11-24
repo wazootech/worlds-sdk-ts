@@ -153,8 +153,7 @@ The SPARQL engine is the external
 [`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine) package, which
 implements `SparqlEngineInterface`.
 
-Regenerate merged API doc JSON with `bun run doc:json` (needs the `deno` CLI for
-`deno doc`; writes gitignored `docs/api.json`). For architecture documentation (package topology, runtime
+For architecture documentation (package topology, runtime
 model), see [ARCHITECTURE.md](ARCHITECTURE.md). For agent coding rules and
 conventions, see [AGENTS.md](AGENTS.md).
 
@@ -258,7 +257,7 @@ All CI checks must pass before merging updates.
 | `bun run test`  | Execute the test suite with `bun test`. |
 | `bun run ci`    | Run complete CI pipeline sequentially.  |
 
-Development uses [Bun](https://bun.com) 1.4.5 (`bun install` first). The package
+Development uses the latest [Bun](https://bun.com) 1.x, at least 1.4.5 (`bun install` first). The package
 is still authored for JSR and consumed from Deno, Node.js and Bun alike.
 
 ## Releases

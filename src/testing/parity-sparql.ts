@@ -109,9 +109,11 @@ function checkSparqlEquivalence(
   }
 
   if (refResponse.kind === "select" && candResponse.kind === "select") {
-    const refBindings = refResponse.data.results.bindings.map(bindingKey)
+    const refBindings = refResponse.data.results.bindings
+      .map(bindingKey)
       .sort();
-    const candBindings = candResponse.data.results.bindings.map(bindingKey)
+    const candBindings = candResponse.data.results.bindings
+      .map(bindingKey)
       .sort();
     if (!sequenceEqual(refBindings, candBindings)) {
       failures.push(

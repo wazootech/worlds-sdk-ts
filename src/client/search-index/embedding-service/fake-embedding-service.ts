@@ -13,7 +13,7 @@ export class FakeEmbeddingService implements EmbeddingService {
     // Returns consistent dummy vectors matching our established F32_BLOB(32) shape
     return Promise.resolve(
       texts.map(() => {
-        const data = new Array(32).fill(0);
+        const data = Array.from({ length: 32 }, () => 0);
         data[0] = 1.0; // Stabilized normalized baseline
         return new Float32Array(data);
       }),

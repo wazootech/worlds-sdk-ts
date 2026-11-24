@@ -1,12 +1,14 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import { MockEmbeddingModelV3 } from "ai/test";
 import { AiSdkEmbeddingService } from "./ai-sdk-embedding-service.ts";
 
-Deno.test("AiSdkEmbeddingService.embed - generates mock embeddings correctly", async () => {
+test("AiSdkEmbeddingService.embed - generates mock embeddings correctly", async () => {
   const mockModel = new MockEmbeddingModelV3({
     doEmbed: ({ values }) =>
       Promise.resolve({
-        embeddings: values.map((value) => value === "first" ? [0, 1] : [1, 2]),
+        embeddings: values.map((value) =>
+          value === "first" ? [0, 1] : [1, 2],
+        ),
         usage: { tokens: 10 },
         warnings: [],
       }),
@@ -15,15 +17,15 @@ Deno.test("AiSdkEmbeddingService.embed - generates mock embeddings correctly", a
   const service = new AiSdkEmbeddingService({ model: mockModel });
   const result = await service.embed(["first", "second"]);
 
-  assertEquals(result, [
+  expect(result).toStrictEqual([
     [0, 1],
     [1, 2],
   ]);
 });
 
-Deno.test("AiSdkEmbeddingService.embed - returns empty array on empty input", async () => {
+test("AiSdkEmbeddingService.embed - returns empty array on empty input", async () => {
   const service = new AiSdkEmbeddingService({ model: null! });
   const result = await service.embed([]);
 
-  assertEquals(result, []);
+  expect(result).toStrictEqual([]);
 });

@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import { createMemoryWorldsSdk } from "./create-memory-sdk.ts";
 
 const SEED = [
@@ -7,7 +7,7 @@ const SEED = [
   '<urn:alice> <urn:posts> "a public note" <urn:graph:public> .',
 ].join("\n");
 
-Deno.test("createMemoryWorldsSdk — import → search → SELECT → ASK → reindex end to end", async () => {
+test("createMemoryWorldsSdk — import → search → SELECT → ASK → reindex end to end", async () => {
   const sdk = createMemoryWorldsSdk();
 
   await sdk.import({
@@ -19,30 +19,27 @@ Deno.test("createMemoryWorldsSdk — import → search → SELECT → ASK → re
   });
 
   const search = await sdk.search({ query: "public" });
-  assertEquals(search.results?.length, 1);
-  assertEquals(search.results?.[0].text, "a public note");
+  expect(search.results?.length).toStrictEqual(1);
+  expect(search.results?.[0].text).toStrictEqual("a public note");
 
   const select = await sdk.sparql({
     query: "SELECT ?o WHERE { <urn:alice> <urn:age> ?o }",
   });
   if (select.kind !== "select") throw new Error("Expected select");
-  assertEquals(select.data.results.bindings.length, 1);
-  assertEquals(
-    select.data.results.bindings[0].o?.value,
-    "42",
-  );
+  expect(select.data.results.bindings.length).toStrictEqual(1);
+  expect(select.data.results.bindings[0].o?.value).toStrictEqual("42");
 
   const ask = await sdk.sparql({
     query: "ASK WHERE { GRAPH <urn:graph:public> { ?s ?p ?o } }",
   });
   if (ask.kind !== "ask") throw new Error("Expected ask");
-  assertEquals(ask.data.boolean, true);
+  expect(ask.data.boolean).toStrictEqual(true);
 
   const reindex = await sdk.reindex();
-  assertEquals(reindex.processedQuadCount, 3);
+  expect(reindex.processedQuadCount).toStrictEqual(3);
 });
 
-Deno.test("createMemoryWorldsSdk — each call returns an independent fresh topology", async () => {
+test("createMemoryWorldsSdk — each call returns an independent fresh topology", async () => {
   const first = createMemoryWorldsSdk();
   const second = createMemoryWorldsSdk();
 
@@ -56,9 +53,5 @@ Deno.test("createMemoryWorldsSdk — each call returns an independent fresh topo
 
   const secondExport = await second.export({ format: { kind: "quads" } });
   if (secondExport.kind !== "quads") throw new Error("Expected quads");
-  assertEquals(
-    secondExport.quads.length,
-    0,
-    "second WorldsSdk must start empty",
-  );
+  expect(secondExport.quads.length).toStrictEqual(0);
 });

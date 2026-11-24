@@ -302,7 +302,7 @@ packages (see workspace#86 for the full mapping).
 - Removed exported `Adapter`. **`ClientInterface`** is the public contract;
   **`Client`** is the exported class
   (`new Client({ quadStore, searchIndex,
-  sparqlEngine? })`). Durable backends:
+sparqlEngine? })`). Durable backends:
   `createLibsqlClient`, `createDenokvClient`. **Removed `createRdfjsClient`** —
   wire in-memory N3 with `RdfjsQuadStore` / `RdfjsSearchIndex` explicitly.
 - Renamed `createLibsqlAdapter` → `createLibsqlClient` (and matching
@@ -326,7 +326,7 @@ packages (see workspace#86 for the full mapping).
   `commitPatchToDenokv`. `createLibsqlPersistHooks` and
   `createDenokvPersistHooks` return
   `{ commitHandler, beforeImport, afterImport
-  }` and map `searchIndexOnImport`
+}` and map `searchIndexOnImport`
   for projection and deferred reindex.
 - Renamed **`commit-sync`** → **`import-lifecycle`** (root barrel export).
   Removed **`CommitSyncState`**; use flat `commitHandler` and optional

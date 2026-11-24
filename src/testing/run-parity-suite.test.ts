@@ -1,4 +1,4 @@
-import { assertEquals, assertFalse } from "@std/assert";
+import { expect, test } from "bun:test";
 import { DataFactory } from "n3";
 import type * as rdfjs from "@rdfjs/types";
 import { createMemoryWorldsSdk } from "@/memory/mod.ts";
@@ -15,37 +15,38 @@ const { quad, namedNode, literal } = DataFactory;
  */
 const memoryFactory: WorldsSdkFactory = () => createMemoryWorldsSdk();
 
-Deno.test("runParitySuite - passes the full corpus on identical in-memory Sdks", async () => {
+test("runParitySuite - passes the full corpus on identical in-memory Sdks", async () => {
   const report = await runParitySuite({
     reference: memoryFactory,
     candidate: memoryFactory,
   });
 
-  assertEquals(
-    report.results.length,
+  expect(report.results.length).toStrictEqual(
     parityCorpus.fixtures.length + parityCorpus.replaceCases.length,
-    "every corpus fixture and replace case runs",
   );
-  assertEquals(
-    report.ok,
-    true,
-    report.results
-      .map(
-        (r) =>
-          `${r.name}: ${r.failures.join("; ")}` +
-          `${r.notes ? ` [notes: ${r.notes.join("; ")}]` : ""}`,
-      )
-      .join("\n"),
-  );
+  // A failing parity suite reports every failed case, not just "false".
+  expect(
+    report.ok
+      ? "ok"
+      : report.results
+          .map(
+            (r) =>
+              `${r.name}: ${r.failures.join("; ")}` +
+              `${r.notes ? ` [notes: ${r.notes.join("; ")}]` : ""}`,
+          )
+          .join("\n"),
+  ).toBe("ok");
 
   // The declared-gate RDF-star fixture must run clean through the in-memory
   // path (the SPARQL engine models quoted triples) and be reported, not skipped.
   const rdfStar = report.results.find((r) => r.name === "rdfStarWorld");
-  assertEquals(rdfStar?.ok, true);
-  assertEquals(rdfStar?.notes, undefined, JSON.stringify(rdfStar?.notes));
+  expect(rdfStar?.ok).toStrictEqual(true);
+  expect(
+    rdfStar?.notes ? JSON.stringify(rdfStar.notes) : undefined,
+  ).toBeUndefined();
 });
 
-Deno.test("runParitySuite - fails when the candidate reorders search results", async () => {
+test("runParitySuite - fails when the candidate reorders search results", async () => {
   const brokenCandidate: WorldsSdkFactory = () => {
     const sdk = createMemoryWorldsSdk();
     const originalSearch = sdk.search.bind(sdk);
@@ -64,16 +65,16 @@ Deno.test("runParitySuite - fails when the candidate reorders search results", a
     replaceCases: [],
   });
 
-  assertFalse(report.ok);
+  expect(report.ok).toBeFalsy();
   const searchFailures = report.results.flatMap((r) => r.failures);
-  assertEquals(
-    searchFailures.some((failure) => failure.includes("search case")),
-    true,
-    searchFailures.join("\n"),
-  );
+  expect(
+    searchFailures.some((failure) => failure.includes("search case"))
+      ? "ok"
+      : searchFailures.join("\n"),
+  ).toBe("ok");
 });
 
-Deno.test("runParitySuite - fails when the candidate's quad counts differ", async () => {
+test("runParitySuite - fails when the candidate's quad counts differ", async () => {
   const extraQuad: rdfjs.Quad = quad(
     namedNode("urn:stray"),
     namedNode("urn:p"),
@@ -100,16 +101,16 @@ Deno.test("runParitySuite - fails when the candidate's quad counts differ", asyn
     replaceCases: [],
   });
 
-  assertFalse(report.ok);
+  expect(report.ok).toBeFalsy();
   const countFailures = report.results.flatMap((r) => r.failures);
-  assertEquals(
-    countFailures.some((failure) => failure.includes("quad count")),
-    true,
-    countFailures.join("\n"),
-  );
+  expect(
+    countFailures.some((failure) => failure.includes("quad count"))
+      ? "ok"
+      : countFailures.join("\n"),
+  ).toBe("ok");
 });
 
-Deno.test("runParitySuite - reports declared-gate notes without failing the suite", async () => {
+test("runParitySuite - reports declared-gate notes without failing the suite", async () => {
   const throwingReference: WorldsSdkFactory = () => {
     const sdk = createMemoryWorldsSdk();
     const originalImport = sdk.import.bind(sdk);
@@ -133,12 +134,10 @@ Deno.test("runParitySuite - reports declared-gate notes without failing the suit
     replaceCases: [],
   });
 
-  assertEquals(report.ok, true, "declared-gate cases never fail the suite");
+  expect(report.ok).toStrictEqual(true);
   const rdfStar = report.results[0];
-  assertEquals(rdfStar?.ok, true);
-  assertEquals(
+  expect(rdfStar?.ok).toStrictEqual(true);
+  expect(
     rdfStar?.notes?.some((note) => note.includes("Unsupported term type")),
-    true,
-    JSON.stringify(rdfStar?.notes),
-  );
+  ).toStrictEqual(true);
 });

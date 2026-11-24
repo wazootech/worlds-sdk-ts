@@ -82,17 +82,13 @@ export const DEFAULT_LABEL_PREDICATES: readonly string[] = [
 /**
  * resolveLabelPredicates merges caller extensions with built-in label IRIs (union, deduped, stable order).
  */
-export function resolveLabelPredicates(
-  labelPredicates?: string[],
-): string[] {
+export function resolveLabelPredicates(labelPredicates?: string[]): string[] {
   const seen = new Set<string>();
   const resolved: string[] = [];
-  for (
-    const predicate of [
-      ...DEFAULT_LABEL_PREDICATES,
-      ...(labelPredicates ?? []),
-    ]
-  ) {
+  for (const predicate of [
+    ...DEFAULT_LABEL_PREDICATES,
+    ...(labelPredicates ?? []),
+  ]) {
     if (!seen.has(predicate)) {
       seen.add(predicate);
       resolved.push(predicate);

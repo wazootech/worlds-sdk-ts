@@ -1,10 +1,11 @@
 # Runtime compatibility
 
-`@worlds/sdk` is authored for Deno and published to JSR. Node.js/npm, pnpm, Yarn
-and Bun consume the same release through JSR's npm compatibility layer
+`@worlds/sdk` is developed and tested with Bun (1.4.5) and published to JSR
+through the `jsr` npm package. Deno, Node.js/npm, pnpm, Yarn and Bun consume
+the same release through JSR's npm compatibility layer
 (`npx jsr add @worlds/sdk`, `bunx jsr add @worlds/sdk`,
-`yarn dlx jsr add @worlds/sdk`). Deno stays first-class; it is not the only
-supported path.
+`yarn dlx jsr add @worlds/sdk`, `deno add jsr:@worlds/sdk`). `src/` uses no
+Deno-only APIs.
 
 Measured 2026-11-18 against `@worlds/sdk` 0.9.0 on Node 24.11, npm 11.6, Bun
 1.3.14; Yarn 4.9.2 measured 2026-11-20 against 0.9.1. Re-run after each publish
@@ -14,14 +15,14 @@ published package into a throwaway project and runs import, search and SPARQL.
 
 ## Matrix
 
-| Toolchain          | Install                        | Core + `/rdfjs` (import, search, SPARQL) | Every subpath imports | TypeScript types     |
-| ------------------ | ------------------------------ | ---------------------------------------- | --------------------- | -------------------- |
-| Deno               | `deno add jsr:@worlds/sdk`     | Yes (repo CI)                            | Yes (repo CI)         | Yes (`deno task ci`) |
-| Node.js + npm      | `npx jsr add @worlds/sdk`      | Yes                                      | 11 of 12, see below   | Fails, see below     |
-| Bun                | `bunx jsr add @worlds/sdk`     | Yes                                      | 12 of 12              | Not tested           |
-| pnpm 12            | `pnpm dlx jsr add @worlds/sdk` | Yes                                      | 12 of 12              | Not tested           |
-| Yarn 4             | `yarn dlx jsr add @worlds/sdk` | Yes                                      | Not tested            | Yes                  |
-| Cloudflare Workers | n/a                            | Not tested, see below                    | Not tested            | Not tested           |
+| Toolchain          | Install                        | Core + `/rdfjs` (import, search, SPARQL) | Every subpath imports | TypeScript types   |
+| ------------------ | ------------------------------ | ---------------------------------------- | --------------------- | ------------------ |
+| Deno               | `deno add jsr:@worlds/sdk`     | Not run in CI since the Bun cutover      | Not tested            | Not tested         |
+| Node.js + npm      | `npx jsr add @worlds/sdk`      | Yes                                      | 11 of 12, see below   | Fails, see below   |
+| Bun                | `bunx jsr add @worlds/sdk`     | Yes (repo CI)                            | 12 of 12              | Yes (`bun run ci`) |
+| pnpm 12            | `pnpm dlx jsr add @worlds/sdk` | Yes                                      | 12 of 12              | Not tested         |
+| Yarn 4             | `yarn dlx jsr add @worlds/sdk` | Yes                                      | Not tested            | Yes                |
+| Cloudflare Workers | n/a                            | Not tested, see below                    | Not tested            | Not tested         |
 
 Yarn is Yarn 4 (Berry) through Corepack with `nodeLinker: node-modules`;
 `yarn dlx jsr add` registers the `@jsr` scope and installs
@@ -33,7 +34,7 @@ check needs a `wrangler` project and a deploy target that nothing here uses yet.
 Open an issue with the use case to change that.
 
 "Every subpath" means a bare `import("@worlds/sdk/<subpath>")` for each key in
-`deno.json` `exports`. The Deno KV backend named in older docs is not an export
+`jsr.json` `exports`. The Deno KV backend named in older docs is not an export
 of `@worlds/sdk` 0.9.0.
 
 ## Known limitations

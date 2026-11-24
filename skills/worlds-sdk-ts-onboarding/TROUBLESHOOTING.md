@@ -3,21 +3,24 @@
 Use this guide to diagnose and resolve common errors and environment issues
 encountered when setting up or developing in the `wazoo-worlds` repository.
 
-## Deno or JSR command errors
+## Bun command errors
 
 ```
-Is Deno installed globally on your machine?
-  ├── [No]  ──> Go to https://deno.land and install Deno.
-  └── [Yes] ──> Is Deno up to date?
-                  ├── [No]  ──> Run: Deno upgrade
-                  └── [Yes] ──> 1. Run: Deno install --allow-scripts
-                                2. Run a task from workspace deno.json
+Is Bun installed on your machine?
+  ├── [No]  ──> Go to https://bun.com and install Bun 1.4.5.
+  └── [Yes] ──> Is it 1.4.5 or newer (bun --version)?
+                  ├── [No]  ──> Run: bun upgrade
+                  └── [Yes] ──> 1. Run: bun install
+                                2. Run a script from the workspace package.json
 ```
 
 ### Symptoms
 
-- Command `deno` not found.
-- Syntax errors or package resolution failures due to outdated runtime versions.
+- Command `bun` not found.
+- `bun fmt` or `bun check` report "Script not found": the installed Bun is too
+  old; those commands first ship in 1.4.5.
+- Package resolution failures for `@wazoo/*` or `@worlds/client`: they resolve
+  through JSR's npm layer, so `bunfig.toml` must map the `@jsr` scope.
 
 ## TensorFlow.js USE offline models missing
 

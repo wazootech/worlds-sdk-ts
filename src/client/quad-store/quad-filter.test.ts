@@ -1,10 +1,10 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import { DataFactory } from "n3";
 import { filterQuads } from "./quad-filter.ts";
 
 const { namedNode, quad, defaultGraph } = DataFactory;
 
-Deno.test("QuadFilter - compiles empty filter to open match", () => {
+test("QuadFilter - compiles empty filter to open match", () => {
   const matcher = filterQuads();
   const sample = quad(
     namedNode("http://s"),
@@ -13,10 +13,10 @@ Deno.test("QuadFilter - compiles empty filter to open match", () => {
     defaultGraph(),
   );
 
-  assertEquals(matcher(sample), true);
+  expect(matcher(sample)).toStrictEqual(true);
 });
 
-Deno.test("QuadFilter - restricts matching by positive (include) scope", () => {
+test("QuadFilter - restricts matching by positive (include) scope", () => {
   const matcher = filterQuads({
     include: {
       subjects: ["http://s1", "http://s2"],
@@ -37,11 +37,11 @@ Deno.test("QuadFilter - restricts matching by positive (include) scope", () => {
     defaultGraph(),
   );
 
-  assertEquals(matcher(pass), true);
-  assertEquals(matcher(fail), false);
+  expect(matcher(pass)).toStrictEqual(true);
+  expect(matcher(fail)).toStrictEqual(false);
 });
 
-Deno.test("QuadFilter - restricts matching by negative (exclude) scope", () => {
+test("QuadFilter - restricts matching by negative (exclude) scope", () => {
   const matcher = filterQuads({
     exclude: {
       graphs: ["http://g1"],
@@ -62,67 +62,61 @@ Deno.test("QuadFilter - restricts matching by negative (exclude) scope", () => {
     namedNode("http://g1"),
   );
 
-  assertEquals(matcher(pass), true);
-  assertEquals(matcher(fail), false);
+  expect(matcher(pass)).toStrictEqual(true);
+  expect(matcher(fail)).toStrictEqual(false);
 });
 
-Deno.test(
-  "QuadFilter - restricts matching by positive (include) predicate scope",
-  () => {
-    const matcher = filterQuads({
-      include: {
-        predicates: ["http://p-allowed"],
-      },
-    });
+test("QuadFilter - restricts matching by positive (include) predicate scope", () => {
+  const matcher = filterQuads({
+    include: {
+      predicates: ["http://p-allowed"],
+    },
+  });
 
-    const pass = quad(
-      namedNode("http://s"),
-      namedNode("http://p-allowed"),
-      namedNode("http://o"),
-      defaultGraph(),
-    );
+  const pass = quad(
+    namedNode("http://s"),
+    namedNode("http://p-allowed"),
+    namedNode("http://o"),
+    defaultGraph(),
+  );
 
-    const fail = quad(
-      namedNode("http://s"),
-      namedNode("http://p-other"),
-      namedNode("http://o"),
-      defaultGraph(),
-    );
+  const fail = quad(
+    namedNode("http://s"),
+    namedNode("http://p-other"),
+    namedNode("http://o"),
+    defaultGraph(),
+  );
 
-    assertEquals(matcher(pass), true);
-    assertEquals(matcher(fail), false);
-  },
-);
+  expect(matcher(pass)).toStrictEqual(true);
+  expect(matcher(fail)).toStrictEqual(false);
+});
 
-Deno.test(
-  "QuadFilter - restricts matching by negative (exclude) subject scope",
-  () => {
-    const matcher = filterQuads({
-      exclude: {
-        subjects: ["http://s-blocked"],
-      },
-    });
+test("QuadFilter - restricts matching by negative (exclude) subject scope", () => {
+  const matcher = filterQuads({
+    exclude: {
+      subjects: ["http://s-blocked"],
+    },
+  });
 
-    const pass = quad(
-      namedNode("http://s-allowed"),
-      namedNode("http://p"),
-      namedNode("http://o"),
-      defaultGraph(),
-    );
+  const pass = quad(
+    namedNode("http://s-allowed"),
+    namedNode("http://p"),
+    namedNode("http://o"),
+    defaultGraph(),
+  );
 
-    const fail = quad(
-      namedNode("http://s-blocked"),
-      namedNode("http://p"),
-      namedNode("http://o"),
-      defaultGraph(),
-    );
+  const fail = quad(
+    namedNode("http://s-blocked"),
+    namedNode("http://p"),
+    namedNode("http://o"),
+    defaultGraph(),
+  );
 
-    assertEquals(matcher(pass), true);
-    assertEquals(matcher(fail), false);
-  },
-);
+  expect(matcher(pass)).toStrictEqual(true);
+  expect(matcher(fail)).toStrictEqual(false);
+});
 
-Deno.test("QuadFilter - intersects multiple combined inclusion/exclusion criteria", () => {
+test("QuadFilter - intersects multiple combined inclusion/exclusion criteria", () => {
   const matcher = filterQuads({
     include: {
       subjects: ["http://s"],
@@ -153,7 +147,7 @@ Deno.test("QuadFilter - intersects multiple combined inclusion/exclusion criteri
     defaultGraph(),
   );
 
-  assertEquals(matcher(pass), true);
-  assertEquals(matcher(failBySubject), false);
-  assertEquals(matcher(failByExclude), false);
+  expect(matcher(pass)).toStrictEqual(true);
+  expect(matcher(failBySubject)).toStrictEqual(false);
+  expect(matcher(failByExclude)).toStrictEqual(false);
 });

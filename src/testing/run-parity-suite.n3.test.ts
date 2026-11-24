@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import { Store } from "n3";
 import { WorldsSdk } from "@/client/client.ts";
 import { type Patch, Transaction } from "@/client/quad-store/mod.ts";
@@ -39,48 +39,38 @@ function createN3WorldsSdk(): WorldsSdk {
   });
 }
 
-Deno.test(
-  "runParitySuite - engine MemoryStore and n3.Store agree on the full corpus",
-  async () => {
-    const report = await runParitySuite({
-      reference: () => createMemoryWorldsSdk(),
-      candidate: () => createN3WorldsSdk(),
-      strictSearchOrder: false,
-    });
+test("runParitySuite - engine MemoryStore and n3.Store agree on the full corpus", async () => {
+  const report = await runParitySuite({
+    reference: () => createMemoryWorldsSdk(),
+    candidate: () => createN3WorldsSdk(),
+    strictSearchOrder: false,
+  });
 
-    assertEquals(
-      report.results.length,
-      parityCorpus.fixtures.length + parityCorpus.replaceCases.length,
-      "every corpus fixture and replace case runs on both stores",
-    );
-    assertEquals(
-      report.ok,
-      true,
-      report.results
-        .map(
-          (r) =>
-            `${r.name}: ${r.failures.join("; ")}` +
-            `${r.notes ? ` [notes: ${r.notes.join("; ")}]` : ""}`,
-        )
-        .join("\n"),
-    );
+  expect(report.results.length).toStrictEqual(
+    parityCorpus.fixtures.length + parityCorpus.replaceCases.length,
+  );
+  // A failing parity suite reports every failed case, not just "false".
+  expect(
+    report.ok
+      ? "ok"
+      : report.results
+          .map(
+            (r) =>
+              `${r.name}: ${r.failures.join("; ")}` +
+              `${r.notes ? ` [notes: ${r.notes.join("; ")}]` : ""}`,
+          )
+          .join("\n"),
+  ).toBe("ok");
 
-    // The reference-gate fixtures must be clean on both stores — any
-    // divergence there is a real parity break, not a declared-category note.
-    const referenceGated = report.results.filter((r) =>
-      r.name !== "rdfStarWorld"
-    );
-    for (const result of referenceGated) {
-      assertEquals(
-        result.ok,
-        true,
-        `${result.name}: ${result.failures.join("; ")}`,
-      );
-      assertEquals(
-        result.notes,
-        undefined,
-        `${result.name} must have no notes`,
-      );
-    }
-  },
-);
+  // The reference-gate fixtures must be clean on both stores — any
+  // divergence there is a real parity break, not a declared-category note.
+  const referenceGated = report.results.filter(
+    (r) => r.name !== "rdfStarWorld",
+  );
+  for (const result of referenceGated) {
+    expect(
+      result.ok ? "ok" : `${result.name}: ${result.failures.join("; ")}`,
+    ).toBe("ok");
+    expect(result.notes).toStrictEqual(undefined);
+  }
+});

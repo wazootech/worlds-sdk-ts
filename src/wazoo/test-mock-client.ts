@@ -7,18 +7,18 @@ export interface MockCall {
   query?: unknown;
 }
 
-export function createMockClient(
-  responses: Record<string, unknown>,
-): { client: unknown; calls: MockCall[] } {
+export function createMockClient(responses: Record<string, unknown>): {
+  client: unknown;
+  calls: MockCall[];
+} {
   const calls: MockCall[] = [];
 
   const handler = {
-    get(
-      _target: unknown,
-      prop: string,
-    ): unknown {
+    get(_target: unknown, prop: string): unknown {
       if (
-        prop === "get" || prop === "post" || prop === "delete" ||
+        prop === "get" ||
+        prop === "post" ||
+        prop === "delete" ||
         prop === "patch"
       ) {
         return (config: Record<string, unknown>) => {

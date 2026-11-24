@@ -61,20 +61,21 @@ export class RdfjsQuadStore implements QuadStoreInterface {
 
   public constructor(private readonly options?: RdfjsQuadStoreOptions) {
     this.store = options?.store ?? new MemoryStore();
-    this.provenanceStore = options?.provenanceStore ??
-      new InMemoryProvenanceStore();
+    this.provenanceStore =
+      options?.provenanceStore ?? new InMemoryProvenanceStore();
   }
 
   public async import(request: ImportRequest): Promise<void> {
-    const commitHandler = this.options?.commit ??
-      createRdfjsStoreCommitHandler(this.store);
+    const commitHandler =
+      this.options?.commit ?? createRdfjsStoreCommitHandler(this.store);
     await importViaTransaction(request, {
       createTransaction: () =>
         new Transaction({
           commit: async (patch, context) => {
-            const priorQuads = context?.importMode === "replace"
-              ? await collectAllQuads(this.store)
-              : [];
+            const priorQuads =
+              context?.importMode === "replace"
+                ? await collectAllQuads(this.store)
+                : [];
             await commitHandler(patch, context);
             await this.recordProvenance(patch, context, priorQuads);
           },

@@ -1,11 +1,11 @@
-import { assertEquals, assertRejects } from "@std/assert";
+import { expect, test } from "bun:test";
 
 import { createMockClient } from "./test-mock-client.ts";
 import { RemoteSparqlEngine } from "./remote-sparql-engine.ts";
 
 // --- RemoteSparqlEngine tests ---
 
-Deno.test("RemoteSparqlEngine.execute delegates to sparqlWorld", async () => {
+test("RemoteSparqlEngine.execute delegates to sparqlWorld", async () => {
   const { client, calls } = createMockClient({
     "/worlds/{id}/sparql": {
       head: { vars: ["p", "o"] },
@@ -29,21 +29,20 @@ Deno.test("RemoteSparqlEngine.execute delegates to sparqlWorld", async () => {
     query: "SELECT ?p ?o WHERE { <http://example.com/s> ?p ?o }",
   });
 
-  assertEquals(calls.length, 1);
-  assertEquals(calls[0].url, "/worlds/{id}/sparql");
-  assertEquals(result.kind, "select");
+  expect(calls.length).toStrictEqual(1);
+  expect(calls[0].url).toStrictEqual("/worlds/{id}/sparql");
+  expect(result.kind).toStrictEqual("select");
   if (result.kind === "select") {
-    assertEquals(result.data.head.vars, ["p", "o"]);
-    assertEquals(result.data.results.bindings.length, 1);
-    assertEquals(result.data.results.bindings[0].p.type, "uri");
-    assertEquals(
+    expect(result.data.head.vars).toStrictEqual(["p", "o"]);
+    expect(result.data.results.bindings.length).toStrictEqual(1);
+    expect(result.data.results.bindings[0].p.type).toStrictEqual("uri");
+    expect(
       (result.data.results.bindings[0].p as { value: string }).value,
-      "http://example.com/p",
-    );
+    ).toStrictEqual("http://example.com/p");
   }
 });
 
-Deno.test("RemoteSparqlEngine.execute handles ASK responses", async () => {
+test("RemoteSparqlEngine.execute handles ASK responses", async () => {
   const { client } = createMockClient({
     "/worlds/{id}/sparql": {
       head: {},
@@ -60,13 +59,13 @@ Deno.test("RemoteSparqlEngine.execute handles ASK responses", async () => {
     query: "ASK WHERE { ?s ?p ?o }",
   });
 
-  assertEquals(result.kind, "ask");
+  expect(result.kind).toStrictEqual("ask");
   if (result.kind === "ask") {
-    assertEquals(result.data.boolean, true);
+    expect(result.data.boolean).toStrictEqual(true);
   }
 });
 
-Deno.test("RemoteSparqlEngine.execute handles CONSTRUCT responses", async () => {
+test("RemoteSparqlEngine.execute handles CONSTRUCT responses", async () => {
   const { client } = createMockClient({
     "/worlds/{id}/sparql": {
       head: {},
@@ -89,14 +88,16 @@ Deno.test("RemoteSparqlEngine.execute handles CONSTRUCT responses", async () => 
     query: "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }",
   });
 
-  assertEquals(result.kind, "construct");
+  expect(result.kind).toStrictEqual("construct");
   if (result.kind === "construct") {
-    assertEquals(result.data.quads.length, 1);
-    assertEquals(result.data.quads[0].subject.value, "http://example.com/s");
+    expect(result.data.quads.length).toStrictEqual(1);
+    expect(result.data.quads[0].subject.value).toStrictEqual(
+      "http://example.com/s",
+    );
   }
 });
 
-Deno.test("RemoteSparqlEngine.execute parses literal terms in CONSTRUCT", async () => {
+test("RemoteSparqlEngine.execute parses literal terms in CONSTRUCT", async () => {
   const { client } = createMockClient({
     "/worlds/{id}/sparql": {
       head: {},
@@ -134,42 +135,41 @@ Deno.test("RemoteSparqlEngine.execute parses literal terms in CONSTRUCT", async 
     query: "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }",
   });
 
-  assertEquals(result.kind, "construct");
+  expect(result.kind).toStrictEqual("construct");
   if (result.kind === "construct") {
-    assertEquals(result.data.quads.length, 4);
+    expect(result.data.quads.length).toStrictEqual(4);
 
     // Typed literal
     const typed = result.data.quads[0].object;
-    assertEquals(typed.termType, "Literal");
-    assertEquals(typed.value, "hello");
+    expect(typed.termType).toStrictEqual("Literal");
+    expect(typed.value).toStrictEqual("hello");
     if (typed.termType === "Literal") {
-      assertEquals(
-        typed.datatype.value,
+      expect(typed.datatype.value).toStrictEqual(
         "http://www.w3.org/2001/XMLSchema#string",
       );
     }
 
     // Language-tagged literal
     const lang = result.data.quads[1].object;
-    assertEquals(lang.termType, "Literal");
+    expect(lang.termType).toStrictEqual("Literal");
     if (lang.termType === "Literal") {
-      assertEquals(lang.value, "bonjour");
-      assertEquals(lang.language, "fr");
+      expect(lang.value).toStrictEqual("bonjour");
+      expect(lang.language).toStrictEqual("fr");
     }
 
     // Blank node
     const bnode = result.data.quads[2].object;
-    assertEquals(bnode.termType, "BlankNode");
-    assertEquals(bnode.value, "b0");
+    expect(bnode.termType).toStrictEqual("BlankNode");
+    expect(bnode.value).toStrictEqual("b0");
 
     // Named node
     const named = result.data.quads[3].object;
-    assertEquals(named.termType, "NamedNode");
-    assertEquals(named.value, "http://example.com/target");
+    expect(named.termType).toStrictEqual("NamedNode");
+    expect(named.value).toStrictEqual("http://example.com/target");
   }
 });
 
-Deno.test("RemoteSparqlEngine.execute throws on API error", async () => {
+test("RemoteSparqlEngine.execute throws on API error", async () => {
   const { client } = createMockClient({
     "/worlds/{id}/sparql": undefined,
   });
@@ -179,9 +179,7 @@ Deno.test("RemoteSparqlEngine.execute throws on API error", async () => {
     "w_test",
   );
 
-  await assertRejects(
-    () => engine.execute({ query: "SELECT ?s WHERE { ?s ?p ?o }" }),
-    Error,
-    "SPARQL failed",
-  );
+  await expect(
+    engine.execute({ query: "SELECT ?s WHERE { ?s ?p ?o }" }),
+  ).rejects.toThrow("SPARQL failed");
 });

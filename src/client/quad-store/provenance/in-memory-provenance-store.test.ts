@@ -1,22 +1,20 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import { InMemoryProvenanceStore } from "./in-memory-provenance-store.ts";
 
-Deno.test("InMemoryProvenanceStore.record defaults recordedAt to write time", async () => {
+test("InMemoryProvenanceStore.record defaults recordedAt to write time", async () => {
   const store = new InMemoryProvenanceStore();
   const before = new Date().toISOString();
   const record = await store.record({ quadId: "q2.abc" });
   const after = new Date().toISOString();
 
-  assertEquals(record.quadId, "q2.abc");
-  assertEquals(record.type, undefined);
-  assertEquals(
+  expect(record.quadId).toStrictEqual("q2.abc");
+  expect(record.type).toStrictEqual(undefined);
+  expect(
     record.recordedAt >= before && record.recordedAt <= after,
-    true,
-    "recordedAt should default to the write time",
-  );
+  ).toStrictEqual(true);
 });
 
-Deno.test("InMemoryProvenanceStore.record honors explicit recordedAt and metadata", async () => {
+test("InMemoryProvenanceStore.record honors explicit recordedAt and metadata", async () => {
   const store = new InMemoryProvenanceStore();
   const record = await store.record({
     quadId: "q2.abc",
@@ -26,23 +24,23 @@ Deno.test("InMemoryProvenanceStore.record honors explicit recordedAt and metadat
     supersedesQuadId: "q2.old",
   });
 
-  assertEquals(record.recordedAt, "2026-01-01T00:00:00Z");
-  assertEquals(record.writer, "agent-7");
-  assertEquals(record.source, "nightly-feed");
-  assertEquals(record.supersedesQuadId, "q2.old");
+  expect(record.recordedAt).toStrictEqual("2026-01-01T00:00:00Z");
+  expect(record.writer).toStrictEqual("agent-7");
+  expect(record.source).toStrictEqual("nightly-feed");
+  expect(record.supersedesQuadId).toStrictEqual("q2.old");
 });
 
-Deno.test("InMemoryProvenanceStore is append-only", async () => {
+test("InMemoryProvenanceStore is append-only", async () => {
   const store = new InMemoryProvenanceStore();
   await store.record({ quadId: "q2.abc", recordedAt: "2026-01-01T00:00:00Z" });
   const second = await store.record({ quadId: "q2.abc" });
 
   const all = await store.list();
-  assertEquals(all.length, 2);
-  assertEquals(second.recordedAt !== "2026-01-01T00:00:00Z", true);
+  expect(all.length).toStrictEqual(2);
+  expect(second.recordedAt !== "2026-01-01T00:00:00Z").toStrictEqual(true);
 });
 
-Deno.test("InMemoryProvenanceStore.list filters by quadId and type", async () => {
+test("InMemoryProvenanceStore.list filters by quadId and type", async () => {
   const store = new InMemoryProvenanceStore();
   await store.record({
     quadId: "q2.a",
@@ -60,13 +58,13 @@ Deno.test("InMemoryProvenanceStore.list filters by quadId and type", async () =>
     recordedAt: "2026-01-03T00:00:00Z",
   });
 
-  assertEquals((await store.list({ quadId: "q2.a" })).length, 2);
-  assertEquals((await store.list({ quadId: "q2.zzz" })).length, 0);
-  assertEquals((await store.list({ type: "remove" })).length, 1);
-  assertEquals((await store.list()).length, 3);
+  expect((await store.list({ quadId: "q2.a" })).length).toStrictEqual(2);
+  expect((await store.list({ quadId: "q2.zzz" })).length).toStrictEqual(0);
+  expect((await store.list({ type: "remove" })).length).toStrictEqual(1);
+  expect((await store.list()).length).toStrictEqual(3);
 });
 
-Deno.test("InMemoryProvenanceStore.history walks supersedes chains in both directions", async () => {
+test("InMemoryProvenanceStore.history walks supersedes chains in both directions", async () => {
   const store = new InMemoryProvenanceStore();
   // Chain: original -> correction -> second correction.
   await store.record({ quadId: "q2.v1", recordedAt: "2026-01-01T00:00:00Z" });
@@ -82,44 +80,43 @@ Deno.test("InMemoryProvenanceStore.history walks supersedes chains in both direc
   });
 
   const middle = await store.history("q2.v2");
-  assertEquals(middle.supersedes.length, 1);
-  assertEquals(middle.supersedes[0].quadId, "q2.v1");
-  assertEquals(middle.supersededBy.length, 1);
-  assertEquals(middle.supersededBy[0].quadId, "q2.v3");
+  expect(middle.supersedes.length).toStrictEqual(1);
+  expect(middle.supersedes[0].quadId).toStrictEqual("q2.v1");
+  expect(middle.supersededBy.length).toStrictEqual(1);
+  expect(middle.supersededBy[0].quadId).toStrictEqual("q2.v3");
 
   const oldest = await store.history("q2.v1");
-  assertEquals(oldest.supersedes.length, 0);
-  assertEquals(oldest.supersededBy.map((r) => r.quadId).sort(), [
+  expect(oldest.supersedes.length).toStrictEqual(0);
+  expect(oldest.supersededBy.map((r) => r.quadId).sort()).toStrictEqual([
     "q2.v2",
     "q2.v3",
   ]);
 
   const newest = await store.history("q2.v3");
-  assertEquals(newest.supersedes.map((r) => r.quadId).sort(), [
+  expect(newest.supersedes.map((r) => r.quadId).sort()).toStrictEqual([
     "q2.v1",
     "q2.v2",
   ]);
-  assertEquals(newest.supersededBy.length, 0);
+  expect(newest.supersededBy.length).toStrictEqual(0);
 });
 
-Deno.test("InMemoryProvenanceStore.history returns an empty chain for unknown quads", async () => {
+test("InMemoryProvenanceStore.history returns an empty chain for unknown quads", async () => {
   const store = new InMemoryProvenanceStore();
   const history = await store.history("q2.unknown");
 
-  assertEquals(history.quadId, "q2.unknown");
-  assertEquals(history.supersedes.length, 0);
-  assertEquals(history.supersededBy.length, 0);
+  expect(history.quadId).toStrictEqual("q2.unknown");
+  expect(history.supersedes.length).toStrictEqual(0);
+  expect(history.supersededBy.length).toStrictEqual(0);
 });
 
-Deno.test("InMemoryProvenanceStore.history tolerates cyclic supersedes chains", async () => {
+test("InMemoryProvenanceStore.history tolerates cyclic supersedes chains", async () => {
   const store = new InMemoryProvenanceStore();
   await store.record({ quadId: "q2.a", supersedesQuadId: "q2.b" });
   await store.record({ quadId: "q2.b", supersedesQuadId: "q2.a" });
 
   const history = await store.history("q2.a");
   // The walk terminates instead of looping forever; both edges are reachable.
-  assertEquals(
+  expect(
     history.supersedes.length + history.supersededBy.length >= 1,
-    true,
-  );
+  ).toStrictEqual(true);
 });

@@ -45,19 +45,21 @@ export class RdfjsSearchIndex implements SearchIndexInterface {
         if (isTextualLiteral(quad.object)) {
           const value = quad.object.value;
           if (value.toLowerCase().includes(query)) {
-            pendingSearchResultPromises.push((async () => {
-              const searchResultBase = {
-                subject: quad.subject.value,
-                predicate: quad.predicate.value,
-                graph: quad.graph.value,
-                text: value,
-              };
-              results.push({
-                id: await buildSearchResultId(searchResultBase),
-                ...searchResultBase,
-                score: 1.0,
-              });
-            })());
+            pendingSearchResultPromises.push(
+              (async () => {
+                const searchResultBase = {
+                  subject: quad.subject.value,
+                  predicate: quad.predicate.value,
+                  graph: quad.graph.value,
+                  text: value,
+                };
+                results.push({
+                  id: await buildSearchResultId(searchResultBase),
+                  ...searchResultBase,
+                  score: 1.0,
+                });
+              })(),
+            );
           }
         }
       });

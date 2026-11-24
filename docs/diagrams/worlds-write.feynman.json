@@ -78,10 +78,7 @@
         {
           "line": "agent",
           "label": "Curate",
-          "note": [
-            "keep durable facts",
-            "drop the rest"
-          ]
+          "note": ["keep durable facts", "drop the rest"]
         },
         {
           "vertex": "branch",
@@ -105,10 +102,7 @@
           "vertex": "write",
           "id": "commit",
           "label": "commit",
-          "note": [
-            "atomic patch",
-            "skips known triples"
-          ]
+          "note": ["atomic patch", "skips known triples"]
         },
         {
           "line": "sdk",
@@ -117,10 +111,7 @@
         {
           "vertex": "index",
           "label": "index",
-          "note": [
-            "embed + chunk",
-            "failure rolls back"
-          ]
+          "note": ["embed + chunk", "failure rolls back"]
         },
         {
           "line": "rest",
@@ -128,10 +119,7 @@
         },
         {
           "vertex": "stop",
-          "note": [
-            "stored",
-            "current state only"
-          ]
+          "note": ["stored", "current state only"]
         }
       ]
     },

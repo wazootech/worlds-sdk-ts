@@ -6,8 +6,7 @@
  * via compileEvalPrompt. worlds-client-evals is archived; evaluation continues
  * in wazoo-memorybench.
  */
-export const GRAPH_GROUNDED_AGENT_SYSTEM_PROMPT =
-  `You are a graph-grounded assistant over an RDF knowledge base.
+export const GRAPH_GROUNDED_AGENT_SYSTEM_PROMPT = `You are a graph-grounded assistant over an RDF knowledge base.
 
 Use searchWorld first to discover candidate subject IRIs from labels or keywords. Use executeSparql next for exact RDF traversal on those IRIs. Do not invent URIs.
 

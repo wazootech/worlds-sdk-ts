@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from "@std/assert";
+import { expect, test } from "bun:test";
 import { DataFactory, Store } from "n3";
 import { WorldsSdk } from "./client.ts";
 import { RdfjsQuadStore, RdfjsSearchIndex } from "../rdfjs/mod.ts";
@@ -26,7 +26,7 @@ function createTestClient(store: Store): WorldsSdk {
   });
 }
 
-Deno.test("WorldsSdk.import delegates to quadStore.import", async () => {
+test("WorldsSdk.import delegates to quadStore.import", async () => {
   const store = new Store();
   const client = createTestClient(store);
 
@@ -34,30 +34,25 @@ Deno.test("WorldsSdk.import delegates to quadStore.import", async () => {
     mode: "merge",
     source: {
       kind: "serialized",
-      data:
-        `<http://example.com/client> <http://example.com/action> "test_import" .`,
+      data: `<http://example.com/client> <http://example.com/action> "test_import" .`,
       contentType: "text/turtle",
     },
   });
 
-  assertEquals(
-    store.size,
-    1,
-    "WorldsSdk should have successfully invoked quadStore import",
-  );
+  expect(store.size).toStrictEqual(1);
 });
 
-Deno.test("WorldsSdk.export delegates to quadStore.export", async () => {
+test("WorldsSdk.export delegates to quadStore.export", async () => {
   const store = new Store();
   const client = createTestClient(store);
 
   const response = await client.export({ format: { kind: "quads" } });
 
   if (response.kind !== "quads") throw new Error("Should be quads");
-  assertEquals(response.quads.length, 0);
+  expect(response.quads.length).toStrictEqual(0);
 });
 
-Deno.test("WorldsSdk.sparql delegates to sparqlEngine.execute", async () => {
+test("WorldsSdk.sparql delegates to sparqlEngine.execute", async () => {
   const store = new Store();
   const client = createTestClient(store);
 
@@ -66,30 +61,28 @@ Deno.test("WorldsSdk.sparql delegates to sparqlEngine.execute", async () => {
   });
 
   if (response.kind !== "ask") throw new Error("Should be ask");
-  assertEquals(response.data.boolean, false);
+  expect(response.data.boolean).toStrictEqual(false);
 });
 
-Deno.test("WorldsSdk.sparql rejects when sparqlEngine is not configured", async () => {
+test("WorldsSdk.sparql rejects when sparqlEngine is not configured", async () => {
   const store = new Store();
   const client = new WorldsSdk({
     quadStore: new RdfjsQuadStore({ store }),
     searchIndex: new RdfjsSearchIndex(store),
   });
 
-  await assertRejects(
-    () => client.sparql({ query: "ASK WHERE { ?s ?p ?o }" }),
-    Error,
-    "SPARQL engine is not configured.",
-  );
+  await expect(
+    client.sparql({ query: "ASK WHERE { ?s ?p ?o }" }),
+  ).rejects.toThrow("SPARQL engine is not configured.");
 });
 
-Deno.test("WorldsSdk.import rejects when quadStore is not configured", async () => {
+test("WorldsSdk.import rejects when quadStore is not configured", async () => {
   const client = new WorldsSdk({
     searchIndex: new RdfjsSearchIndex(new Store()),
   });
 
-  await assertRejects(
-    async () => {
+  await expect(
+    (async () => {
       await client.import({
         mode: "merge",
         source: {
@@ -98,27 +91,23 @@ Deno.test("WorldsSdk.import rejects when quadStore is not configured", async () 
           contentType: "text/turtle",
         },
       });
-    },
-    Error,
-    "Quad store is not configured.",
-  );
+    })(),
+  ).rejects.toThrow("Quad store is not configured.");
 });
 
-Deno.test("WorldsSdk.search rejects when searchIndex is not configured", async () => {
+test("WorldsSdk.search rejects when searchIndex is not configured", async () => {
   const client = new WorldsSdk({
     quadStore: new RdfjsQuadStore({ store: new Store() }),
   });
 
-  await assertRejects(
-    async () => {
+  await expect(
+    (async () => {
       await client.search({ query: "test" });
-    },
-    Error,
-    "Search index is not configured.",
-  );
+    })(),
+  ).rejects.toThrow("Search index is not configured.");
 });
 
-Deno.test("WorldsSdk.search delegates to searchIndex.search", async () => {
+test("WorldsSdk.search delegates to searchIndex.search", async () => {
   const store = new Store();
   store.addQuad(
     namedNode("http://example.com/sub"),
@@ -129,11 +118,11 @@ Deno.test("WorldsSdk.search delegates to searchIndex.search", async () => {
   const client = createTestClient(store);
 
   const response = await client.search({ query: "integrate" });
-  assertEquals(response.results?.length, 1);
-  assertEquals(response.results?.[0].text, "Integrate all systems.");
+  expect(response.results?.length).toStrictEqual(1);
+  expect(response.results?.[0].text).toStrictEqual("Integrate all systems.");
 });
 
-Deno.test("WorldsSdk.search returns stable hashQuad-based search result ids", async () => {
+test("WorldsSdk.search returns stable hashQuad-based search result ids", async () => {
   const store = new Store();
   const indexedQuad = quad(
     namedNode("http://example.com/sub"),
@@ -148,11 +137,11 @@ Deno.test("WorldsSdk.search returns stable hashQuad-based search result ids", as
   const secondResponse = await client.search({ query: "integrate" });
   const expectedId = hashQuad(indexedQuad);
 
-  assertEquals(firstResponse.results?.[0].id, expectedId);
-  assertEquals(secondResponse.results?.[0].id, expectedId);
+  expect(firstResponse.results?.[0].id).toStrictEqual(expectedId);
+  expect(secondResponse.results?.[0].id).toStrictEqual(expectedId);
 });
 
-Deno.test("WorldsSdk.reindex delegates to searchIndex.reindex", async () => {
+test("WorldsSdk.reindex delegates to searchIndex.reindex", async () => {
   const store = new Store();
   store.addQuad(
     namedNode("http://example.com/sub"),
@@ -163,11 +152,11 @@ Deno.test("WorldsSdk.reindex delegates to searchIndex.reindex", async () => {
   const client = createTestClient(store);
   const response = await client.reindex();
 
-  assertEquals(response.processedQuadCount, store.size);
-  assertEquals(response.chunkRowCount, 0);
+  expect(response.processedQuadCount).toStrictEqual(store.size);
+  expect(response.chunkRowCount).toStrictEqual(0);
 });
 
-Deno.test("WorldsSdk - import delivers immediate search hits", async () => {
+test("WorldsSdk - import delivers immediate search hits", async () => {
   const store = new Store();
   const client = new WorldsSdk({
     quadStore: new RdfjsQuadStore({ store }),
@@ -185,11 +174,11 @@ Deno.test("WorldsSdk - import delivers immediate search hits", async () => {
   });
 
   const response = await client.search({ query: "wiring" });
-  assertEquals(response.results?.length, 1);
-  assertEquals(response.results?.[0].text, "Factory wiring works.");
+  expect(response.results?.length).toStrictEqual(1);
+  expect(response.results?.[0].text).toStrictEqual("Factory wiring works.");
 });
 
-Deno.test("WorldsSdk - preloaded store is shared with the client", async () => {
+test("WorldsSdk - preloaded store is shared with the client", async () => {
   const store = new Store();
   store.addQuad(
     namedNode("http://example.com/existing"),
@@ -203,11 +192,11 @@ Deno.test("WorldsSdk - preloaded store is shared with the client", async () => {
   });
 
   const response = await client.search({ query: "preloaded" });
-  assertEquals(response.results?.length, 1);
-  assertEquals(store.size, 1);
+  expect(response.results?.length).toStrictEqual(1);
+  expect(store.size).toStrictEqual(1);
 });
 
-Deno.test("WorldsSdk - queryEngine enables SELECT queries", async () => {
+test("WorldsSdk - queryEngine enables SELECT queries", async () => {
   const store = new Store();
   const client = new WorldsSdk({
     quadStore: new RdfjsQuadStore({ store }),
@@ -247,6 +236,6 @@ Deno.test("WorldsSdk - queryEngine enables SELECT queries", async () => {
   if (response.kind !== "select") {
     throw new Error("Expected select response kind");
   }
-  assertEquals(response.data.results.bindings.length, 1);
-  assertEquals(response.data.results.bindings[0].text?.value, "hello");
+  expect(response.data.results.bindings.length).toStrictEqual(1);
+  expect(response.data.results.bindings[0].text?.value).toStrictEqual("hello");
 });

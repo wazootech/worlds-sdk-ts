@@ -19,7 +19,7 @@ export async function embeddingFailureCase(ctx: CaseContext): Promise<void> {
     embeddingService: failingEmbeddings,
   });
   const failed = await rejects(() =>
-    subject.commit(insertPatch(f.one), mergeImport)
+    subject.commit(insertPatch(f.one), mergeImport),
   );
   const stored = (await subject.storedQuads()).length;
   const chunks = (await subject.chunkedQuadIds()).length;
@@ -41,7 +41,7 @@ export async function writeFailureCase(ctx: CaseContext): Promise<void> {
   subject.failNextWrite();
   if (
     !(await rejects(() =>
-      subject.commit(insertPatch(f.one, f.two), mergeImport)
+      subject.commit(insertPatch(f.one, f.two), mergeImport),
     ))
   ) {
     ctx.fail("write failure: expected the commit to reject");
@@ -80,9 +80,10 @@ export async function replaceFailureCase(ctx: CaseContext): Promise<void> {
   }
   const stored = await storedIds(subject);
   const chunked = [...new Set(await subject.chunkedQuadIds())].sort();
-  const expected = ctx.contract.replaceImportFailure === "keeps-old-graph"
-    ? sortedIds([f.base, f.three])
-    : [];
+  const expected =
+    ctx.contract.replaceImportFailure === "keeps-old-graph"
+      ? sortedIds([f.base, f.three])
+      : [];
   if (!sameIds(stored, expected) || !sameIds(chunked, expected)) {
     ctx.fail(
       `replace failure: declared "${ctx.contract.replaceImportFailure}" expects ${expected.length} quads and chunks, ` +

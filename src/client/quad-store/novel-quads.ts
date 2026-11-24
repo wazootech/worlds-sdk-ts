@@ -118,5 +118,5 @@ export async function computeNovelQuads(
 ): Promise<PreparedPatch & NovelQuads> {
   const { include, exclude } = options;
   const prepared = preparePatch(patch, { include, exclude });
-  return { ...prepared, ...await selectNovelQuads(prepared, options) };
+  return { ...prepared, ...(await selectNovelQuads(prepared, options)) };
 }

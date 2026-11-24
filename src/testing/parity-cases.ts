@@ -86,12 +86,10 @@ export async function runReplaceCase(
   const failures: string[] = [];
   try {
     const firstCount = await countNquads(replaceCase.first);
-    for (
-      const [label, factory] of [
-        ["reference", options.reference],
-        ["candidate", options.candidate],
-      ] as const
-    ) {
+    for (const [label, factory] of [
+      ["reference", options.reference],
+      ["candidate", options.candidate],
+    ] as const) {
       const sdk = await factory();
       await importNquads(sdk, replaceCase.first, "replace");
       const afterFirst = await exportQuads(sdk);

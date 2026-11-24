@@ -91,9 +91,7 @@ export interface WorldsSdkOptions {
  * WorldsSdk synthesizes a Worlds SDK facade from wired quad, SPARQL, and search subsystems.
  */
 export class WorldsSdk implements WorldsSdkInterface {
-  public constructor(
-    private readonly options: WorldsSdkOptions,
-  ) {}
+  public constructor(private readonly options: WorldsSdkOptions) {}
 
   public import(request: ImportRequest): Promise<void> {
     if (!this.options.quadStore) {
@@ -133,8 +131,8 @@ export class WorldsSdk implements WorldsSdkInterface {
   public async provenance(
     request: ProvenanceQueryRequest,
   ): Promise<ProvenanceQueryResponse> {
-    const handler = this.options.provenance ??
-      asProvenanceHandler(this.options.quadStore);
+    const handler =
+      this.options.provenance ?? asProvenanceHandler(this.options.quadStore);
     if (!handler) {
       throw new Error("Provenance is not configured.");
     }
@@ -150,7 +148,8 @@ function asProvenanceHandler(
   quadStore?: QuadStoreInterface,
 ): ProvenanceQueryHandler | undefined {
   if (
-    quadStore && "provenanceQuery" in quadStore &&
+    quadStore &&
+    "provenanceQuery" in quadStore &&
     typeof quadStore.provenanceQuery === "function"
   ) {
     return quadStore as unknown as ProvenanceQueryHandler;

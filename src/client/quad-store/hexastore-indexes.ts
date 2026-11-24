@@ -8,12 +8,7 @@ export interface HexastoreIndexDescriptor {
   /** columns lists the ordered column group for the index. */
   columns:
     | readonly [string, string, string]
-    | readonly [
-      string,
-      string,
-      string,
-      string,
-    ];
+    | readonly [string, string, string, string];
 }
 
 /**

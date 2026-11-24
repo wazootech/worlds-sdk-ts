@@ -1,9 +1,14 @@
 /**
  * generateDocJson merges `deno doc --json` output for every package export subpath.
+ * Runs under Bun or Node; it shells out to the `deno` CLI, the one remaining
+ * Deno-only step (no Bun equivalent of `deno doc` exists).
  */
-import denoJson from "../deno.json" with { type: "json" };
+import { spawnSync } from "node:child_process";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import jsrJson from "../jsr.json" with { type: "json" };
 
-/** DocJsonEntryPoint records one deno.json export and its source file. */
+/** DocJsonEntryPoint records one jsr.json export and its source file. */
 interface DocJsonEntryPoint {
   /** subpath is the @worlds/sdk export key (e.g. "./adapters/libsql"). */
   subpath: string;
@@ -21,7 +26,7 @@ interface DocJsonOutput {
   nodes: Record<string, unknown>;
 }
 
-const exportsMap = denoJson.exports as Record<string, string>;
+const exportsMap = jsrJson.exports as Record<string, string>;
 const outputPath = new URL("../docs/api.json", import.meta.url);
 
 const merged: DocJsonOutput = {
@@ -31,21 +36,19 @@ const merged: DocJsonOutput = {
 };
 
 for (const [subpath, filePath] of Object.entries(exportsMap)) {
-  const command = new Deno.Command(Deno.execPath(), {
-    args: ["doc", "--json", filePath],
-    stdout: "piped",
-    stderr: "piped",
-  });
-  const { code, stdout, stderr } = await command.output();
+  const { status, stdout, stderr } = spawnSync(
+    "deno",
+    ["doc", "--json", filePath],
+    { encoding: "utf8", maxBuffer: 256 * 1024 * 1024 },
+  );
 
-  if (code !== 0) {
-    const errorText = new TextDecoder().decode(stderr);
+  if (status !== 0) {
     throw new Error(
-      `deno doc --json ${filePath} failed (exit ${code}): ${errorText}`,
+      `deno doc --json ${filePath} failed (exit ${status}): ${stderr}`,
     );
   }
 
-  const document = JSON.parse(new TextDecoder().decode(stdout)) as {
+  const document = JSON.parse(stdout) as {
     nodes?: Record<string, unknown>;
   };
 
@@ -53,9 +56,9 @@ for (const [subpath, filePath] of Object.entries(exportsMap)) {
   Object.assign(merged.nodes, document.nodes ?? {});
 }
 
-await Deno.mkdir(new URL("../docs/", import.meta.url), { recursive: true });
-await Deno.writeTextFile(outputPath, `${JSON.stringify(merged, null, 2)}\n`);
+mkdirSync(fileURLToPath(new URL("../docs/", import.meta.url)), {
+  recursive: true,
+});
+writeFileSync(outputPath, `${JSON.stringify(merged, null, 2)}\n`);
 
-console.log(
-  `Wrote ${merged.entryPoints.length} entry points to docs/api.json`,
-);
+console.log(`Wrote ${merged.entryPoints.length} entry points to docs/api.json`);

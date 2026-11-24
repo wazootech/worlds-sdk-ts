@@ -1,0 +1,58 @@
+{
+  "name": "@worlds/sdk",
+  "private": true,
+  "type": "module",
+  "description": "Bun toolchain manifest for @worlds/sdk. The published package is described by jsr.json; scripts/check-manifests.ts keeps the two in sync.",
+  "packageManager": "bun@1.4.5",
+  "exports": {
+    ".": "./src/mod.ts",
+    "./quad-store": "./src/client/quad-store/mod.ts",
+    "./search-index": "./src/client/search-index/mod.ts",
+    "./search-index/embedding-service": "./src/client/search-index/embedding-service/mod.ts",
+    "./search-index/quad-chunker": "./src/client/search-index/quad-chunker/mod.ts",
+    "./sparql-engine": "./src/client/sparql-engine/mod.ts",
+    "./rdfjs": "./src/rdfjs/mod.ts",
+    "./memory": "./src/memory/mod.ts",
+    "./ai-sdk": "./src/ai-sdk/mod.ts",
+    "./tfjs-use": "./src/tfjs-use/mod.ts",
+    "./testing": "./src/testing/mod.ts",
+    "./wazoo": "./src/wazoo/mod.ts"
+  },
+  "scripts": {
+    "download:tfjs-use": "bun ./scripts/download-tfjs-use.ts",
+    "example:hello-world": "bun ./examples/hello-world/main.ts",
+    "example:ai-sdk-hello-world": "bun ./examples/ai-sdk-hello-world/main.ts",
+    "example:tfjs-universal-sentence-encoder": "bun ./examples/tfjs-universal-sentence-encoder/main.ts",
+    "example:wazoo-hello-world": "bun ./examples/wazoo-hello-world/main.ts",
+    "fmt": "bun fmt --no-script",
+    "fmt:check": "bun fmt --no-script --check",
+    "lint": "oxlint --deny-warnings",
+    "check": "bun check --no-script",
+    "check:manifests": "bun ./scripts/check-manifests.ts",
+    "test": "bun test",
+    "publish:dry": "jsr publish --dry-run --allow-dirty",
+    "doc:json": "bun ./scripts/generate-doc-json.ts",
+    "ci": "bun run fmt:check && bun run lint && bun run check && bun run check:manifests && bun run test"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^3.0.80",
+    "@langchain/core": "^1.1.48",
+    "@langchain/textsplitters": "^1.0.1",
+    "@rdfjs/types": "^2.0.1",
+    "@std/encoding": "npm:@jsr/std__encoding@^1.0.10",
+    "@std/path": "npm:@jsr/std__path@^1.1.5",
+    "@tensorflow/tfjs": "^4.22.0",
+    "@tensorflow/tfjs-backend-wasm": "^4.22.0",
+    "@types/n3": "1.26.1",
+    "@wazoo/sparql-engine": "npm:@jsr/wazoo__sparql-engine@^0.5.0",
+    "@worlds/client": "npm:@jsr/worlds__client@^0.1.0",
+    "ai": "^6.0.195",
+    "n3": "^2.0.3",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/bun": "1.4.5",
+    "jsr": "0.14.3",
+    "oxlint": "1.95.0"
+  }
+}

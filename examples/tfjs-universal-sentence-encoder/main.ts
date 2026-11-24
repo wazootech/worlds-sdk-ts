@@ -16,9 +16,10 @@ if (import.meta.main) {
 
   for (let i = 0; i < texts.length; i++) {
     const dims = embeddings[i].length;
-    const preview = embeddings[i].slice(0, 5).map((v) => v.toFixed(4)).join(
-      ", ",
-    );
+    const preview = embeddings[i]
+      .slice(0, 5)
+      .map((v) => v.toFixed(4))
+      .join(", ");
     console.log(`  [${dims}-d] "${texts[i]}" → [${preview}, …]`);
   }
 }

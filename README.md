@@ -47,14 +47,14 @@ With an import map:
 
 ```html
 <script type="importmap">
-{
-  "imports": {
-    "@worlds/sdk": "https://esm.sh/jsr/@worlds/sdk@0.5.0"
+  {
+    "imports": {
+      "@worlds/sdk": "https://esm.sh/jsr/@worlds/sdk@0.5.0"
+    }
   }
-}
 </script>
 <script type="module">
-import { WorldsSdk } from "@worlds/sdk";
+  import { WorldsSdk } from "@worlds/sdk";
 </script>
 ```
 
@@ -153,8 +153,8 @@ The SPARQL engine is the external
 [`@wazoo/sparql-engine`](https://jsr.io/@wazoo/sparql-engine) package, which
 implements `SparqlEngineInterface`.
 
-Regenerate merged API doc JSON with `deno task doc:json` (writes gitignored
-`docs/api.json`). For architecture documentation (package topology, runtime
+Regenerate merged API doc JSON with `bun run doc:json` (needs the `deno` CLI for
+`deno doc`; writes gitignored `docs/api.json`). For architecture documentation (package topology, runtime
 model), see [ARCHITECTURE.md](ARCHITECTURE.md). For agent coding rules and
 conventions, see [AGENTS.md](AGENTS.md).
 
@@ -200,11 +200,11 @@ const client = new WorldsSdk({
 
 ## Examples
 
-| Example                          | Description                         | Command                                             |
-| -------------------------------- | ----------------------------------- | --------------------------------------------------- |
-| Hello world                      | In-memory graph with search         | `deno task example:hello-world`                     |
-| AI SDK                           | Vercel AI SDK tools with Gemini     | `deno task example:ai-sdk-hello-world`              |
-| TF.js Universal Sentence Encoder | Offline TF.js USE embedding service | `deno task example:tfjs-universal-sentence-encoder` |
+| Example                          | Description                         | Command                                           |
+| -------------------------------- | ----------------------------------- | ------------------------------------------------- |
+| Hello world                      | In-memory graph with search         | `bun run example:hello-world`                     |
+| AI SDK                           | Vercel AI SDK tools with Gemini     | `bun run example:ai-sdk-hello-world`              |
+| TF.js Universal Sentence Encoder | Offline TF.js USE embedding service | `bun run example:tfjs-universal-sentence-encoder` |
 
 For LibSQL examples, see the
 [`@worlds/libsql`](https://github.com/wazootech/worlds-libsql) repository.
@@ -223,7 +223,7 @@ opinionated sequence (verify before proceeding, run tests before claiming done)
 that catches the "it works on my machine" class of onboarding failures.
 
 The skill adopts a named persona (Ethan, the lead developer) and validates each
-stage before moving on — Deno version, dependency install, model file presence,
+stage before moving on — Bun version, dependency install, model file presence,
 example execution, full test suite. If anything fails, it cross-references the
 [TROUBLESHOOTING.md](skills/worlds-sdk-ts-onboarding/TROUBLESHOOTING.md) instead
 of guessing.
@@ -250,28 +250,31 @@ and comparison tables live in the
 
 All CI checks must pass before merging updates.
 
-| Command          | Description                                  |
-| ---------------- | -------------------------------------------- |
-| `deno fmt`       | Format all code using native Deno formatter. |
-| `deno task lint` | Run strict static analysis checks.           |
-| `deno task test` | Execute comprehensive test suites.           |
-| `deno task ci`   | Run complete CI pipeline sequentially.       |
+| Command         | Description                             |
+| --------------- | --------------------------------------- |
+| `bun run fmt`   | Format all code with `bun fmt`.         |
+| `bun run lint`  | Run static analysis (Oxlint).           |
+| `bun run check` | Type-check with `bun check`.            |
+| `bun run test`  | Execute the test suite with `bun test`. |
+| `bun run ci`    | Run complete CI pipeline sequentially.  |
+
+Development uses [Bun](https://bun.com) 1.4.5 (`bun install` first). The package
+is still authored for JSR and consumed from Deno, Node.js and Bun alike.
 
 ## Releases
 
 Every push to `main` runs the [Publish workflow](.github/workflows/publish.yml),
-which publishes only when `deno.json`'s `version` is not yet on JSR:
+which publishes only when `jsr.json`'s `version` is not yet on JSR:
 
 - **Release PR** (bumps `version`): merging it publishes the new version of
   `@worlds/sdk`.
 - **Routine PR** (no bump): the Publish job skips green with a notice. That is
   expected, not a failure.
 
-To release, bump `version` in `deno.json` (minor for additive public API, patch
-for fixes) in the PR that should ship. If the package ever imports a pinned
-`jsr:@worlds/sdk@<version>` of itself, commit that entry to `deno.lock`;
-otherwise a cold CI run rewrites the lockfile and `deno publish` aborts on the
-dirty tree.
+To release, bump `version` in `jsr.json` (minor for additive public API, patch
+for fixes) in the PR that should ship. The `jsr` CLI (pinned in `devDependencies`) publishes; `package.json` and
+`jsr.json` must agree on exports and dependency ranges, which
+`bun run check:manifests` enforces in CI.
 
 ## Quicklinks
 

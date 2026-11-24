@@ -34,7 +34,7 @@ the workspace root:
 
 | File                           | Purpose                                                           |
 | ------------------------------ | ----------------------------------------------------------------- |
-| `deno.json`                    | Package metadata, export map, available tasks                     |
+| `jsr.json` / `package.json`    | Package metadata and export map / scripts and dependencies        |
 | `README.md`                    | Project overview, quickstart, adapter ecosystem                   |
 | `AGENTS.md`                    | Coding conventions, glossary, import rules, agent prompt contract |
 | `examples/hello-world/main.ts` | Minimal in-memory client demonstration                            |
@@ -47,17 +47,17 @@ Before running tests or examples, install dependencies and execute package build
 scripts:
 
 ```bash
-deno install --allow-scripts
+bun install
 ```
 
 To verify the local installation, run:
 
 ```bash
 # Run all tests
-deno task test
+bun run test
 
 # Run only the core client test suite
-deno test --allow-all src/client/client.test.ts
+bun test src/client/client.test.ts
 ```
 
 ## Ecosystem integration and peripherals

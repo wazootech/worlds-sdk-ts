@@ -59,7 +59,7 @@ export class UniversalSentenceEncoderLite {
     const encodings = inputs.map((text) => this.tokenizer.encode(text));
 
     const indicesArr = encodings.map((arr, i) =>
-      arr.map((_token, index) => [i, index])
+      arr.map((_token, index) => [i, index]),
     );
 
     let flattenedIndicesArr: Array<[number, number]> = [];
@@ -74,10 +74,7 @@ export class UniversalSentenceEncoderLite {
       [flattenedIndicesArr.length, 2],
       "int32",
     );
-    const values = tf.tensor1d(
-      tf.util.flatten(encodings) as number[],
-      "int32",
-    );
+    const values = tf.tensor1d(tf.util.flatten(encodings) as number[], "int32");
 
     const modelInputs: ModelInputs = { indices, values };
 

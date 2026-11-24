@@ -19,21 +19,18 @@ export function createRdfjsStoreCommitHandler(
       "applyPatch" in store &&
       typeof (store as Record<string, unknown>).applyPatch === "function"
     ) {
-      return (store as unknown as import("./transaction-context.ts").PatchableStore)
-        .applyPatch(patch, context);
+      return (
+        store as unknown as import("./transaction-context.ts").PatchableStore
+      ).applyPatch(patch, context);
     }
 
     if (context?.importMode === "replace") {
       const stream = store.match(null, null, null, null);
       await new Promise<void>((resolve, reject) => {
         stream.on("data", (quad: rdfjs.Quad) => {
-          if (
-            "removeQuad" in store && typeof store.removeQuad === "function"
-          ) {
+          if ("removeQuad" in store && typeof store.removeQuad === "function") {
             store.removeQuad(quad);
-          } else if (
-            "delete" in store && typeof store.delete === "function"
-          ) {
+          } else if ("delete" in store && typeof store.delete === "function") {
             store.delete(quad);
           }
         });

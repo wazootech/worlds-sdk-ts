@@ -29,15 +29,19 @@ export function createExecuteSparqlTool(
   return tool({
     description: EXECUTE_SPARQL_TOOL_DESCRIPTION,
     inputSchema: z.object({
-      query: z.string().describe(
-        "The raw read-only SPARQL query string. Only SELECT and ASK are allowed when updates are disabled.",
-      ),
-      baseIri: z.string().optional().describe(
-        "Base IRI for the query execution.",
-      ),
-      timeoutMs: z.number().optional().describe(
-        "Query timeout in milliseconds (defaults to 30 seconds).",
-      ),
+      query: z
+        .string()
+        .describe(
+          "The raw read-only SPARQL query string. Only SELECT and ASK are allowed when updates are disabled.",
+        ),
+      baseIri: z
+        .string()
+        .optional()
+        .describe("Base IRI for the query execution."),
+      timeoutMs: z
+        .number()
+        .optional()
+        .describe("Query timeout in milliseconds (defaults to 30 seconds)."),
     }),
     execute: async (request: SparqlRequest) => {
       if (options?.allowUpdates === false) {

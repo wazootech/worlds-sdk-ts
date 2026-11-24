@@ -1,11 +1,11 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import { DataFactory } from "n3";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { chunkQuads } from "./chunk-quads.ts";
 
 const { quad, namedNode, literal } = DataFactory;
 
-Deno.test("QuadChunker.chunk - ingests short literal quad", async () => {
+test("QuadChunker.chunk - ingests short literal quad", async () => {
   // Construct a test quad: <urn:bob> <urn:bio> "Bob is a dev"
   const testQuad = quad(
     namedNode("urn:bob"),
@@ -23,18 +23,14 @@ Deno.test("QuadChunker.chunk - ingests short literal quad", async () => {
   );
 
   // Verify single output mapping exactly
-  assertEquals(
-    chunks.length,
-    1,
-    "Should yield exactly one chunk for short text",
-  );
-  assertEquals(chunks[0].subject, "urn:bob");
-  assertEquals(chunks[0].predicate, "urn:bio");
-  assertEquals(chunks[0].graph, ""); // default graph value in N3
-  assertEquals(chunks[0].value, "Bob is a dev");
+  expect(chunks.length).toStrictEqual(1);
+  expect(chunks[0].subject).toStrictEqual("urn:bob");
+  expect(chunks[0].predicate).toStrictEqual("urn:bio");
+  expect(chunks[0].graph).toStrictEqual(""); // default graph value in N3
+  expect(chunks[0].value).toStrictEqual("Bob is a dev");
 });
 
-Deno.test("QuadChunker.chunk - splits large text across chunks", async () => {
+test("QuadChunker.chunk - splits large text across chunks", async () => {
   // Total length ~23, should yield at least 2-3 chunks at max 10 chars each
   const testQuad = quad(
     namedNode("urn:subject"),
@@ -51,22 +47,22 @@ Deno.test("QuadChunker.chunk - splits large text across chunks", async () => {
   );
 
   // Should have generated multiple distinct items
-  assertEquals(chunks.length > 1, true, "Should generate more than one chunk");
+  expect(chunks.length > 1).toStrictEqual(true);
 
   // All derived chunks must preserve the source relation identifers
   for (const c of chunks) {
-    assertEquals(c.subject, "urn:subject");
-    assertEquals(c.predicate, "urn:predicate");
+    expect(c.subject).toStrictEqual("urn:subject");
+    expect(c.predicate).toStrictEqual("urn:predicate");
   }
 
   // Combined text should generally reconstruct original content
   const combined = chunks.map((c) => c.value).join("");
   // Depending on how whitespace is trimmed, simple check
-  assertEquals(combined.includes("First"), true);
-  assertEquals(combined.includes("Second"), true);
+  expect(combined.includes("First")).toStrictEqual(true);
+  expect(combined.includes("Second")).toStrictEqual(true);
 });
 
-Deno.test("QuadChunker.chunk - ignores non-literal nodes", async () => {
+test("QuadChunker.chunk - ignores non-literal nodes", async () => {
   const linkQuad = quad(
     namedNode("urn:alice"),
     namedNode("urn:knows"),
@@ -82,10 +78,10 @@ Deno.test("QuadChunker.chunk - ignores non-literal nodes", async () => {
   );
 
   // Expected to discard since it's not indexable text
-  assertEquals(chunks.length, 0, "Should produce 0 chunks for node links");
+  expect(chunks.length).toStrictEqual(0);
 });
 
-Deno.test("QuadChunker.chunk - handles parallel quad batches", async () => {
+test("QuadChunker.chunk - handles parallel quad batches", async () => {
   const inputBatch = [
     quad(namedNode("urn:q1"), namedNode("urn:p1"), literal("Doc One")),
     quad(namedNode("urn:q2"), namedNode("urn:p2"), literal("Doc Two")),
@@ -100,18 +96,14 @@ Deno.test("QuadChunker.chunk - handles parallel quad batches", async () => {
   );
 
   // Should correlate back correctly
-  assertEquals(
-    results.length,
-    2,
-    "Should track and produce 2 distinct artifacts",
-  );
-  assertEquals(results[0].subject, "urn:q1");
-  assertEquals(results[0].value, "Doc One");
-  assertEquals(results[1].subject, "urn:q2");
-  assertEquals(results[1].value, "Doc Two");
+  expect(results.length).toStrictEqual(2);
+  expect(results[0].subject).toStrictEqual("urn:q1");
+  expect(results[0].value).toStrictEqual("Doc One");
+  expect(results[1].subject).toStrictEqual("urn:q2");
+  expect(results[1].value).toStrictEqual("Doc Two");
 });
 
-Deno.test("QuadChunker.chunk - ignores structured primitive literals (number/boolean)", async () => {
+test("QuadChunker.chunk - ignores structured primitive literals (number/boolean)", async () => {
   const numberQuad = quad(
     namedNode("urn:subject"),
     namedNode("urn:predicate"),
@@ -138,14 +130,10 @@ Deno.test("QuadChunker.chunk - ignores structured primitive literals (number/boo
     new RecursiveCharacterTextSplitter({ chunkSize: 1000 }),
   );
 
-  assertEquals(
-    chunks.length,
-    0,
-    "Should filter out non-textual structured primitives to reduce noise",
-  );
+  expect(chunks.length).toStrictEqual(0);
 });
 
-Deno.test("QuadChunker.chunk - accepts explicit strings and localized language strings", async () => {
+test("QuadChunker.chunk - accepts explicit strings and localized language strings", async () => {
   const stringQuad = quad(
     namedNode("urn:subject"),
     namedNode("urn:predicate"),
@@ -166,11 +154,7 @@ Deno.test("QuadChunker.chunk - accepts explicit strings and localized language s
     new RecursiveCharacterTextSplitter({ chunkSize: 1000 }),
   );
 
-  assertEquals(
-    chunks.length,
-    2,
-    "Should successfully accept and process string variants",
-  );
-  assertEquals(chunks[0].value, "explicit text");
-  assertEquals(chunks[1].value, "bonjour");
+  expect(chunks.length).toStrictEqual(2);
+  expect(chunks[0].value).toStrictEqual("explicit text");
+  expect(chunks[1].value).toStrictEqual("bonjour");
 });

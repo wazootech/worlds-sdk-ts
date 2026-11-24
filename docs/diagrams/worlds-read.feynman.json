@@ -43,10 +43,7 @@
         {
           "vertex": "search",
           "label": "search",
-          "note": [
-            "keyword + vector · RRF",
-            "finds subject IRIs"
-          ]
+          "note": ["keyword + vector · RRF", "finds subject IRIs"]
         },
         {
           "line": "sdk",
@@ -56,10 +53,7 @@
         {
           "vertex": "sparql",
           "label": "SPARQL",
-          "note": [
-            "exact facts about",
-            "those subjects"
-          ]
+          "note": ["exact facts about", "those subjects"]
         },
         {
           "line": "agent",

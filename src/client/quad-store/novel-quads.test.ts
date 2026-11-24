@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from "@std/assert";
+import { expect, test } from "bun:test";
 import type * as rdfjs from "@rdfjs/types";
 import { DataFactory } from "n3";
 import { hashQuad } from "./hash-quad.ts";
@@ -17,40 +17,40 @@ const c = quad(namedNode("urn:c"), namedNode("urn:p"), literal("c"), g);
 const storing = (stored: string[]) => (keys: string[]) =>
   Promise.resolve(new Set(keys.filter((key) => stored.includes(key))));
 
-Deno.test("preparePatch - filters both sides and hashes in order", () => {
+test("preparePatch - filters both sides and hashes in order", () => {
   const prepared = preparePatch(
     { insertions: [a, b], deletions: [c, a] },
     { exclude: { subjects: ["urn:b"] } },
   );
-  assertEquals(prepared.insertions, [a]);
-  assertEquals(prepared.insertionIds, [hashQuad(a)]);
-  assertEquals(prepared.deletions, [c, a]);
-  assertEquals(prepared.deletionIds, [hashQuad(c), hashQuad(a)]);
+  expect(prepared.insertions).toStrictEqual([a]);
+  expect(prepared.insertionIds).toStrictEqual([hashQuad(a)]);
+  expect(prepared.deletions).toStrictEqual([c, a]);
+  expect(prepared.deletionIds).toStrictEqual([hashQuad(c), hashQuad(a)]);
 });
 
-Deno.test("preparePatch - does not deduplicate within a side", () => {
+test("preparePatch - does not deduplicate within a side", () => {
   const prepared = preparePatch({ insertions: [a, a], deletions: [] });
-  assertEquals(prepared.insertions.length, 2);
+  expect(prepared.insertions.length).toStrictEqual(2);
 });
 
-Deno.test("computeNovelQuads - keeps only quads the store lacks", async () => {
+test("computeNovelQuads - keeps only quads the store lacks", async () => {
   const result = await computeNovelQuads(
     { insertions: [a, b], deletions: [] },
     { lookupExisting: storing([hashQuad(a)]) },
   );
-  assertEquals(result.novelInsertions, [b]);
-  assertEquals(result.novelQuadIds, [hashQuad(b)]);
+  expect(result.novelInsertions).toStrictEqual([b]);
+  expect(result.novelQuadIds).toStrictEqual([hashQuad(b)]);
 });
 
-Deno.test("selectNovelQuads - a stored quad deleted in the same patch is novel again", async () => {
+test("selectNovelQuads - a stored quad deleted in the same patch is novel again", async () => {
   const prepared = preparePatch({ insertions: [a, b], deletions: [a] });
   const result = await selectNovelQuads(prepared, {
     lookupExisting: storing([hashQuad(a), hashQuad(b)]),
   });
-  assertEquals(result.novelInsertions, [a]);
+  expect(result.novelInsertions).toStrictEqual([a]);
 });
 
-Deno.test("selectNovelQuads - replacing treats nothing as existing and skips the lookup", async () => {
+test("selectNovelQuads - replacing treats nothing as existing and skips the lookup", async () => {
   let lookups = 0;
   const result = await selectNovelQuads(
     preparePatch({ insertions: [a, b], deletions: [] }),
@@ -62,11 +62,11 @@ Deno.test("selectNovelQuads - replacing treats nothing as existing and skips the
       },
     },
   );
-  assertEquals(result.novelInsertions, [a, b]);
-  assertEquals(lookups, 0);
+  expect(result.novelInsertions).toStrictEqual([a, b]);
+  expect(lookups).toStrictEqual(0);
 });
 
-Deno.test("selectNovelQuads - no insertions means no lookup", async () => {
+test("selectNovelQuads - no insertions means no lookup", async () => {
   let lookups = 0;
   const result = await selectNovelQuads(
     preparePatch({ insertions: [], deletions: [a] }),
@@ -77,11 +77,11 @@ Deno.test("selectNovelQuads - no insertions means no lookup", async () => {
       },
     },
   );
-  assertEquals(result, { novelInsertions: [], novelQuadIds: [] });
-  assertEquals(lookups, 0);
+  expect(result).toStrictEqual({ novelInsertions: [], novelQuadIds: [] });
+  expect(lookups).toStrictEqual(0);
 });
 
-Deno.test("selectNovelQuads - keyOf swaps the identity used for lookup and deletion", async () => {
+test("selectNovelQuads - keyOf swaps the identity used for lookup and deletion", async () => {
   const keyOf = (q: rdfjs.Quad) => `${q.subject.value}|${q.object.value}`;
   const seen: string[][] = [];
   const result = await selectNovelQuads(
@@ -94,11 +94,11 @@ Deno.test("selectNovelQuads - keyOf swaps the identity used for lookup and delet
       },
     },
   );
-  assertEquals(seen, [["urn:a|a", "urn:b|b"]]);
-  assertEquals(result.novelInsertions, [b]);
+  expect(seen).toStrictEqual([["urn:a|a", "urn:b|b"]]);
+  expect(result.novelInsertions).toStrictEqual([b]);
 });
 
-Deno.test("selectNovelQuads - passes duplicates to the lookup and keeps each novel copy", async () => {
+test("selectNovelQuads - passes duplicates to the lookup and keeps each novel copy", async () => {
   const seen: string[][] = [];
   const result = await selectNovelQuads(
     preparePatch({ insertions: [a, a], deletions: [] }),
@@ -109,17 +109,14 @@ Deno.test("selectNovelQuads - passes duplicates to the lookup and keeps each nov
       },
     },
   );
-  assertEquals(seen[0]!.length, 2);
-  assertEquals(result.novelInsertions, [a, a]);
+  expect(seen[0]!.length).toStrictEqual(2);
+  expect(result.novelInsertions).toStrictEqual([a, a]);
 });
 
-Deno.test("selectNovelQuads - a failing lookup rejects", async () => {
-  await assertRejects(
-    () =>
-      selectNovelQuads(preparePatch({ insertions: [a], deletions: [] }), {
-        lookupExisting: () => Promise.reject(new Error("db down")),
-      }),
-    Error,
-    "db down",
-  );
+test("selectNovelQuads - a failing lookup rejects", async () => {
+  await expect(
+    selectNovelQuads(preparePatch({ insertions: [a], deletions: [] }), {
+      lookupExisting: () => Promise.reject(new Error("db down")),
+    }),
+  ).rejects.toThrow("db down");
 });

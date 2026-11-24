@@ -23,15 +23,19 @@ export function createExportRdfTool(client: WorldsSdkInterface) {
     inputSchema: z.object({
       format: z.object({
         kind: z.literal("serialized").describe("Desired output format."),
-        contentType: z.string().optional().describe(
-          "The MIME type of the exported data. Usually 'text/turtle' or 'application/n-triples'.",
-        ),
+        contentType: z
+          .string()
+          .optional()
+          .describe(
+            "The MIME type of the exported data. Usually 'text/turtle' or 'application/n-triples'.",
+          ),
       }),
     }),
     execute: async (request: SerializedExportRequest) => {
       try {
         if (
-          request.format.kind === "serialized" && !request.format.contentType
+          request.format.kind === "serialized" &&
+          !request.format.contentType
         ) {
           request.format.contentType = "text/turtle";
         }

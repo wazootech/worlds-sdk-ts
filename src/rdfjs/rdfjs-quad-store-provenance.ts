@@ -24,11 +24,10 @@ export async function recordPatchProvenance(
     const quadId = safeHashQuad(quad);
     if (quadId !== null) insertionIds.add(quadId);
   }
-  const removedQuads = [...patch.deletions, ...priorQuads]
-    .filter((quad) => {
-      const quadId = safeHashQuad(quad);
-      return quadId !== null && !insertionIds.has(quadId);
-    });
+  const removedQuads = [...patch.deletions, ...priorQuads].filter((quad) => {
+    const quadId = safeHashQuad(quad);
+    return quadId !== null && !insertionIds.has(quadId);
+  });
   const supersededBySpog = new Map(
     removedQuads.map((quad) => [spogKey(quad), hashQuad(quad)]),
   );
@@ -86,9 +85,7 @@ export interface RecordPatchProvenanceOptions {
  * supersession relationship provenance should capture.
  */
 function spogKey(quad: rdfjs.Quad): string {
-  return [
-    quad.subject.value,
-    quad.predicate.value,
-    quad.graph.value,
-  ].join("\u0000");
+  return [quad.subject.value, quad.predicate.value, quad.graph.value].join(
+    "\u0000",
+  );
 }

@@ -49,8 +49,8 @@ export function planSearchIndexing(
   context?: TransactionContext,
   options?: PlanSearchIndexingOptions,
 ): SearchIndexPlan {
-  const effective = mode ?? options?.defaultMode ??
-    DEFAULT_SEARCH_INDEX_ON_IMPORT;
+  const effective =
+    mode ?? options?.defaultMode ?? DEFAULT_SEARCH_INDEX_ON_IMPORT;
   const deferredImport = effective === "deferred" && isImportCommit(context);
   return {
     projectDuringCommit: effective !== "disabled" && !deferredImport,

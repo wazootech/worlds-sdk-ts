@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import { DataFactory, Store } from "n3";
 import type { QuadStoreInterface } from "./quad-store-interface.ts";
 import { RdfjsQuadStore } from "@/rdfjs/rdfjs-quad-store.ts";
@@ -44,7 +44,7 @@ export function registerQuadStoreContractTests(
 ): void {
   const { label, setup } = options;
 
-  Deno.test(`${label} - contract - merge mode retains prior quads`, async () => {
+  test(`${label} - contract - merge mode retains prior quads`, async () => {
     const { store, cleanup } = await setup();
     try {
       await store.import({
@@ -60,13 +60,13 @@ export function registerQuadStoreContractTests(
       if (response.kind !== "quads") {
         throw new Error("Expected quads response");
       }
-      assertEquals(response.quads.length, 2);
+      expect(response.quads.length).toStrictEqual(2);
     } finally {
       if (cleanup) await cleanup();
     }
   });
 
-  Deno.test(`${label} - contract - replace mode leaves only new quads`, async () => {
+  test(`${label} - contract - replace mode leaves only new quads`, async () => {
     const { store, cleanup } = await setup();
     try {
       await store.import({
@@ -82,8 +82,10 @@ export function registerQuadStoreContractTests(
       if (response.kind !== "quads") {
         throw new Error("Expected quads response");
       }
-      assertEquals(response.quads.length, 1);
-      assertEquals(response.quads[0].subject.value, fixtureQuad2.subject.value);
+      expect(response.quads.length).toStrictEqual(1);
+      expect(response.quads[0].subject.value).toStrictEqual(
+        fixtureQuad2.subject.value,
+      );
     } finally {
       if (cleanup) await cleanup();
     }

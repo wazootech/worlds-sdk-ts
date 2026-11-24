@@ -1,4 +1,4 @@
-import { assertEquals, assertNotEquals, assertThrows } from "@std/assert";
+import { expect, test } from "bun:test";
 import type * as rdfjs from "@rdfjs/types";
 import { DataFactory } from "n3";
 import { serializeQuadToCanonicalNQuads } from "./canonical-nquads.ts";
@@ -9,75 +9,77 @@ const s = namedNode("http://example.org/s");
 const p = namedNode("http://example.org/p");
 const XSD = "http://www.w3.org/2001/XMLSchema#";
 
-Deno.test("serializes default-graph quads to RDFC-1.0 canonical N-Quads", () => {
+test("serializes default-graph quads to RDFC-1.0 canonical N-Quads", () => {
   // plain xsd:string literal omits the datatype
-  assertEquals(
+  expect(
     serializeQuadToCanonicalNQuads(quad(s, p, literal("hello"))),
-    '<http://example.org/s> <http://example.org/p> "hello" .\n',
-  );
+  ).toStrictEqual('<http://example.org/s> <http://example.org/p> "hello" .\n');
   // explicit xsd:string is normalized to the plain form
-  assertEquals(
+  expect(
     serializeQuadToCanonicalNQuads(
       quad(s, p, literal("hi", namedNode(XSD + "string"))),
     ),
-    '<http://example.org/s> <http://example.org/p> "hi" .\n',
-  );
+  ).toStrictEqual('<http://example.org/s> <http://example.org/p> "hi" .\n');
   // language-tagged literal
-  assertEquals(
+  expect(
     serializeQuadToCanonicalNQuads(quad(s, p, literal("bonjour", "fr"))),
+  ).toStrictEqual(
     '<http://example.org/s> <http://example.org/p> "bonjour"@fr .\n',
   );
   // non-string datatypes keep their datatype IRI
-  assertEquals(
+  expect(
     serializeQuadToCanonicalNQuads(
       quad(s, p, literal("42", namedNode(XSD + "integer"))),
     ),
+  ).toStrictEqual(
     "<http://example.org/s> <http://example.org/p> " +
       '"42"^^<http://www.w3.org/2001/XMLSchema#integer> .\n',
   );
 });
 
-Deno.test("serializes named graphs and blank nodes", () => {
-  assertEquals(
+test("serializes named graphs and blank nodes", () => {
+  expect(
     serializeQuadToCanonicalNQuads(
       quad(s, p, literal("hello"), namedNode("http://example.org/g")),
     ),
+  ).toStrictEqual(
     '<http://example.org/s> <http://example.org/p> "hello" ' +
       "<http://example.org/g> .\n",
   );
   // blank-node labels are dataset-local and emitted as-is (label-based scheme)
-  assertEquals(
+  expect(
     serializeQuadToCanonicalNQuads(quad(blankNode("b0"), p, literal("hello"))),
-    '_:b0 <http://example.org/p> "hello" .\n',
-  );
+  ).toStrictEqual('_:b0 <http://example.org/p> "hello" .\n');
 });
 
-Deno.test("escapes literal values per the N-Quads grammar", () => {
+test("escapes literal values per the N-Quads grammar", () => {
   // value: a"b\c + newline + d + tab + e + \u0001 + \u007f
-  assertEquals(
+  expect(
     serializeQuadToCanonicalNQuads(
       quad(s, p, literal('a"b\\c\nd\te\u0001\u007f')),
     ),
-    // byte-identical to rdf-canonize (RDFC-1.0) output for this literal
+  ).toStrictEqual(
     "<http://example.org/s> <http://example.org/p> " +
       '"a\\"b\\\\c\\nd\\te\\u0001\\u007F" .\n',
   );
 });
 
-Deno.test("escaping keeps distinct literal values distinct", () => {
+test("escaping keeps distinct literal values distinct", () => {
   // a quote inside the value cannot be confused with the literal delimiter
-  assertNotEquals(
+  expect(
     serializeQuadToCanonicalNQuads(quad(s, p, literal('a"b'))),
+  ).not.toStrictEqual(
     serializeQuadToCanonicalNQuads(quad(s, p, literal("a", "b"))),
   );
   // escape sequences are unambiguous
-  assertNotEquals(
+  expect(
     serializeQuadToCanonicalNQuads(quad(s, p, literal("a\nb"))),
+  ).not.toStrictEqual(
     serializeQuadToCanonicalNQuads(quad(s, p, literal("anb"))),
   );
 });
 
-Deno.test("serializes RDF 1.2 directional literals", () => {
+test("serializes RDF 1.2 directional literals", () => {
   const dirLiteral = {
     termType: "Literal",
     value: "مرحبا",
@@ -87,21 +89,20 @@ Deno.test("serializes RDF 1.2 directional literals", () => {
       "http://www.w3.org/1999/02/22-rdf-syntax-ns#dirLangString",
     ),
   } as unknown as rdfjs.Literal;
-  assertEquals(
-    serializeQuadToCanonicalNQuads(quad(s, p, dirLiteral)),
+  expect(serializeQuadToCanonicalNQuads(quad(s, p, dirLiteral))).toStrictEqual(
     '<http://example.org/s> <http://example.org/p> "مرحبا"@ar--rtl .\n',
   );
 });
 
-Deno.test("rejects RDF-star triple terms and variables", () => {
-  assertThrows(() =>
+test("rejects RDF-star triple terms and variables", () => {
+  expect(() =>
     serializeQuadToCanonicalNQuads(
       quad(quad(s, p, literal("x")), p, literal("o")),
-    )
-  );
-  assertThrows(() =>
+    ),
+  ).toThrow();
+  expect(() =>
     serializeQuadToCanonicalNQuads(
       quad(s, p, literal("o"), DataFactory.variable("g")),
-    )
-  );
+    ),
+  ).toThrow();
 });

@@ -29,7 +29,7 @@ export async function laterWriteFailureCase(ctx: CaseContext): Promise<void> {
   subject.failLaterWrite();
   if (
     !(await rejects(() =>
-      subject.commit(insertPatch(f.one, f.two), mergeImport)
+      subject.commit(insertPatch(f.one, f.two), mergeImport),
     ))
   ) {
     ctx.fail("later-write failure: expected the commit to reject");
@@ -37,7 +37,8 @@ export async function laterWriteFailureCase(ctx: CaseContext): Promise<void> {
   const stored = await storedIds(subject);
   const chunked = [...new Set(await subject.chunkedQuadIds())].sort();
   const prior = sortedIds([f.base]);
-  const keeps = !ctx.contract.atomic &&
+  const keeps =
+    !ctx.contract.atomic &&
     ctx.contract.laterWriteFailure === "keeps-written-quads";
   if (!stored.includes(prior[0]!)) {
     ctx.fail("later-write failure: the previously committed quad must survive");

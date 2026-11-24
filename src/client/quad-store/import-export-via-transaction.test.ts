@@ -1,4 +1,4 @@
-import { assertEquals } from "@std/assert";
+import { expect, test } from "bun:test";
 import { DataFactory } from "n3";
 import type * as rdfjs from "@rdfjs/types";
 import type { TransactionContext } from "@/client/quad-store/transaction-context.ts";
@@ -47,7 +47,7 @@ function createRecordingTransaction(): {
   };
 }
 
-Deno.test("importViaTransaction - buffers quads and commits with merge mode", async () => {
+test("importViaTransaction - buffers quads and commits with merge mode", async () => {
   const recording = createRecordingTransaction();
 
   await importViaTransaction(
@@ -58,11 +58,11 @@ Deno.test("importViaTransaction - buffers quads and commits with merge mode", as
     { createTransaction: recording.createTransaction },
   );
 
-  assertEquals(recording.bufferedQuads().length, 2);
-  assertEquals(recording.lastCommitContext()?.importMode, "merge");
+  expect(recording.bufferedQuads().length).toStrictEqual(2);
+  expect(recording.lastCommitContext()?.importMode).toStrictEqual("merge");
 });
 
-Deno.test("importViaTransaction - defaults mode to merge", async () => {
+test("importViaTransaction - defaults mode to merge", async () => {
   const recording = createRecordingTransaction();
 
   await importViaTransaction(
@@ -70,10 +70,10 @@ Deno.test("importViaTransaction - defaults mode to merge", async () => {
     { createTransaction: recording.createTransaction },
   );
 
-  assertEquals(recording.lastCommitContext()?.importMode, "merge");
+  expect(recording.lastCommitContext()?.importMode).toStrictEqual("merge");
 });
 
-Deno.test("importViaTransaction - passes replace mode to commit context", async () => {
+test("importViaTransaction - passes replace mode to commit context", async () => {
   const recording = createRecordingTransaction();
 
   await importViaTransaction(
@@ -81,5 +81,5 @@ Deno.test("importViaTransaction - passes replace mode to commit context", async 
     { createTransaction: recording.createTransaction },
   );
 
-  assertEquals(recording.lastCommitContext()?.importMode, "replace");
+  expect(recording.lastCommitContext()?.importMode).toStrictEqual("replace");
 });

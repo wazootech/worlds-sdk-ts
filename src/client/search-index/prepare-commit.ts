@@ -102,19 +102,23 @@ export async function prepareCommit(
     defaultMode: options.defaultMode,
   });
   const projecting = plan.projectDuringCommit ? projection : undefined;
-  const novel = options.selectNovel === "when-projecting" && !projecting
-    ? { novelInsertions: [], novelQuadIds: [] }
-    : await selectNovelQuads(prepared, {
-      replacing,
-      keyOf: options.keyOf,
-      lookupExisting: options.lookupExisting,
-    });
-  const rows = projecting && novel.novelQuadIds.length > 0
-    ? (await chunkAndEmbedQuads(
-      novel.novelInsertions,
-      novel.novelQuadIds,
-      projecting,
-    )).rows
-    : [];
+  const novel =
+    options.selectNovel === "when-projecting" && !projecting
+      ? { novelInsertions: [], novelQuadIds: [] }
+      : await selectNovelQuads(prepared, {
+          replacing,
+          keyOf: options.keyOf,
+          lookupExisting: options.lookupExisting,
+        });
+  const rows =
+    projecting && novel.novelQuadIds.length > 0
+      ? (
+          await chunkAndEmbedQuads(
+            novel.novelInsertions,
+            novel.novelQuadIds,
+            projecting,
+          )
+        ).rows
+      : [];
   return { prepared, plan, novel, rows, replacing };
 }

@@ -14,8 +14,7 @@ if (import.meta.main) {
   await client.import({
     source: {
       kind: "serialized",
-      data:
-        `<http://example.com/subject> <http://example.com/predicate> "Hello, World!" .`,
+      data: `<http://example.com/subject> <http://example.com/predicate> "Hello, World!" .`,
       contentType: "text/turtle",
     },
   });

@@ -446,8 +446,8 @@ this repo's specifics:
 - Before pushing, run `bun run ci` (fmt, lint, check, manifests, test).
 - `bun run lint` (Oxlint) keeps `typescript/no-explicit-any` on; use real types or `unknown`.
 - `@ts-ignore` is not used; prefer `@ts-expect-error` with a reason.
-- Actions are pinned to commit SHAs, and CI pins Bun to `1.4.5` (`.github/workflows/ci.yml`, `package.json`
-  `packageManager`).
+- Actions are pinned to commit SHAs, and CI floats Bun on `1.x` so regressions surface early (`.github/workflows/ci.yml`; `package.json`
+  `packageManager` records the minimum, 1.4.5).
 - `secret-scan.yml` (gitleaks) runs on every PR; `code-health.yml` fails any
   source file over 120 lines of code (300 for tests; blank, comment, and import
   lines excluded) unless it is on the short allowlist in the workflow (it may

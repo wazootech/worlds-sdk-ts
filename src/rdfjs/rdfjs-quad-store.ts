@@ -12,12 +12,16 @@ import {
   exportFromRdfjsStore,
   hashQuad,
   importViaTransaction,
+  InMemoryChangeLogStore,
   InMemoryProvenanceStore,
+  recordPatchChangeLog,
   Transaction,
 } from "@/client/quad-store/mod.ts";
 import { MemoryStore } from "@wazoo/sparql-engine";
 import type { RdfjsStoreLike } from "@/client/quad-store/rdfjs-store-like.ts";
 import type {
+  ChangeLogEntry,
+  ChangeLogStore,
   ProvenanceQueryRequest,
   ProvenanceQueryResponse,
   ProvenanceStore,
@@ -45,6 +49,18 @@ export interface RdfjsQuadStoreOptions {
    * Defaults to an InMemoryProvenanceStore scoped to this store instance.
    */
   provenanceStore?: ProvenanceStore;
+
+  /**
+   * changeLogEnabled turns on the opt-in change log for this store.
+   * Defaults to false; worlds that do not need history pay no storage.
+   */
+  changeLogEnabled?: boolean;
+
+  /**
+   * changeLogStore optionally overrides the append-only change-log store.
+   * Defaults to an InMemoryChangeLogStore scoped to this store instance.
+   */
+  changeLogStore?: ChangeLogStore;
 }
 
 /**
@@ -52,10 +68,15 @@ export interface RdfjsQuadStoreOptions {
  * an underlying in-memory or compatible RDFJS Store. Every commit records
  * sidecar provenance: write records for insertions, removal tombstones for
  * deletions and replace-mode wipes, and supersedesQuadId links when a commit
- * replaces a quad sharing subject, predicate, and graph.
+ * replaces a quad sharing subject, predicate, and graph. When changeLogEnabled
+ * is true, every commit also records append-only change-log entries (add and
+ * remove operations with transaction id, time, actor, and source) after the
+ * commit handler succeeds, so a failed commit writes no log rows.
  */
 export class RdfjsQuadStore implements QuadStoreInterface {
   public readonly provenanceStore: ProvenanceStore;
+  public readonly changeLogStore: ChangeLogStore;
+  public readonly changeLogEnabled: boolean;
 
   private readonly store: RdfjsStoreLike;
 
@@ -63,6 +84,9 @@ export class RdfjsQuadStore implements QuadStoreInterface {
     this.store = options?.store ?? new MemoryStore();
     this.provenanceStore =
       options?.provenanceStore ?? new InMemoryProvenanceStore();
+    this.changeLogStore =
+      options?.changeLogStore ?? new InMemoryChangeLogStore();
+    this.changeLogEnabled = options?.changeLogEnabled ?? false;
   }
 
   public async import(request: ImportRequest): Promise<void> {
@@ -78,6 +102,9 @@ export class RdfjsQuadStore implements QuadStoreInterface {
                 : [];
             await commitHandler(patch, context);
             await this.recordProvenance(patch, context, priorQuads);
+            if (this.changeLogEnabled) {
+              await this.recordChangeLog(patch, context, priorQuads);
+            }
           },
         }),
     });
@@ -124,6 +151,25 @@ export class RdfjsQuadStore implements QuadStoreInterface {
       provenanceStore: this.provenanceStore,
       patch,
       context,
+      priorQuads,
+    });
+  }
+
+  /**
+   * recordChangeLog appends one change-log entry per added or removed quad
+   * in the patch, grouped under one fresh transaction id. It runs only after
+   * the commit handler succeeds, so a failed commit writes no log rows.
+   */
+  private recordChangeLog(
+    patch: import("@/client/quad-store/mod.ts").Patch,
+    context?: TransactionContext,
+    priorQuads: rdfjs.Quad[] = [],
+  ): Promise<ChangeLogEntry[]> {
+    return recordPatchChangeLog({
+      changeLogStore: this.changeLogStore,
+      patch,
+      context,
+      transactionId: crypto.randomUUID(),
       priorQuads,
     });
   }

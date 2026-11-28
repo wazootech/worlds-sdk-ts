@@ -1,6 +1,6 @@
 {
   "name": "@worlds/sdk",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "exports": {
     ".": "./src/mod.ts",
     "./quad-store": "./src/client/quad-store/mod.ts",
@@ -21,7 +21,8 @@
       "bunfig.toml",
       "package.json",
       "tsconfig.json",
-      ".oxlintrc.json"
+      ".oxlintrc.json",
+      "scripts/check-manifests.ts"
     ]
   },
   "imports": {

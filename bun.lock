@@ -126,7 +126,7 @@
 
     "@vercel/oidc": ["@vercel/oidc@3.2.0", "", {}, "sha512-UycprH3T6n3jH0k44NHMa7pnFHGu/N05MjojYr+Mc6I7obkoLIJujSWwin1pCvdy/eOxrI/l3uDLQsmcrOb4ug=="],
 
-    "@wazoo/sparql-engine": ["@jsr/wazoo__sparql-engine@0.5.1", "https://npm.jsr.io/~/11/@jsr/wazoo__sparql-engine/0.5.1.tgz", { "dependencies": { "@rdfjs/types": "^2.0.1" } }, "sha512-moFAPS6D61w6gVNLCf+eG5kPhlBrWKzQ6OQMgcWZAqm8GxDH6Z9XMucDhUnX1ugszhaeKkokeJUJmv4tzmKj6Q=="],
+    "@wazoo/sparql-engine": ["@jsr/wazoo__sparql-engine@0.5.4", "https://npm.jsr.io/~/11/@jsr/wazoo__sparql-engine/0.5.4.tgz", { "dependencies": { "@rdfjs/types": "^2.0.1" } }, "sha512-oLY76/L1ffHtw35izwYmM9iLqYx4qXeGeNfNydvU56FDjzw+kW131sgYGztWSTfF3hgpgG1+9HmXoqfQed2eZA=="],
 
     "@webgpu/types": ["@webgpu/types@0.1.38", "", {}, "sha512-7LrhVKz2PRh+DD7+S+PVaFd5HxaWQvoMqBbsV9fNJO1pjUs1P8bM2vQVNfk+3URTqbuTI7gkXi0rfsN0IadoBA=="],
 

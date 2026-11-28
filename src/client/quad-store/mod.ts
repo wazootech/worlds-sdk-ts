@@ -1,5 +1,6 @@
 export * from "./quad-store-interface.ts";
 export * from "./provenance/mod.ts";
+export * from "./change-log/mod.ts";
 export * from "./patch.ts";
 export * from "./transaction-context.ts";
 export * from "./quad-filter.ts";
